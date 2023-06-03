@@ -1,0 +1,36 @@
+AddCSLuaFile()
+
+SWEP.Base 					= "hvh_base"
+
+SWEP.PrintName 				= "P228"	
+SWEP.Alias 					= "p228"
+SWEP.IconLetter				= "a"
+SWEP.CanBuy        		 	= true
+
+if CLIENT then
+	killicon.AddFont( "hvh_p228", "HvH_KillIcon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+end
+
+SWEP.Slot					= WPNSLOT_SECONDARY
+SWEP.Weight					= 5
+SWEP.ViewModelFlip			= true
+SWEP.CSMuzzleFlashes 		= true
+SWEP.CSMuzzleX 				= false
+SWEP.HoldType				= "pistol"
+SWEP.ViewModel				= "models/weapons/v_pist_p228.mdl"	
+SWEP.WorldModel				= "models/weapons/w_pist_p228.mdl"	
+
+SWEP.Primary.Sound			= Sound( "weapons/p228/p228-1.wav" )
+SWEP.Primary.Recoil			= 2
+SWEP.Primary.Damage			= 40
+SWEP.Primary.NumShots		= 1
+SWEP.Primary.Cone			= 0.032
+SWEP.Primary.Delay			= 0.15
+SWEP.Primary.Range			= 4096
+SWEP.Primary.RangeModifier	= 0.8
+SWEP.Primary.ArmorRatio		= 1.25
+
+SWEP.Primary.ClipSize		= 13
+SWEP.Primary.DefaultClip	= 13
+SWEP.Primary.Automatic		= false
+SWEP.Primary.Ammo			= "BULLET_PLAYER_357SIG"

@@ -1,0 +1,8 @@
+"hvh"
+{
+	"base"			"base"
+	"title"			"Hack vs Hack"
+	"category"		"pvp"
+	"maps"			"^aim_|^hvh_"
+	"menusystem"	"0"
+}
