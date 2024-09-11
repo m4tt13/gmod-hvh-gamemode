@@ -20,7 +20,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_mach_m249para.mdl"	
 SWEP.WorldModel				= "models/weapons/w_mach_m249para.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/m249/m249-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_M249.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 32
 SWEP.Primary.NumShots		= 1

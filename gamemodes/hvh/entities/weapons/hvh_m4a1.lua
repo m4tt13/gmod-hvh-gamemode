@@ -20,8 +20,8 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_m4a1.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_m4a1.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/m4a1/m4a1_unsil-1.wav" )
-SWEP.Primary.SoundSilencer	= Sound( "weapons/m4a1/m4a1-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_M4A1.Single" )
+SWEP.Primary.SoundSilenced	= Sound( "Weapon_M4A1.Silenced" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 33
 SWEP.Primary.NumShots		= 1
@@ -66,7 +66,7 @@ function SWEP:PrimaryAttack()
 		cone = 0.015
 	end
 
-	self:EmitSound( self:GetSilencerOn() && self.Primary.SoundSilencer || self.Primary.Sound )
+	self:EmitSound( self:GetSilencerOn() && self.Primary.SoundSilenced || self.Primary.Sound )
 
 	self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, cone )
 

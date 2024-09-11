@@ -20,7 +20,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_sg552.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_sg552.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/sg552/sg552-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_SG552.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 33
 SWEP.Primary.NumShots		= 1

@@ -20,7 +20,7 @@ SWEP.HoldType				= "revolver"
 SWEP.ViewModel				= "models/weapons/v_pist_deagle.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_deagle.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/deagle/deagle-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_DEagle.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 54
 SWEP.Primary.NumShots		= 1

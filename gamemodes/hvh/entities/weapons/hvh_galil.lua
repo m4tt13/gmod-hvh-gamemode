@@ -20,7 +20,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_galil.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_galil.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/galil/galil-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_Galil.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 30
 SWEP.Primary.NumShots		= 1

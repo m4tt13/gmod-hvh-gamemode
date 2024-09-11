@@ -1,15 +1,11 @@
 CreateConVar( "mp_vaulting_anim", "0", FCVAR_REPLICATED )
 CreateConVar( "mp_typing_anim", "0", FCVAR_REPLICATED )
 
-function GM:HandlePlayerVaulting( ply, velocity )
+function GM:HandlePlayerVaulting( ply, velocity, plyTable )
 
-	if ( !GetConVar( "mp_vaulting_anim" ):GetBool() ) then return end
-	if ( velocity:LengthSqr() < 1000000 ) then return end
-	if ( ply:IsOnGround() ) then return end
-
-	ply.CalcIdeal = ACT_MP_SWIM
-
-	return true
+	if ( GetConVarNumber( "mp_vaulting_anim" ) == 0 ) then return end
+	
+	return BaseClass.HandlePlayerVaulting( self, ply, velocity, plyTable )
 
 end
 
@@ -27,7 +23,7 @@ function GM:UpdateAnimation( ply, velocity, maxseqgroundspeed )
 	-- if we're under water we want to constantly be swimming..
 	if ( ply:WaterLevel() >= 2 ) then
 		rate = math.max( rate, 0.5 )
-	elseif ( GetConVar( "mp_vaulting_anim" ):GetBool() && !ply:IsOnGround() && len >= 1000 ) then
+	elseif ( GetConVarNumber( "mp_vaulting_anim" ) != 0 && !ply:IsOnGround() && len >= 1000 ) then
 		rate = 0.1
 	end
 
@@ -54,11 +50,17 @@ function GM:UpdateAnimation( ply, velocity, maxseqgroundspeed )
 
 		end
 		
-		if ( GetConVar( "mp_typing_anim" ):GetBool() ) then
-			GAMEMODE:GrabEarAnimation( ply )
-		end
-		
+		GAMEMODE:GrabEarAnimation( ply )
 		GAMEMODE:MouthMoveAnimation( ply )
+
 	end
+
+end
+
+function GM:GrabEarAnimation( ply, plyTable )
+
+	if ( GetConVarNumber( "mp_typing_anim" ) == 0 ) then return end
+
+	BaseClass.GrabEarAnimation( self, ply, plyTable )
 
 end

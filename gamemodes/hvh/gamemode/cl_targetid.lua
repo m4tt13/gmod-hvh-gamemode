@@ -34,9 +34,9 @@ function GM:HUDDrawTargetID()
 	surface.SetFont( font )
 	local w, h = surface.GetTextSize( text )
 	
-	local MouseX, MouseY = gui.MousePos()
+	local MouseX, MouseY = input.GetCursorPos()
 	
-	if ( MouseX == 0 && MouseY == 0 ) then
+	if ( MouseX == 0 && MouseY == 0 || !vgui.CursorVisible() ) then
 	
 		MouseX = ScrW() / 2
 		MouseY = ScrH() / 2
@@ -55,12 +55,12 @@ function GM:HUDDrawTargetID()
 	
 	y = y + h + 5
 	
-	local text = trace.Entity:Health() .. "%"
-	local font = "TargetIDSmall"
+	text = trace.Entity:Health() .. "%"
+	font = "TargetIDSmall"
 	
 	surface.SetFont( font )
-	local w, h = surface.GetTextSize( text )
-	local x = MouseX - w / 2
+	w, h = surface.GetTextSize( text )
+	x = MouseX - w / 2
 	
 	draw.SimpleText( text, font, x + 1, y + 1, Color( 0, 0, 0, 120 ) )
 	draw.SimpleText( text, font, x + 2, y + 2, Color( 0, 0, 0, 50 ) )

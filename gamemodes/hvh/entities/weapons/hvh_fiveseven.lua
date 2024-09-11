@@ -20,7 +20,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_fiveseven.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_fiveseven.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/fiveseven/fiveseven-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_FiveSeven.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 25
 SWEP.Primary.NumShots		= 1

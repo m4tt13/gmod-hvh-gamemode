@@ -20,7 +20,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_smg_mac10.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_mac10.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/mac10/mac10-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_MAC10.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 29
 SWEP.Primary.NumShots		= 1

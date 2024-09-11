@@ -4,6 +4,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
+GM.Version = "1.1"
 
 GM.TeamBased = true
 
@@ -54,11 +55,11 @@ end
 
 function GM:GetMapRemainingTime()
 
-	if ( GetConVar( "nextlevel" ):GetString() != "" ) then
+	if ( GetConVarString( "nextlevel" ) != "" ) then
 		return 0
 	end
 
-	local timelimit = GetConVar( "mp_timelimit" ):GetInt()
+	local timelimit = GetConVarNumber( "mp_timelimit" )
 
 	if ( timelimit <= 0 ) then
 		return -1

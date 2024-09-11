@@ -20,8 +20,8 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_usp.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_usp.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/usp/usp_unsil-1.wav" )
-SWEP.Primary.SoundSilencer	= Sound( "weapons/usp/usp1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_USP.Single" )
+SWEP.Primary.SoundSilenced	= Sound( "Weapon_USP.SilencedShot" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 34
 SWEP.Primary.NumShots		= 1
@@ -70,7 +70,7 @@ function SWEP:PrimaryAttack()
 		
 	end
 
-	self:EmitSound( self:GetSilencerOn() && self.Primary.SoundSilencer || self.Primary.Sound )
+	self:EmitSound( self:GetSilencerOn() && self.Primary.SoundSilenced || self.Primary.Sound )
 
 	self:ShootBullet( damage, self.Primary.NumShots, cone )
 

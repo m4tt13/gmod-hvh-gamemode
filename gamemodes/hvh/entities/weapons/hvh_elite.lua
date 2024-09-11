@@ -20,7 +20,7 @@ SWEP.HoldType				= "duel"
 SWEP.ViewModel				= "models/weapons/v_pist_elite.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_elite.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/elite/elite-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_Elite.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 45
 SWEP.Primary.NumShots		= 1

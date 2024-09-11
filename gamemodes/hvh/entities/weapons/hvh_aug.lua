@@ -20,7 +20,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_aug.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_aug.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/aug/aug-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_AUG.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 32
 SWEP.Primary.NumShots		= 1

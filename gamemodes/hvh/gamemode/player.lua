@@ -166,6 +166,8 @@ end
 function GM:PlayerPostThink( ply )
 
 	ValidateCurObsTarget( ply )
+	
+	Menu_Display( ply )
 
 end
 
@@ -178,6 +180,8 @@ end
 function GM:PlayerDisconnected( ply )
 
 	Stats_SavePlayer( ply )
+	
+	VoteMap_OnPlayerDisconnected( ply )
 
 	ply:SetTeam( TEAM_UNASSIGNED )
 
@@ -262,7 +266,7 @@ concommand.Add( "giveweapon", function( pl, cmd, args ) GiveWeapon( pl, args[1],
 
 local function PlayerFloodCheck( ply )
 
-	local maxChat = GetConVar( "mp_flood_time" ):GetFloat()
+	local maxChat = GetConVarNumber( "mp_flood_time" )
 	
 	if ( maxChat <= 0 ) then
 		return false
@@ -324,7 +328,7 @@ function GM:PlayerSay( ply, text, teamonly )
 
 	if ( ltext == "nextmap" ) then
 	
-		local nextmap = GetConVar( "nextlevel" ):GetString()
+		local nextmap = GetConVarString( "nextlevel" )
 		
 		if ( nextmap == "" ) then
 			nextmap = game.GetMapNext()
@@ -338,7 +342,7 @@ function GM:PlayerSay( ply, text, teamonly )
 	
 	elseif ( ltext == "timeleft" ) then
 	
-		if ( GetConVar( "mp_timelimit" ):GetInt() > 0 ) then
+		if ( GetConVarNumber( "mp_timelimit" ) > 0 ) then
 		
 			local TimeLeft = GAMEMODE:GetMapRemainingTime()
 			
@@ -361,6 +365,10 @@ function GM:PlayerSay( ply, text, teamonly )
 	elseif ( ltext == "top" || ltext == "top10" ) then
 		
 		Stats_ShowTopPlayers( ply )
+		
+	elseif ( ltext == "votemap" ) then
+		
+		VoteMap_ShowMenu( ply )
 		
 	elseif ( prefix ) then
 	
@@ -407,6 +415,8 @@ function GM:PlayerSilentDeath( victim )
 
 end
 
+DEATH_NOTICE_HEADSHOT = 4
+
 function GM:PlayerDeath( ply, inflictor, attacker )
 
 	ply.NextSpawnTime = CurTime() + 2
@@ -439,9 +449,7 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 
 	if ( attacker == ply ) then
 
-		net.Start( "PlayerKilledSelf" )
-			net.WriteEntity( ply )
-		net.Broadcast()
+		self:SendDeathNotice( nil, "suicide", ply, 0 )
 
 		MsgAll( attacker:Nick() .. " suicided!\n" )
 
@@ -450,15 +458,11 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 	end
 
 	if ( attacker:IsPlayer() ) then
-
-		net.Start( "PlayerKilledByPlayer" )
-
-			net.WriteEntity( ply )
-			net.WriteString( inflictor:GetClass() )
-			net.WriteEntity( attacker )
-			net.WriteBool( isHeadshot )
-
-		net.Broadcast()
+		
+		local flags = 0
+		if ( isHeadshot ) then flags = flags + DEATH_NOTICE_HEADSHOT end
+		
+		self:SendDeathNotice( attacker, inflictor:GetClass(), ply, flags )
 
 		MsgAll( attacker:Nick() .. " killed " .. ply:Nick() .. " using " .. inflictor:GetClass() .. "\n" )
 
@@ -466,13 +470,7 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 		
 	end
 
-	net.Start( "PlayerKilled" )
-
-		net.WriteEntity( ply )
-		net.WriteString( inflictor:GetClass() )
-		net.WriteString( attacker:GetClass() )
-
-	net.Broadcast()
+	self:SendDeathNotice( self:GetDeathNoticeEntityName( attacker ), inflictor:GetClass(), ply, 0 )
 
 	MsgAll( ply:Nick() .. " was killed by " .. attacker:GetClass() .. "\n" )
 
@@ -520,7 +518,7 @@ local function SetUpPlayerVars( ply )
 	ply:SetCrouchedWalkSpeed( 0.3 )
 	ply:SetDuckSpeed( 0.3 )
 	ply:SetUnDuckSpeed( 0.2 )
-	ply:SetJumpPower( GetConVar( "sv_jump_impulse" ):GetFloat() )
+	ply:SetJumpPower( GetConVarNumber( "sv_jump_impulse" ) )
 	ply:AllowFlashlight( true )
 	ply:SetMaxHealth( 100 )
 	ply:SetMaxArmor( 100 )
@@ -530,11 +528,11 @@ local function SetUpPlayerVars( ply )
 	ply:SetNoCollideWithTeammates( false )
 	ply:SetAvoidPlayers( false )
 	
-	if ( GetConVar( "sv_noplayercollision" ):GetBool() ) then
+	if ( GetConVarNumber( "sv_noplayercollision" ) != 0 ) then
 		ply:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 	end
 	
-	if ( GetConVar( "sv_nodamageforces" ):GetBool() ) then
+	if ( GetConVarNumber( "sv_nodamageforces" ) != 0 ) then
 		ply:AddEFlags( EFL_NO_DAMAGE_FORCES ) 
 	end
 
@@ -626,13 +624,13 @@ end
 
 function GM:PlayerDeathSound()
 
-	return !GetConVar( "mp_deathsound" ):GetBool()
+	return GetConVarNumber( "mp_deathsound" ) == 0
 	
 end
 
 function GM:PlayerSwitchFlashlight( ply, enabled )
 
-	if ( enabled && !GetConVar( "mp_flashlight" ):GetBool() ) then
+	if ( enabled && GetConVarNumber( "mp_flashlight" ) == 0 ) then
 		return false
 	end
 
@@ -649,7 +647,7 @@ function GM:PlayerCanJoinTeam( ply, teamid )
 		
 	end
 	
-	local TimeBetweenSwitches = GetConVar( "mp_teamswitch_cooldown" ):GetFloat()
+	local TimeBetweenSwitches = GetConVarNumber( "mp_teamswitch_cooldown" )
 
 	if ( TimeBetweenSwitches > 0 && ply.LastTeamSwitch ) then
 	
@@ -720,7 +718,7 @@ local function PlayerCanRespawn( ply )
 			return false
 		end
 		
-		if ( CurTime() > ( GAMEMODE:GetRoundStartTime() + GetConVar( "mp_join_grace_time" ):GetFloat() ) ) then
+		if ( CurTime() > ( GAMEMODE:GetRoundStartTime() + GetConVarNumber( "mp_join_grace_time" ) ) ) then
 			return false
 		end
 		
@@ -756,13 +754,13 @@ end
 
 function GM:GetFallDamage( ply, flFallSpeed )
 
-	return BaseClass.GetFallDamage( self, ply, flFallSpeed ) * GetConVar( "sv_falldamage_scale" ):GetFloat()
+	return BaseClass.GetFallDamage( self, ply, flFallSpeed ) * GetConVarNumber( "sv_falldamage_scale" )
 
 end
 
 function GM:PlayerShouldTaunt( ply, actid )
 
-	return GetConVar( "mp_allowtaunts" ):GetBool()
+	return GetConVarNumber( "mp_allowtaunts" ) != 0
 
 end
 
@@ -815,14 +813,14 @@ local hitgroup_dmgscale = {
 
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( hitgroup != HITGROUP_HEAD && GetConVar( "mp_damage_headshot_only" ):GetBool() ) then
+	if ( hitgroup != HITGROUP_HEAD && GetConVarNumber( "mp_damage_headshot_only" ) != 0 ) then
 		return true
 	end
 
 	local dmgscale = hitgroup_dmgscale[hitgroup]
 	
 	if ( dmgscale ) then
-		dmginfo:ScaleDamage( GetConVar( dmgscale ):GetFloat() )
+		dmginfo:ScaleDamage( GetConVarNumber( dmgscale ) )
 	end
 
 	return false
@@ -831,7 +829,7 @@ end
 
 function GM:PlayerShouldTakeDamage( ply, attacker )
 
-	if ( !GetConVar( "mp_friendlyfire" ):GetBool() ) then
+	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
 	
 		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
 			return false
@@ -854,72 +852,50 @@ local hitgroup_armored = {
 
 }
 
-local NEW_ARMOR = nil
+function GM:HandlePlayerArmorReduction( ply, dmginfo )
 
-function GM:EntityTakeDamage( target, dmg )
+	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 || !hitgroup_armored[ ply:LastHitGroup() ] ) then return end
 
-	if ( target:IsPlayer() &&
-		target:Alive() &&
-		!target:HasGodMode() &&
-		target:Armor() > 0 && 
-		hitgroup_armored[ target:LastHitGroup() ] &&
-		dmg:GetDamage() > 0 && 
-		!( dmg:IsDamageType( DMG_FALL ) || dmg:IsDamageType( DMG_DROWN ) ) ) then
+	local armorBonus = 0.5
+	local armorRatio = 0.5
+	
+	local attacker = dmginfo:GetAttacker()
+	
+	if ( IsValid( attacker ) && attacker:IsPlayer() ) then
 		
-		local attacker = dmg:GetAttacker()
+		local weapon = attacker:GetActiveWeapon()
 		
-		if ( IsValid( attacker ) && attacker:IsPlayer() && hook.Run( "PlayerShouldTakeDamage", target, attacker ) ) then
-		
-			local weapon = attacker:GetActiveWeapon()
-			
-			if ( IsValid( weapon ) && weapon.Primary && weapon.Primary.ArmorRatio ) then
-			
-				local armorBonus = 0.5
-				local armorRatio = 0.5 * weapon.Primary.ArmorRatio
-				local damage = dmg:GetDamage()
-				local damageToHealth = damage * armorRatio
-				local damageToArmor = ( damage - damageToHealth ) * armorBonus
-				local armor = target:Armor()
-
-				if ( damageToArmor > armor ) then
-
-					damageToHealth = damage - ( armor / armorBonus )
-					damageToArmor = armor
-					armor = 0
-
-				else
-
-					if ( damageToArmor < 0 ) then
-						damageToArmor = 1
-					end
-
-					armor = armor - damageToArmor
-				
-				end
-				
-				NEW_ARMOR = math.floor( armor )
-				target:SetArmor( 0 )
-				
-				damage = damageToHealth
-				dmg:SetDamage( damage )
-				
-			end
-		
+		if ( IsValid( weapon ) && weapon.Primary && weapon.Primary.ArmorRatio ) then
+			armorRatio = armorRatio * weapon.Primary.ArmorRatio
 		end
 		
 	end
+	
+	local damage = dmginfo:GetDamage()
+	local damageToHealth = damage * armorRatio
+	local damageToArmor = ( damage - damageToHealth ) * armorBonus
+	local armor = ply:Armor()
 
-	return false
+	if ( damageToArmor > armor ) then
 
-end
+		damageToHealth = damage - ( armor / armorBonus )
+		damageToArmor = armor
+		armor = 0
 
-function GM:PostEntityTakeDamage( ent, dmg, took )
+	else
 
-	if ( ent:IsPlayer() && ent:Alive() && NEW_ARMOR != nil ) then
-		ent:SetArmor( NEW_ARMOR )
+		if ( damageToArmor < 0 ) then
+			damageToArmor = 1
+		end
+		
+		armor = armor - damageToArmor
+
 	end
 	
-	NEW_ARMOR = nil
+	ply:SetArmor( armor )
+	
+	damage = damageToHealth
+	dmginfo:SetDamage( damage )
 
 end
 

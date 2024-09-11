@@ -12,6 +12,7 @@ if CLIENT then
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.DrawCrosshair			= false
 SWEP.Weight					= 30
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -20,7 +21,8 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_snip_awp.mdl"	
 SWEP.WorldModel				= "models/weapons/w_snip_awp.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/awp/awp1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_AWP.Single" )
+SWEP.Primary.SoundZoom		= Sound( "Default.Zoom" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 115
 SWEP.Primary.NumShots		= 1
@@ -104,7 +106,7 @@ function SWEP:SecondaryAttack()
 	
 	end
 	
-	self:EmitSound( Sound( "weapons/zoom.wav" ) )
+	self:EmitSound( self.Primary.SoundZoom )
 
 	self:SetNextSecondaryFire( CurTime() + 0.3 )
 	self:SetZoomFullyActiveTime( CurTime() + 0.15 )

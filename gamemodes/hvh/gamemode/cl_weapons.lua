@@ -66,9 +66,20 @@ function GM:ShowHelp()
 		return
 		
 	end
+	
+	local ply = LocalPlayer()
+
+	if ( !ply:Alive() ) then
+		return
+	end
+	
+	local teamid = ply:Team()
+
+	if ( teamid != TEAM_TERRORIST && teamid != TEAM_CT ) then
+		return
+	end
 
 	GAMEMODE:HideTeam()
-	GAMEMODE:HideSpare1()
 
 	self.WeaponSelectPnl = vgui.Create( "EditablePanel" )
 	self.WeaponSelectPnl:MakePopup()
@@ -253,7 +264,7 @@ function GM:ShowHelp()
 	getlastButton:SetFont( "HvH_Menu" )
 	getlastButton:SetTextInset( 10, 0 )
 	getlastButton:SetTextColor( clr_text )
-	getlastButton:SetText( "Get the latest" )
+	getlastButton:SetText( "Last loadout" )
 	getlastButton:SetContentAlignment( 4 )
 	getlastButton:SetMouseInputEnabled( true )
 	getlastButton:DockMargin( 0, 30, 0, 10 )
@@ -293,7 +304,7 @@ function GM:ShowHelp()
 	savecurButton:SetFont( "HvH_Menu" )
 	savecurButton:SetTextInset( 10, 0 )
 	savecurButton:SetTextColor( clr_text )
-	savecurButton:SetText( "Save current" )
+	savecurButton:SetText( "Save loadout" )
 	savecurButton:SetContentAlignment( 4 )
 	savecurButton:SetMouseInputEnabled( true )
 	savecurButton:DockMargin( 0, 0, 0, 10 )
@@ -314,7 +325,7 @@ function GM:ShowHelp()
 
 	savecurButton.DoClick = function( self )
 
-		for id, wpn in pairs( LocalPlayer():GetWeapons() ) do
+		for id, wpn in pairs( ply:GetWeapons() ) do
 		
 			local loadout = loadouts[ wpn:GetSlot() ]
 			
@@ -381,3 +392,5 @@ function GM:HideHelp()
 	end
 
 end
+
+concommand.Add( "buymenu", function() GAMEMODE:ShowHelp() end )

@@ -24,7 +24,7 @@ end
 
 function GM:FinishMove( ply, mv )
 
-	local jump_boost = GetConVar( "sv_jump_boost" ):GetFloat()
+	local jump_boost = GetConVarNumber( "sv_jump_boost" )
 
 	if ( JUMPING && jump_boost > 0 ) then
 

@@ -3,17 +3,19 @@ AddCSLuaFile( "animations.lua" )
 AddCSLuaFile( "cl_deathnotice.lua" )
 AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "cl_menu.lua" )
 AddCSLuaFile( "cl_pickteam.lua" )
-AddCSLuaFile( "cl_playerlist.lua" )
 AddCSLuaFile( "cl_scoreboard.lua" )
 AddCSLuaFile( "cl_targetid.lua" )
-AddCSLuaFile( "cl_topplayers.lua" )
 AddCSLuaFile( "cl_weapons.lua" )
 AddCSLuaFile( "player_shd.lua" )
 AddCSLuaFile( "shared.lua" )
 
 include( "shared.lua" )
+include( "menu.lua" )
 include( "stats.lua" )
+include( "votemap.lua" )
+include( "player_ext.lua" )
 include( "player.lua" )
 
 WINNER_NONE = 1
@@ -34,6 +36,7 @@ CreateConVar( "mp_winlimit", "0", FCVAR_NONE, "Max number of rounds one team can
 CreateConVar( "mp_ignore_round_win_conditions", "0", FCVAR_NONE, "Ignore conditions which would end the current round." )
 
 util.AddNetworkString( "HvH_PlaySound" )
+util.AddNetworkString( "HvH_ShowMenu" )
 
 local round_end_info = {
 
@@ -82,8 +85,8 @@ local round_start_snds = {
 
 local function ReadMultiplayCvars()
 
-	GAMEMODE.FreezeTime = GetConVar( "mp_freezetime" ):GetInt()
-	SetGlobalInt( "RoundTime", math.floor( GetConVar( "mp_roundtime" ):GetFloat() * 60 ) )
+	GAMEMODE.FreezeTime = GetConVarNumber( "mp_freezetime" )
+	SetGlobalInt( "RoundTime", math.floor( GetConVarNumber( "mp_roundtime" ) * 60 ) )
 
 end
 
@@ -109,6 +112,8 @@ function GM:Initialize()
 	
 	Stats_Load()
 	
+	VoteMap_Init()
+	
 end
 
 local function UpdateTeamScores()
@@ -128,7 +133,7 @@ local function GoToIntermission()
 
 	GAMEMODE.GameOver = true
 	
-	GAMEMODE.IntermissionEndTime = CurTime() + GetConVar( "mp_chattime" ):GetInt()
+	GAMEMODE.IntermissionEndTime = CurTime() + GetConVarNumber( "mp_chattime" )
 	
 	SetGlobalBool( "FreezePeriod", true )
 
@@ -138,6 +143,16 @@ local function GoToIntermission()
 		pl:SendLua( "GAMEMODE:ScoreboardShow()" )
 
 	end
+
+end
+
+local function PlaySound( snd )
+
+	net.Start( "HvH_PlaySound" )
+		
+		net.WriteString( snd )
+	
+	net.Broadcast()
 
 end
 
@@ -153,11 +168,7 @@ local function TerminateRound( delay, reason )
 		
 		PrintMessage( HUD_PRINTCENTER, reason_info.Msg )
 		
-		net.Start( "HvH_PlaySound" )
-		
-			net.WriteString( reason_info.Sound )
-			
-		net.Broadcast()
+		PlaySound( reason_info.Sound )
 	
 	end
 
@@ -172,7 +183,7 @@ end
 
 function GM:CheckWinConditions()
 
-	if ( GetConVar( "mp_ignore_round_win_conditions" ):GetBool() ) then
+	if ( GetConVarNumber( "mp_ignore_round_win_conditions" ) != 0 ) then
 		return
 	end
 
@@ -234,20 +245,20 @@ function GM:CheckWinConditions()
 			GAMEMODE.NumCTWins = GAMEMODE.NumCTWins + 1
 			UpdateTeamScores()
 			
-			TerminateRound( GetConVar( "mp_round_restart_delay" ):GetFloat(), REASON_CT_WIN )
+			TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_CT_WIN )
 			
 		elseif ( numAliveCT == 0 ) then
 	
 			GAMEMODE.NumTerroristWins = GAMEMODE.NumTerroristWins + 1
 			UpdateTeamScores()
 	
-			TerminateRound( GetConVar( "mp_round_restart_delay" ):GetFloat(), REASON_TER_WIN )
+			TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_TER_WIN )
 	
 		end
 		
 	elseif ( numAliveTerrorist == 0 && numAliveCT == 0 && ( numTerrorist > 0 || numCT > 0 ) ) then
 	
-		TerminateRound( GetConVar( "mp_round_restart_delay" ):GetFloat(), REASON_ROUND_DRAW )
+		TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_ROUND_DRAW )
 	
 	end
 
@@ -271,7 +282,7 @@ end
 
 local function CheckFragLimit()
 
-	local fraglimit = GetConVar( "mp_fraglimit" ):GetInt()
+	local fraglimit = GetConVarNumber( "mp_fraglimit" )
 
 	if ( fraglimit <= 0 ) then
 		return false
@@ -294,7 +305,7 @@ end
 
 local function CheckMaxRounds()
 
-	local maxrounds = GetConVar( "mp_maxrounds" ):GetInt()
+	local maxrounds = GetConVarNumber( "mp_maxrounds" )
 
 	if ( maxrounds != 0 ) then
 	
@@ -313,7 +324,7 @@ end
 
 local function CheckWinLimit()
 
-	local winlimit = GetConVar( "mp_winlimit" ):GetInt()
+	local winlimit = GetConVarNumber( "mp_winlimit" )
 
 	if ( winlimit != 0 ) then
 	
@@ -345,17 +356,13 @@ local function CheckFreezePeriodExpired()
 
 	SetGlobalBool( "FreezePeriod", false )
 	
-	net.Start( "HvH_PlaySound" )
-		
-		net.WriteString( round_start_snds[ math.random( #round_start_snds ) ] )
-		
-	net.Broadcast()
+	PlaySound( round_start_snds[ math.random( #round_start_snds ) ] )
 
 end
 
 local function CheckRoundTimeExpired()
 
-	if ( GetConVar( "mp_ignore_round_win_conditions" ):GetBool() ) then
+	if ( GetConVarNumber( "mp_ignore_round_win_conditions" ) != 0 ) then
 		return
 	end
 
@@ -367,7 +374,7 @@ local function CheckRoundTimeExpired()
 		return
 	end
 
-	TerminateRound( GetConVar( "mp_round_restart_delay" ):GetFloat(), REASON_ROUND_DRAW )
+	TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_ROUND_DRAW )
 	
 end
 
@@ -445,34 +452,12 @@ end
 
 function GM:ShowHelp( ply )
 
-	if ( !ply:Alive() ) then
-		return
-	end
-	
-	local teamid = ply:Team()
-
-	if ( teamid != TEAM_TERRORIST && teamid != TEAM_CT ) then
-		return
-	end
-
-	ply:SendLua( "GAMEMODE:ShowHelp()" )
+	ply:ConCommand( "buymenu" )
 
 end
 
 function GM:ShowTeam( ply )
 
-	ply:SendLua( "GAMEMODE:ShowTeam()" )
-
-end
-
-function GM:ShowSpare1( ply )
-
-	Stats_ShowTopPlayers( ply )
-
-end
-
-function GM:ShowSpare2( ply )
-
-	ply:SendLua( "GAMEMODE:ShowSpare2()" )
+	ply:ConCommand( "teammenu" )
 
 end

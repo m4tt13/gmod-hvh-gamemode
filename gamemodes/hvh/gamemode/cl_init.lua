@@ -1,11 +1,10 @@
 include( "shared.lua" )
 include( "cl_deathnotice.lua" )
 include( "cl_hud.lua" )
+include( "cl_menu.lua" )
 include( "cl_pickteam.lua" )
-include( "cl_playerlist.lua" )
 include( "cl_scoreboard.lua" )
 include( "cl_targetid.lua" )
-include( "cl_topplayers.lua" )
 include( "cl_weapons.lua" )
 
 DEFINE_BASECLASS( "gamemode_base" )
@@ -55,6 +54,10 @@ local hud = {
 function GM:HUDShouldDraw( name )
 
 	if ( hud[name] ) then return false end
+	
+	if ( name == "CHudWeaponSelection" && Menu_TakesInput() ) then
+		return false
+	end
 
 	return BaseClass.HUDShouldDraw( self, name )
 	
@@ -110,7 +113,7 @@ end
 
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( !GetConVar( "mp_friendlyfire" ):GetBool() ) then
+	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
 	
 		local attacker = dmginfo:GetAttacker()
 
@@ -120,7 +123,7 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 		
 	end
 
-	if ( hitgroup != HITGROUP_HEAD && GetConVar( "mp_damage_headshot_only" ):GetBool() ) then
+	if ( hitgroup != HITGROUP_HEAD && GetConVarNumber( "mp_damage_headshot_only" ) != 0 ) then
 		return true
 	end
 
@@ -128,10 +131,18 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 end
 
+function GM:PlayerButtonDown( ply, button )
+
+	if ( IsFirstTimePredicted() ) then
+		Menu_HandleKeyInput( button )
+	end
+
+end
+
 local function RecvPlaySound()
 
 	local snd = net.ReadString()
-		
+	
 	surface.PlaySound( Sound( snd ) )
 
 end

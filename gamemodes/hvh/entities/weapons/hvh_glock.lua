@@ -20,7 +20,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_glock18.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_glock18.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/glock/glock18-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_Glock.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 25
 SWEP.Primary.NumShots		= 1

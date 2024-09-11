@@ -20,7 +20,7 @@ SWEP.HoldType				= "shotgun"
 SWEP.ViewModel				= "models/weapons/v_shot_xm1014.mdl"	
 SWEP.WorldModel				= "models/weapons/w_shot_xm1014.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/xm1014/xm1014-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_XM1014.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 20
 SWEP.Primary.NumShots		= 6

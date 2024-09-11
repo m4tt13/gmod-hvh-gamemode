@@ -20,7 +20,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_smg_p90.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_p90.mdl"	
 
-SWEP.Primary.Sound			= Sound( "weapons/p90/p90-1.wav" )
+SWEP.Primary.Sound			= Sound( "Weapon_P90.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 26
 SWEP.Primary.NumShots		= 1

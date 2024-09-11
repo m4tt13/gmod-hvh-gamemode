@@ -1,7 +1,7 @@
 surface.CreateFont( "HvH_KillIcon", {
 
 	font = "csd",
-	size = 50,
+	size = 64,
 	weight = 0,
 	antialias = true,
 	additive = true
@@ -9,168 +9,78 @@ surface.CreateFont( "HvH_KillIcon", {
 } )
 
 local Color_Icon = Color( 255, 80, 0, 255 )
-local NPC_Color = Color( 250, 50, 50, 255 )
+local NPC_Color_Enemy = Color( 250, 50, 50, 255 )
+local NPC_Color_Friendly = Color( 50, 200, 50, 255 )
 
+killicon.AddFont( "suicide", "HvH_KillIcon", "C", Color_Icon )
 killicon.AddFont( "headshot", "HvH_KillIcon", "D", Color_Icon )
 
 local Deaths = {}
 
-local function RecvPlayerKilledByPlayer()
+local function getDeathColor( teamID, target )
 
-	local victim	= net.ReadEntity()
-	local inflictor	= net.ReadString()
-	local attacker	= net.ReadEntity()
-	local headshot	= net.ReadBool()
-
-	if ( !IsValid( attacker ) ) then return end
-	if ( !IsValid( victim ) ) then return end
-
-	GAMEMODE:AddDeathNotice( attacker:Name(), attacker:Team(), inflictor, victim:Name(), victim:Team(), headshot )
-
-end
-net.Receive( "PlayerKilledByPlayer", RecvPlayerKilledByPlayer )
-
-local function RecvPlayerKilledSelf()
-
-	local victim = net.ReadEntity()
-	if ( !IsValid( victim ) ) then return end
-	GAMEMODE:AddDeathNotice( nil, 0, "suicide", victim:Name(), victim:Team(), false )
-
-end
-net.Receive( "PlayerKilledSelf", RecvPlayerKilledSelf )
-
-local function RecvPlayerKilled()
-
-	local victim	= net.ReadEntity()
-	if ( !IsValid( victim ) ) then return end
-	local inflictor	= net.ReadString()
-	local attacker	= "#" .. net.ReadString()
-
-	GAMEMODE:AddDeathNotice( attacker, -1, inflictor, victim:Name(), victim:Team(), false )
-
-end
-net.Receive( "PlayerKilled", RecvPlayerKilled )
-
-local function RecvPlayerKilledNPC()
-
-	local victimtype = net.ReadString()
-	local victim	= "#" .. victimtype
-	local inflictor	= net.ReadString()
-	local attacker	= net.ReadEntity()
-
-	if ( !IsValid( attacker ) ) then return end
-
-	GAMEMODE:AddDeathNotice( attacker:Name(), attacker:Team(), inflictor, victim, -1, false )
-
-	local bIsLocalPlayer = ( IsValid(attacker) && attacker == LocalPlayer() )
-
-	local bIsEnemy = IsEnemyEntityName( victimtype )
-	local bIsFriend = IsFriendEntityName( victimtype )
-
-	if ( bIsLocalPlayer && bIsEnemy ) then
-		achievements.IncBaddies()
+	if ( teamID == -1 ) then
+		return table.Copy( NPC_Color_Enemy )
 	end
 
-	if ( bIsLocalPlayer && bIsFriend ) then
-		achievements.IncGoodies()
+	if ( teamID == -2 ) then
+		return table.Copy( NPC_Color_Friendly )
 	end
 
-	if ( bIsLocalPlayer && ( !bIsFriend && !bIsEnemy ) ) then
-		achievements.IncBystander()
-	end
+	return table.Copy( team.GetColor( teamID ) )
 
 end
-net.Receive( "PlayerKilledNPC", RecvPlayerKilledNPC )
 
-local function RecvNPCKilledNPC()
+function GM:AddDeathNotice( attacker, team1, inflictor, victim, team2, flags )
 
-	local victim	= "#" .. net.ReadString()
-	local inflictor	= net.ReadString()
-	local attacker	= "#" .. net.ReadString()
-
-	GAMEMODE:AddDeathNotice( attacker, -1, inflictor, victim, -1, false )
-
-end
-net.Receive( "NPCKilledNPC", RecvNPCKilledNPC )
-
-function GM:AddDeathNotice( Attacker, team1, Inflictor, Victim, team2, headshot )
+	if ( inflictor == "suicide" ) then attacker = nil end
 
 	local Death = {}
 	Death.time		= CurTime()
 
-	Death.left		= Attacker
-	Death.right		= Victim
-	Death.icon		= Inflictor
-	Death.headshot	= headshot
+	Death.left		= attacker
+	Death.right		= victim
+	Death.icon		= inflictor
+	Death.flags		= flags
 
-	if ( team1 == -1 ) then Death.color1 = table.Copy( NPC_Color )
-	else Death.color1 = table.Copy( team.GetColor( team1 ) ) end
-
-	if ( team2 == -1 ) then Death.color2 = table.Copy( NPC_Color )
-	else Death.color2 = table.Copy( team.GetColor( team2 ) ) end
-
-	if ( Death.left == Death.right ) then
-	
-		Death.left = nil
-		Death.icon = "suicide"
-		
-	end
+	Death.color1	= getDeathColor( team1, Death.left )
+	Death.color2	= getDeathColor( team2, Death.right )
 
 	table.insert( Deaths, Death )
 
 end
 
-local function DrawDeath( x, y, death, hud_deathnotice_time )
+DEATH_NOTICE_HEADSHOT = 4
 
-	local fadeout = ( death.time + hud_deathnotice_time ) - CurTime()
+local function DrawDeath( x, y, death, time )
+
+	local fadeout = ( death.time + time ) - CurTime()
 
 	local alpha = math.Clamp( fadeout * 255, 0, 255 )
 	death.color1.a = alpha
 	death.color2.a = alpha
-
-	local maxH = 0
 	
-	local w, h
-
 	draw.SimpleText( death.right, "ChatFont", x, y, death.color2, TEXT_ALIGN_RIGHT )
 	
-	w, h = surface.GetTextSize( death.right )
-	x = x - w
-
-	maxH = math.max( maxH, h )
+	x = x - surface.GetTextSize( death.right )
 	
-	if ( death.headshot ) then
+	if ( bit.band( death.flags, DEATH_NOTICE_HEADSHOT ) != 0 ) then 
 	
-		w, h = killicon.GetSize( "headshot" )
-		x = x - ( w / 2 )
-		
-		maxH = math.max( maxH, h )
+		x = x - killicon.GetSize( "headshot" )
 	
-		killicon.Draw( x, y, "headshot", alpha )
-		x = x - ( w / 2 )
+		killicon.Render( x, y, "headshot", alpha, true )
 		
 	end
 	
-	w, h = killicon.GetSize( death.icon )
-	x = x - ( w / 2 )
+	x = x - killicon.GetSize( death.icon )
 	
-	maxH = math.max( maxH, h )
-	
-	killicon.Draw( x, y, death.icon, alpha )
-	x = x - ( w / 2 )
-	
+	killicon.Render( x, y, death.icon, alpha, true )
+
 	if ( death.left ) then
-	
 		draw.SimpleText( death.left, "ChatFont", x, y, death.color1, TEXT_ALIGN_RIGHT )
-		
-		w, h = surface.GetTextSize( death.left )
-		x = x - w
-		
-		maxH = math.max( maxH, h )
-		
 	end
 
-	return ( y + maxH * 0.70 )
+	return y + 40
 
 end
 
@@ -178,10 +88,11 @@ function GM:DrawDeathNotice()
 
 	if ( GetConVarNumber( "cl_drawhud" ) == 0 ) then return end
 
-	local hud_deathnotice_time = GetConVar( "hud_deathnotice_time" ):GetFloat()
+	local time = GetConVarNumber( "hud_deathnotice_time" )
+	local reset = Deaths[1] != nil
 
-	x = ScrW() - 15
-	y = 15
+	local x = ScrW() - 15
+	local y = 15
 	
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()
@@ -190,9 +101,9 @@ function GM:DrawDeathNotice()
 		y = y + 60
 	end
 
-	for k, Death in pairs( Deaths ) do
+	for k, Death in ipairs( Deaths ) do
 
-		if ( Death.time + hud_deathnotice_time > CurTime() ) then
+		if ( Death.time + time > CurTime() ) then
 
 			if ( Death.lerp ) then
 			
@@ -205,20 +116,15 @@ function GM:DrawDeathNotice()
 			Death.lerp.x = x
 			Death.lerp.y = y
 
-			y = DrawDeath( x, y, Death, hud_deathnotice_time )
+			y = DrawDeath( math.floor( x ), math.floor( y ), Death, time )
+			reset = false
 
 		end
 
 	end
 
-	for k, Death in pairs( Deaths ) do
-	
-		if ( Death.time + hud_deathnotice_time > CurTime() ) then
-			return
-		end
-		
+	if ( reset ) then
+		Deaths = {}
 	end
-
-	Deaths = {}
 
 end

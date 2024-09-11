@@ -6,8 +6,6 @@ local hvhrank_show_rank_all		= CreateConVar( "hvhrank_show_rank_all", "1" )
 
 local table_exist = false
 
-util.AddNetworkString( "HvH_TopPlayers" )
-
 function Stats_Load()
 	
 	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC)" )
@@ -32,10 +30,10 @@ function Stats_LoadPlayer( ply, steamid )
 		
 		ply.Stats = { 
 		
-			Score = result[1].score, 
-			Kills = result[1].kills, 
-			Deaths = result[1].deaths, 
-			Headshots = result[1].headshots 
+			Score = tonumber( result[1].score ), 
+			Kills = tonumber( result[1].kills ), 
+			Deaths = tonumber( result[1].deaths ), 
+			Headshots = tonumber( result[1].headshots )
 			
 		}
 		
@@ -70,7 +68,7 @@ end
 
 function Stats_OnPlayerDeath( victim, attacker, headshot )
 
-	if ( !victim.Stats || !attacker.Stats || attacker == victim ) then
+	if ( !victim.Stats || !attacker.Stats || victim == attacker ) then
 		return
 	end
 	
@@ -139,32 +137,99 @@ function Stats_ShowRank( ply )
 
 end
 
-function Stats_ShowTopPlayers( ply )
+local snd_button_press1 = Sound( "buttons/button14.wav" )
+local snd_button_press2 = Sound( "buttons/combine_button7.wav" )
 
-	if ( !ply.Stats ) then
-		return
+local ShowMenu = nil
+
+local function HandleMenuItem( ply, item )
+
+	if ( item == 8 ) then
+
+		ply:PlaySound( snd_button_press1 )
+
+		ShowMenu( ply, ply.MenuSection - 1 )
+
+	elseif ( item == 9 ) then
+
+		ply:PlaySound( snd_button_press1 )
+
+		ShowMenu( ply, ply.MenuSection + 1 )
+	
+	elseif ( item == 10 ) then
+	
+		ply:PlaySound( snd_button_press2 )
+	
+		Menu_Close( ply )
+	
 	end
 
-	local result = sql.Query( "SELECT * FROM hvhrank ORDER BY score DESC LIMIT 15" )
+end
+
+ShowMenu = function( ply, section )
+
+	local offset = ( section - 1 ) * 10
+	local result = sql.Query( Format( "SELECT * FROM hvhrank ORDER BY score DESC LIMIT 11 OFFSET %i", offset ) )
 	
 	if ( result ) then
 	
-		net.Start( "HvH_TopPlayers" )
+		ply.MenuSection = section
+	
+		Menu_Start()
 		
-			net.WriteUInt( #result, 4 )
-
-			for rank, row in ipairs( result ) do
-
-				net.WriteString( row.name )
-				net.WriteInt( row.score, 32 )
-				net.WriteInt( row.kills, 32 )
-				net.WriteInt( row.deaths, 32 )
-				net.WriteInt( row.headshots, 32 )
+			Menu_AddLine( "[HvH Rank] Top Players:" )
+			
+			local item = 1
+			
+			for _, row in ipairs( result ) do
+			
+				local deaths = tonumber( row.deaths ) != 0 && tonumber( row.deaths ) || 1
+				local kdr = tonumber( row.kills ) / deaths
+				local rank = offset + item
+				
+				Menu_AddLine( Format( "%i. %s - %.2f KDR - %i points", rank, row.name, kdr, tonumber( row.score ) ) )
+				
+				item = item + 1
+				if ( item > 10 ) then break end
 			
 			end
-		
-		net.Send( ply )
+			
+			for i = item, 10 do
+				Menu_AddLine()
+			end
+			
+			Menu_AddLine()
+			
+			if ( offset > 1 ) then
+				Menu_AddLine( "Previous", true, 8 )
+			else
+				Menu_AddLine()
+			end
 
+			if ( #result > 10 ) then
+				Menu_AddLine( "Next", true, 9 )
+			else
+				Menu_AddLine()
+			end
+
+			Menu_AddLine( "Exit", false, 10 )
+			
+		Menu_End( ply, HandleMenuItem )
+
+	else
+	
+		Menu_Close( ply )
+	
 	end
+	
+end
+
+function Stats_ShowTopPlayers( ply )
+
+	if ( !table_exist ) then
+		return
+	end
+
+	ShowMenu( ply, 1 )
 
 end

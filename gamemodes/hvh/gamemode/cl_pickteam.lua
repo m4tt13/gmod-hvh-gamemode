@@ -6,7 +6,7 @@ local clr_border	= Color( 188, 112, 0, 128 )
 function GM:ShowTeam()
 
 	local ply		= LocalPlayer()
-	local teamid 	= LocalPlayer():Team()
+	local teamid 	= ply:Team()
 
 	if ( IsValid( self.TeamSelectPnl ) ) then
 	
@@ -19,7 +19,6 @@ function GM:ShowTeam()
 	end
 	
 	GAMEMODE:HideHelp()
-	GAMEMODE:HideSpare1()
 
 	self.TeamSelectPnl = vgui.Create( "EditablePanel" )
 	self.TeamSelectPnl:MakePopup()
@@ -41,7 +40,7 @@ function GM:ShowTeam()
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, true, true, false, false )
 		
 	end
-		
+	
 	local mainMenu = self.TeamSelectPnl:Add( "Panel" )
 	mainMenu:SetWide( 170 )
 	mainMenu:DockMargin( 0, 0, 5, 0 )
@@ -379,3 +378,5 @@ function GM:HideTeam()
 	end
 
 end
+
+concommand.Add( "teammenu", function() GAMEMODE:ShowTeam() end )

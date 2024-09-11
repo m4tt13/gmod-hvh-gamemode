@@ -18,7 +18,7 @@ SWEP.Base 				= "weapon_base"
 
 SWEP.Slot				= 0
 SWEP.DrawAmmo			= false
-SWEP.DrawCrosshair		= false
+SWEP.DrawCrosshair		= true
 SWEP.SwayScale			= 0.5
 SWEP.BobScale			= 0.5
 SWEP.ViewModelFOV		= 72
@@ -102,7 +102,7 @@ end
 
 function SWEP:TakePrimaryAmmo( num )
 
-	if ( GetConVar( "sv_infinite_ammo" ):GetBool() ) then return end
+	if ( GetConVarNumber( "sv_infinite_ammo" ) != 0 ) then return end
 	
 	if ( self:Clip1() <= 0 ) then
 
@@ -119,22 +119,6 @@ function SWEP:TakePrimaryAmmo( num )
 end
 
 if CLIENT then
-
-	function SWEP:DrawHUD()
-
-		local x, y = ScrW() / 2.0, ScrH() / 2.0
-
-		surface.SetDrawColor( 0, 255, 0, 255 )
-		
-		local gap = 4
-		local length = gap + 8
-		
-		surface.DrawLine( x - length, y, x - gap, y )
-		surface.DrawLine( x + length, y, x + gap, y )
-		surface.DrawLine( x, y - length, x, y - gap )
-		surface.DrawLine( x, y + length, x, y + gap )
-		
-	end
 
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 	
