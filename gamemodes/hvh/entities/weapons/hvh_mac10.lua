@@ -20,15 +20,16 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_smg_mac10.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_mac10.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.82
+SWEP.ArmorRatio				= 0.95
+
 SWEP.Primary.Sound			= Sound( "Weapon_MAC10.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 29
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.028
 SWEP.Primary.Delay			= 0.07
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.82
-SWEP.Primary.ArmorRatio		= 0.95
 
 SWEP.Primary.ClipSize		= 30
 SWEP.Primary.DefaultClip	= 30

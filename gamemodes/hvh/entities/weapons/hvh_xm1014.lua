@@ -20,15 +20,16 @@ SWEP.HoldType				= "shotgun"
 SWEP.ViewModel				= "models/weapons/v_shot_xm1014.mdl"	
 SWEP.WorldModel				= "models/weapons/w_shot_xm1014.mdl"	
 
+SWEP.Range					= 3048
+SWEP.RangeModifier			= 0.96
+SWEP.ArmorRatio				= 1
+
 SWEP.Primary.Sound			= Sound( "Weapon_XM1014.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 20
 SWEP.Primary.NumShots		= 6
 SWEP.Primary.Cone			= 0.0725
 SWEP.Primary.Delay			= 0.25
-SWEP.Primary.Range			= 3048
-SWEP.Primary.RangeModifier	= 0.96
-SWEP.Primary.ArmorRatio		= 1.0
 
 SWEP.Primary.ClipSize		= 7
 SWEP.Primary.DefaultClip	= 7
@@ -37,8 +38,8 @@ SWEP.Primary.Ammo			= "BULLET_PLAYER_BUCKSHOT"
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 3, "ReloadState" )
-	self:NetworkVar( "Float", 3, "ReloadTimer" )
+	self:NetworkVar( "Int", 0, "ReloadState" )
+	self:NetworkVar( "Float", 0, "ReloadTimer" )
 	
 end
 

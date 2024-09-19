@@ -6,6 +6,8 @@ local votemap_initialdelay = CreateConVar( "votemap_initialdelay", "30.0", FCVAR
 local maplist = {}
 local votemap_allowed = true
 
+local clr_prefix = Color( 250, 100, 0 )
+
 function VoteMap_Init()
 
 	local file = file.Open( "cfg/votemaplist.txt", "r", "MOD" )
@@ -44,8 +46,8 @@ end
 local function ChangeMap( name )
 
 	votemap_allowed = false
-	
-	PrintMessage( HUD_PRINTTALK, Format( "[VoteMap] Changing map to %s...", name ) )
+
+	PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] Changing map to ", COLOR_MAPNAME, name, color_white, "..." ) )
 	
 	timer.Simple( 5.0, function() RunConsoleCommand( "changelevel", name ) end )
 	
@@ -116,21 +118,21 @@ local function VotingAllowed( ply )
 
 	if ( !votemap_enabled:GetBool() ) then
 	
-		ply:ChatPrint( "[VoteMap] Voting is disabled.")
+		ply:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] Voting is disabled." ) )
 		return false
 	
 	end
 
 	if ( !votemap_allowed ) then
 	
-		ply:ChatPrint( "[VoteMap] Voting is not allowed yet.")
+		ply:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] Voting is not allowed yet." ) )
 		return false
 		
 	end
 	
 	if ( #player.GetHumans() < votemap_minplayers:GetInt() ) then
 	
-		ply:ChatPrint( "[VoteMap] The minimal number of players required has not been met.")
+		ply:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] The minimal number of players required has not been met." ) )
 		return false
 		
 	end
@@ -168,7 +170,7 @@ local function HandleMenuItem( ply, item )
 			
 			local votes_needed = math.ceil( #player.GetHumans() * votemap_needed:GetFloat() )
 
-			PrintMessage( HUD_PRINTTALK, Format( "[VoteMap] %s wants to change map to %s (%i/%i).", ply:Name(), map.Name, map.Votes, votes_needed ) )
+			PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] ", COLOR_NICKNAME, ply:Name(), color_white, " wants to change map to ", COLOR_MAPNAME, map.Name, color_white, " (", tostring( map.Votes ), "/", tostring( votes_needed ), ")" ) )
 
 			if ( map.Votes >= votes_needed ) then
 				ChangeMap( map.Name )

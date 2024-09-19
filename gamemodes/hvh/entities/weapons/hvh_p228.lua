@@ -20,15 +20,16 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_p228.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_p228.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.8
+SWEP.ArmorRatio				= 1.25
+
 SWEP.Primary.Sound			= Sound( "Weapon_P228.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 40
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.032
 SWEP.Primary.Delay			= 0.15
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.8
-SWEP.Primary.ArmorRatio		= 1.25
 
 SWEP.Primary.ClipSize		= 13
 SWEP.Primary.DefaultClip	= 13

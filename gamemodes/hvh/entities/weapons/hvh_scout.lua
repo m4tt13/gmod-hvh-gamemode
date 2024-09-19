@@ -21,27 +21,30 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_snip_scout.mdl"	
 SWEP.WorldModel				= "models/weapons/w_snip_scout.mdl"	
 
+SWEP.Range					= 8192
+SWEP.RangeModifier			= 0.98
+SWEP.ArmorRatio				= 1.7
+
 SWEP.Primary.Sound			= Sound( "Weapon_Scout.Single" )
-SWEP.Primary.SoundZoom		= Sound( "Default.Zoom" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 75
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.02
 SWEP.Primary.Delay			= 1.25
-SWEP.Primary.Range			= 8192
-SWEP.Primary.RangeModifier	= 0.98
-SWEP.Primary.ArmorRatio		= 1.7
 
 SWEP.Primary.ClipSize		= 10
 SWEP.Primary.DefaultClip	= 10
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "BULLET_PLAYER_762MM"
 
+SWEP.Secondary.Sound		= Sound( "Default.Zoom" )
+SWEP.Secondary.Delay		= 0.3
+
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 3, "ZoomLevel" )
-	self:NetworkVar( "Int", 4, "LastZoomLevel" )
-	self:NetworkVar( "Float", 3, "ZoomFullyActiveTime" )
+	self:NetworkVar( "Int", 0, "ZoomLevel" )
+	self:NetworkVar( "Int", 1, "LastZoomLevel" )
+	self:NetworkVar( "Float", 0, "ZoomFullyActiveTime" )
 	
 end
 
@@ -106,10 +109,10 @@ function SWEP:SecondaryAttack()
 	
 	end
 	
-	self:EmitSound( self.Primary.SoundZoom )
+	self:EmitSound( self.Secondary.Sound )
 
-	self:SetNextSecondaryFire( CurTime() + 0.3 )
-	self:SetZoomFullyActiveTime( CurTime() + 0.15 )
+	self:SetNextSecondaryFire( CurTime() + self.Secondary.Delay )
+	self:SetZoomFullyActiveTime( CurTime() + self.Secondary.Delay / 2 )
 
 end
 

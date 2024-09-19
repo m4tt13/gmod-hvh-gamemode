@@ -14,22 +14,26 @@ if CLIENT then
 	
 end
 
-SWEP.Base 				= "weapon_base"
+SWEP.Base 					= "weapon_base"
 
-SWEP.Slot				= 0
-SWEP.DrawAmmo			= false
-SWEP.DrawCrosshair		= true
-SWEP.SwayScale			= 0.5
-SWEP.BobScale			= 0.5
-SWEP.ViewModelFOV		= 72
-SWEP.ViewModelFlip		= false
-SWEP.UseHands			= true
-SWEP.CSMuzzleFlashes 	= true
-SWEP.CSMuzzleX 			= false
-SWEP.DeploySpeed 		= 1.0
-SWEP.HoldType			= "pistol"
-SWEP.IconLetter         = "c"
-SWEP.CanBuy        		 = false
+SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.DrawAmmo				= false
+SWEP.DrawCrosshair			= true
+SWEP.SwayScale				= 0.5
+SWEP.BobScale				= 0.5
+SWEP.ViewModelFOV			= 72
+SWEP.ViewModelFlip			= false
+SWEP.UseHands				= true
+SWEP.CSMuzzleFlashes 		= true
+SWEP.CSMuzzleX 				= false
+SWEP.DeploySpeed 			= 1.0
+SWEP.HoldType				= "pistol"
+SWEP.IconLetter        	 	= "c"
+SWEP.CanBuy        		 	= false
+
+SWEP.Range					= 8192
+SWEP.RangeModifier			= 0.75
+SWEP.ArmorRatio				= 1.05
 
 SWEP.Primary.Sound			= Sound( "Weapon_AR2.Single" )
 SWEP.Primary.Recoil			= 2
@@ -37,13 +41,10 @@ SWEP.Primary.Damage			= 150
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.01
 SWEP.Primary.Delay			= 0.15
-SWEP.Primary.Range			= 8192
-SWEP.Primary.RangeModifier	= 0.75
-SWEP.Primary.ArmorRatio		= 1.05
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
-SWEP.Secondary.Automatic	= false
+SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
 CreateConVar( "sv_infinite_ammo", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
@@ -88,11 +89,11 @@ function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo_type, force, trace
 	bullet.Src		= owner:GetShootPos()
 	bullet.Dir		= owner:GetAimVector()
 	bullet.Spread	= Vector( aimcone, aimcone, 0 )
-	bullet.Tracer	= tracer || 5
+	bullet.Tracer	= tracer || 1
 	bullet.Force	= force || 1
 	bullet.Damage	= damage
 	bullet.AmmoType = ammo_type || self.Primary.Ammo
-	bullet.Distance	= distance || self.Primary.Range
+	bullet.Distance	= distance || self.Range
 
 	owner:FireBullets( bullet )
 

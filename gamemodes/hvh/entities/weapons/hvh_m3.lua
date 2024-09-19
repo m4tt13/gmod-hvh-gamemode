@@ -20,15 +20,16 @@ SWEP.HoldType				= "shotgun"
 SWEP.ViewModel				= "models/weapons/v_shot_m3super90.mdl"	
 SWEP.WorldModel				= "models/weapons/w_shot_m3super90.mdl"	
 
+SWEP.Range					= 3000
+SWEP.RangeModifier			= 0.96
+SWEP.ArmorRatio				= 1
+
 SWEP.Primary.Sound			= Sound( "Weapon_M3.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 22
 SWEP.Primary.NumShots		= 9
 SWEP.Primary.Cone			= 0.0675
 SWEP.Primary.Delay			= 0.875
-SWEP.Primary.Range			= 3000
-SWEP.Primary.RangeModifier	= 0.96
-SWEP.Primary.ArmorRatio		= 1.0
 
 SWEP.Primary.ClipSize		= 8
 SWEP.Primary.DefaultClip	= 8
@@ -37,8 +38,8 @@ SWEP.Primary.Ammo			= "BULLET_PLAYER_BUCKSHOT"
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 3, "ReloadState" )
-	self:NetworkVar( "Float", 3, "ReloadTimer" )
+	self:NetworkVar( "Int", 0, "ReloadState" )
+	self:NetworkVar( "Float", 0, "ReloadTimer" )
 	
 end
 

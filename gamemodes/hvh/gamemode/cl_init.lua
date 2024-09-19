@@ -72,36 +72,49 @@ function GM:HUDPaint()
 
 end
 
-local chat_colors = {
-
-	["\x01"] = Color( 255, 255, 255 ),
-	["\x02"] = Color( 255, 127, 127 ),
-	["\x03"] = Color( 127, 255, 127 ),
-	["\x04"] = Color( 127, 127, 255 ),
-	["\x05"] = Color( 150, 210, 255 )
-
-}
-
 function GM:ChatText( playerindex, playername, text, filter )
 
 	if ( filter == "none" ) then
 	
-		local tab = {}
-		local pattern = "[\x01\x02\x03\x04\x05]"
+		local args = {}
+		local cur_pos = 1
+		local total_len = string.len( text )
 
-		for s in text:gsub( pattern, "\0%0\0" ):gmatch( "%Z+" ) do
-		   
-		   local clr = chat_colors[s]
-		   
-		   if ( clr ) then
-				table.insert( tab, clr )
-		   else
-				table.insert( tab, s )
-		   end
-		   
+		while ( cur_pos <= total_len ) do
+
+			local code_start = string.find( text, "\x01", cur_pos, true )
+
+			if ( code_start ) then
+
+				local code_end = code_start + 7
+				local range_len = code_start - cur_pos
+				
+				if ( range_len > 0 ) then
+					table.insert( args, string.sub( text, cur_pos, code_start - 1 ) )
+				end
+				
+				if ( code_end <= total_len ) then
+				
+					local r = tonumber( text[ code_start + 1 ] .. text[ code_start + 2 ], 16 ) || 0
+					local g = tonumber( text[ code_start + 3 ] .. text[ code_start + 4 ], 16 ) || 0
+					local b = tonumber( text[ code_start + 5 ] .. text[ code_start + 6 ], 16 ) || 0
+					
+					table.insert( args, Color( r, g, b ) )
+					
+				end
+				
+				cur_pos = code_end
+
+			else
+
+				table.insert( args, string.sub( text, cur_pos ) )
+				break
+
+			end
+			
 		end
 		
-		chat.AddText( unpack( tab ) )
+		chat.AddText( unpack( args ) )
 
 		return true
 		
@@ -123,7 +136,7 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 		
 	end
 
-	if ( hitgroup != HITGROUP_HEAD && GetConVarNumber( "mp_damage_headshot_only" ) != 0 ) then
+	if ( GetConVarNumber( "mp_damage_headshot_only" ) != 0 && dmginfo:IsBulletDamage() && hitgroup != HITGROUP_HEAD ) then
 		return true
 	end
 

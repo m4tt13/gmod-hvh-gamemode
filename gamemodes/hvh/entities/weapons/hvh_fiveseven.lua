@@ -20,15 +20,16 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_fiveseven.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_fiveseven.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.885
+SWEP.ArmorRatio				= 1.5
+
 SWEP.Primary.Sound			= Sound( "Weapon_FiveSeven.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 25
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.025
 SWEP.Primary.Delay			= 0.15
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.885
-SWEP.Primary.ArmorRatio		= 1.5
 
 SWEP.Primary.ClipSize		= 20
 SWEP.Primary.DefaultClip	= 20

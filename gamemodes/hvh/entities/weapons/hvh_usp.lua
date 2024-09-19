@@ -20,26 +20,28 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_usp.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_usp.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.79
+SWEP.ArmorRatio				= 1
+
 SWEP.Primary.Sound			= Sound( "Weapon_USP.Single" )
-SWEP.Primary.SoundSilenced	= Sound( "Weapon_USP.SilencedShot" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 34
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.023
 SWEP.Primary.Delay			= 0.15
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.79
-SWEP.Primary.ArmorRatio		= 1.0
 
 SWEP.Primary.ClipSize		= 12
 SWEP.Primary.DefaultClip	= 12
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "BULLET_PLAYER_45ACP"
 
+SWEP.Secondary.Delay		= 3
+
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Bool", 3, "SilencerOn" )
-	self:NetworkVar( "Float", 3, "DoneSwitchingSilencer" )
+	self:NetworkVar( "Bool", 0, "SilencerOn" )
+	self:NetworkVar( "Float", 0, "DoneSwitchingSilencer" )
 	
 end
 
@@ -56,6 +58,8 @@ function SWEP:Initialize()
 	
 end
 
+local snd_silenced = Sound( "Weapon_USP.SilencedShot" )
+
 function SWEP:PrimaryAttack()
 
 	if ( !self:CanPrimaryAttack() ) then return end
@@ -70,7 +74,7 @@ function SWEP:PrimaryAttack()
 		
 	end
 
-	self:EmitSound( self:GetSilencerOn() && self.Primary.SoundSilenced || self.Primary.Sound )
+	self:EmitSound( self:GetSilencerOn() && snd_silenced || self.Primary.Sound )
 
 	self:ShootBullet( damage, self.Primary.NumShots, cone )
 
@@ -94,9 +98,9 @@ function SWEP:SecondaryAttack()
 	
 	end
 
-	self:SetDoneSwitchingSilencer( CurTime() + 3 )
-	self:SetNextPrimaryFire( CurTime() + 3 )
-	self:SetNextSecondaryFire( CurTime() + 3 )
+	self:SetDoneSwitchingSilencer( CurTime() + self.Secondary.Delay )
+	self:SetNextPrimaryFire( CurTime() + self.Secondary.Delay )
+	self:SetNextSecondaryFire( CurTime() + self.Secondary.Delay )
 
 end
 

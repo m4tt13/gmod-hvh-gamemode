@@ -20,26 +20,29 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_glock18.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_glock18.mdl"	
 
+SWEP.Range					= 8192
+SWEP.RangeModifier			= 0.75
+SWEP.ArmorRatio				= 1.05
+
 SWEP.Primary.Sound			= Sound( "Weapon_Glock.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 25
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.023
 SWEP.Primary.Delay			= 0.15
-SWEP.Primary.Range			= 8192
-SWEP.Primary.RangeModifier	= 0.75
-SWEP.Primary.ArmorRatio		= 1.05
 
 SWEP.Primary.ClipSize		= 20
 SWEP.Primary.DefaultClip	= 20
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "BULLET_PLAYER_9MM"
 
+SWEP.Secondary.Delay		= 0.3
+
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Bool", 3, "BurstMode" )
-	self:NetworkVar( "Int", 3, "BurstShotsRemaining" )
-	self:NetworkVar( "Float", 3, "NextBurstShot" )
+	self:NetworkVar( "Bool", 0, "BurstMode" )
+	self:NetworkVar( "Int", 0, "BurstShotsRemaining" )
+	self:NetworkVar( "Float", 0, "NextBurstShot" )
 	
 end
 
@@ -105,7 +108,7 @@ function SWEP:SecondaryAttack()
 	
 	end
 
-	self:SetNextSecondaryFire( CurTime() + 0.3 )
+	self:SetNextSecondaryFire( CurTime() + self.Secondary.Delay )
 
 end
 

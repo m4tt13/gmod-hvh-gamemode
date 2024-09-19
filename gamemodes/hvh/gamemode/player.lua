@@ -14,6 +14,7 @@ CreateConVar( "mp_damage_scale_arms", "1.0" )
 CreateConVar( "mp_damage_scale_legs", "0.75" )
 CreateConVar( "mp_deathsound", "0" )
 CreateConVar( "mp_allowtaunts", "0" )
+CreateConVar( "mp_startarmor", "1" )
 
 local function IsValidObsTarget( ply, target )
 
@@ -243,13 +244,13 @@ local function GiveWeapon( ply, weapon, translate )
 	end
 	
 	local swep = translate && GetWeaponByAlias( weapon ) || weapons.GetStored( weapon )
-			
+	
 	if ( !swep || !swep.CanBuy ) then 
 		return false
 	end
 	
 	for id, wpn in pairs( ply:GetWeapons() ) do
-				
+	
 		if ( wpn:GetSlot() == swep.Slot ) then
 			ply:StripWeapon( wpn:GetClass() )
 		end
@@ -372,7 +373,7 @@ function GM:PlayerSay( ply, text, teamonly )
 		
 	elseif ( prefix ) then
 	
-		if ( ltext == "spec" ) then
+		if ( ltext == "spec" || ltext == "spectate" ) then
 		
 			ply:ConCommand( "changeteam " .. TEAM_SPECTATOR )
 	
@@ -380,8 +381,9 @@ function GM:PlayerSay( ply, text, teamonly )
 		
 			ply:SetFrags( 0 )
 			ply:SetDeaths( 0 )
-			PrintMessage( HUD_PRINTTALK, ply:Nick() .. " has reset his score." )
-	
+			
+			PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", Color( 90, 200, 180 ), "ResetScore", color_white, "] ", COLOR_NICKNAME, ply:Nick(), color_white, " has reset his score." ) )
+
 		elseif ( !GiveWeapon( ply, ltext, true ) ) then
 		
 			hidechat = false
@@ -441,7 +443,7 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 	
 	local isHeadshot = ( ply:LastHitGroup() == HITGROUP_HEAD )
 	
-	Stats_OnPlayerDeath( ply, attacker, isHeadshot )
+	Stats_OnPlayerDeath( ply, attacker, isHeadshot, ( inflictor:GetClass() == "hvh_knife" ) )
 	
 	if ( IsValidObsTarget( ply, attacker ) ) then
 		ply:SpectateEntity( attacker )
@@ -523,7 +525,7 @@ local function SetUpPlayerVars( ply )
 	ply:SetMaxHealth( 100 )
 	ply:SetMaxArmor( 100 )
 	ply:SetHealth( 100 )
-	ply:SetArmor( 100 )
+	ply:SetArmor( GetConVarNumber( "mp_startarmor" ) != 0 && 100 || 0 )
 	ply:ShouldDropWeapon( false )
 	ply:SetNoCollideWithTeammates( false )
 	ply:SetAvoidPlayers( false )
@@ -617,7 +619,9 @@ function GM:PlayerLoadout( pl )
 		end
 	
 	end
-
+	
+	pl:Give( "hvh_knife" )
+	
 	StockPlayerAmmo( pl )
 
 end
@@ -655,7 +659,7 @@ function GM:PlayerCanJoinTeam( ply, teamid )
 	
 		if ( NextSwitchTime >= CurTime() ) then
 	
-			ply:ChatPrint( Format( "Please wait %i more seconds before trying to change team again.", ( NextSwitchTime - CurTime() ) ) )
+			ply:ChatPrint( Format( "Please wait %i more seconds before trying to change team again.", math.ceil( NextSwitchTime - CurTime() ) ) )
 			return false
 			
 		end
@@ -748,7 +752,7 @@ function GM:OnPlayerChangedTeam( ply, oldteam, newteam )
 	
 	GAMEMODE:CheckWinConditions()
 
-	PrintMessage( HUD_PRINTTALK, ply:Nick() .. " is joining the " .. team.GetName( newteam ) )
+	PrintMessage( HUD_PRINTTALK, util.ColorizeText( COLOR_NICKNAME, ply:Nick(), color_white, " is joining the ", team.GetColor( newteam ), team.GetName( newteam ) ) )
 
 end
 
@@ -766,35 +770,39 @@ end
 
 function GM:PlayerTraceAttack( ply, dmginfo, dir, trace )
 
-	local attacker = dmginfo:GetAttacker()
-	
-	if ( IsValid( attacker ) && attacker:IsPlayer() ) then
-	
-		local weapon = attacker:GetActiveWeapon()
+	if ( dmginfo:IsBulletDamage() ) then
+
+		local attacker = dmginfo:GetAttacker()
 		
-		if ( IsValid( weapon ) && weapon.Primary && weapon.Primary.Range && weapon.Primary.RangeModifier ) then
+		if ( IsValid( attacker ) && attacker:IsPlayer() ) then
 		
-			local rangeModifier = weapon.Primary.RangeModifier
+			local weapon = attacker:GetActiveWeapon()
 			
-			if ( weapon:GetClass() == "hvh_glock" && weapon:GetBurstMode() ) then
+			if ( IsValid( weapon ) && weapon.Range && weapon.RangeModifier ) then
 			
-				rangeModifier = 0.9
-			
-			elseif ( weapon:GetClass() == "hvh_m4a1" && weapon:GetSilencerOn() ) then
-			
-				rangeModifier = 0.95
+				local rangeModifier = weapon.RangeModifier
+				
+				if ( weapon:GetClass() == "hvh_glock" && weapon:GetBurstMode() ) then
+				
+					rangeModifier = 0.9
+				
+				elseif ( weapon:GetClass() == "hvh_m4a1" && weapon:GetSilencerOn() ) then
+				
+					rangeModifier = 0.95
+				
+				end
+
+				local travelledDistance = trace.Fraction * weapon.Range
+				local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
+
+				dmginfo:ScaleDamage( damageScale )
 			
 			end
-
-			local travelledDistance = trace.Fraction * weapon.Primary.Range
-			local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
-			
-			dmginfo:ScaleDamage( damageScale )
 		
 		end
-	
+		
 	end
-
+	
 	return false
 
 end
@@ -813,7 +821,7 @@ local hitgroup_dmgscale = {
 
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( hitgroup != HITGROUP_HEAD && GetConVarNumber( "mp_damage_headshot_only" ) != 0 ) then
+	if ( GetConVarNumber( "mp_damage_headshot_only" ) != 0 && dmginfo:IsBulletDamage() && hitgroup != HITGROUP_HEAD ) then
 		return true
 	end
 
@@ -865,8 +873,8 @@ function GM:HandlePlayerArmorReduction( ply, dmginfo )
 		
 		local weapon = attacker:GetActiveWeapon()
 		
-		if ( IsValid( weapon ) && weapon.Primary && weapon.Primary.ArmorRatio ) then
-			armorRatio = armorRatio * weapon.Primary.ArmorRatio
+		if ( IsValid( weapon ) && weapon.ArmorRatio ) then
+			armorRatio = armorRatio * weapon.ArmorRatio
 		end
 		
 	end

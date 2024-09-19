@@ -2,13 +2,16 @@ local hvhrank_points_start 		= CreateConVar( "hvhrank_points_start", "1000" )
 local hvhrank_points_kill 		= CreateConVar( "hvhrank_points_kill", "2" )
 local hvhrank_points_diff 		= CreateConVar( "hvhrank_points_diff", "100" )
 local hvhrank_points_headshot 	= CreateConVar( "hvhrank_points_headshot", "1" )
+local hvhrank_points_knife_mult	= CreateConVar( "hvhrank_points_knife_mult", "2" )
 local hvhrank_show_rank_all		= CreateConVar( "hvhrank_show_rank_all", "1" )
 
 local table_exist = false
 
+local clr_prefix = Color( 127, 127, 255 )
+
 function Stats_Load()
 	
-	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC)" )
+	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC, knife_kills NUMERIC)" )
 	
 	if ( result == false ) then
 		Msg( Format( "[HvH Rank] Could not create SQL table: %s\n", sql.LastError() ) )
@@ -33,7 +36,8 @@ function Stats_LoadPlayer( ply, steamid )
 			Score = tonumber( result[1].score ), 
 			Kills = tonumber( result[1].kills ), 
 			Deaths = tonumber( result[1].deaths ), 
-			Headshots = tonumber( result[1].headshots )
+			Headshots = tonumber( result[1].headshots ),
+			KnifeKills = tonumber( result[1].knife_kills )
 			
 		}
 		
@@ -46,11 +50,12 @@ function Stats_LoadPlayer( ply, steamid )
 			Score = points_start, 
 			Kills = 0, 
 			Deaths = 0,
-			Headshots = 0 
+			Headshots = 0,
+			KnifeKills = 0
 			
 		}
 		
-		sql.Query( Format( "INSERT INTO hvhrank VALUES (NULL, %s, %s, %i, 0, 0, 0)", sql.SQLStr( steamid ), sql.SQLStr( ply:Name() ), points_start ) )
+		sql.Query( Format( "INSERT INTO hvhrank VALUES (NULL, %s, %s, %i, 0, 0, 0, 0)", sql.SQLStr( steamid ), sql.SQLStr( ply:Name() ), points_start ) )
 		
 	end
 
@@ -62,11 +67,11 @@ function Stats_SavePlayer( ply )
 		return
 	end
 
-	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, sql.SQLStr( ply:SteamID() ) ) )
+	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i, knife_kills = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, ply.Stats.KnifeKills, sql.SQLStr( ply:SteamID() ) ) )
 
 end
 
-function Stats_OnPlayerDeath( victim, attacker, headshot )
+function Stats_OnPlayerDeath( victim, attacker, headshot, knife_kill )
 
 	if ( !victim.Stats || !attacker.Stats || victim == attacker ) then
 		return
@@ -77,26 +82,48 @@ function Stats_OnPlayerDeath( victim, attacker, headshot )
 
 	local points_kill = hvhrank_points_kill:GetInt()
 	local points_diff = hvhrank_points_diff:GetInt()
-	local score_diff = victim.Stats.Score - attacker.Stats.Score
+
+	if ( points_diff > 0 ) then
 	
-	if ( score_diff > 0 && points_diff != 0	) then
-		points_kill = points_kill + math.floor( score_diff / points_diff )
+		local score_diff = victim.Stats.Score - attacker.Stats.Score
+	
+		if ( score_diff > 0 ) then
+			points_kill = points_kill + math.floor( score_diff / points_diff )
+		end
+		
+	end
+
+	if ( knife_kill ) then
+	
+		attacker.Stats.KnifeKills = attacker.Stats.KnifeKills + 1
+		
+		local points_knife_mult = hvhrank_points_knife_mult:GetFloat()
+		
+		if ( points_knife_mult > 0 ) then
+			points_kill = math.ceil( points_kill * points_knife_mult )
+		end
+		
 	end
 	
 	victim.Stats.Score 		= victim.Stats.Score	- points_kill
 	attacker.Stats.Score 	= attacker.Stats.Score 	+ points_kill
-	
-	victim:ChatPrint( Format( "\x01[\x04HvH Rank\x01] -%i points (%i) for being killed by \x03%s\x01 (%i)", points_kill, victim.Stats.Score, attacker:Name(), attacker.Stats.Score ) )
-	attacker:ChatPrint( Format( "\x01[\x04HvH Rank\x01] +%i points (%i) for killing \x03%s\x01 (%i)", points_kill, attacker.Stats.Score, victim:Name(), victim.Stats.Score ) )
+
+	victim:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] -", tostring( points_kill ), " points (", tostring( victim.Stats.Score ), ") for being killed by ", COLOR_NICKNAME, attacker:Name(), color_white, " (", tostring( attacker.Stats.Score ), ")" ) )
+	attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_kill ), " points (", tostring( attacker.Stats.Score ), ") for killing ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
 	
 	if ( headshot ) then
-	
+
+		attacker.Stats.Headshots = attacker.Stats.Headshots + 1
+
 		local points_headshot = hvhrank_points_headshot:GetInt()
-	
-		attacker.Stats.Score 		= attacker.Stats.Score + points_headshot
-		attacker.Stats.Headshots 	= attacker.Stats.Headshots + 1
 		
-		attacker:ChatPrint( Format( "\x01[\x04HvH Rank\x01] +%i points (%i) for headshotting \x03%s\x01 (%i)", points_headshot, attacker.Stats.Score, victim:Name(), victim.Stats.Score ) )
+		if ( points_headshot > 0 ) then
+		
+			attacker.Stats.Score = attacker.Stats.Score + points_headshot
+
+			attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_headshot ), " points (", tostring( attacker.Stats.Score ), ") for headshotting ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
+		
+		end
 		
 	end
 
@@ -119,7 +146,7 @@ function Stats_ShowRank( ply )
 		
 			if ( row.steamid == ply:SteamID() ) then
 			
-				local text = Format( "\x01[\x04HvH Rank\x01] Player \x03%s\x01 is ranked at %i/%i with %i points, %i kills, %i deaths and %i headshots", ply:Name(), rank, #result, ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots )
+				local text = util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] ", COLOR_NICKNAME, ply:Name(), color_white, " is ranked at ", tostring( rank ), "/", tostring( #result ), " with ", tostring( ply.Stats.Score ), " points, ", tostring( ply.Stats.Kills ), " kills, ", tostring( ply.Stats.Deaths ), " deaths, ", tostring( ply.Stats.Headshots ), " headshots and ", tostring( ply.Stats.KnifeKills ), " knife kills" )
 				
 				if ( hvhrank_show_rank_all:GetBool() ) then
 					PrintMessage( HUD_PRINTTALK, text )

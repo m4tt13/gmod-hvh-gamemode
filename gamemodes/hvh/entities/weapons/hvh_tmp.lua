@@ -20,15 +20,16 @@ SWEP.HoldType				= "smg"
 SWEP.ViewModel				= "models/weapons/v_smg_tmp.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_tmp.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.84
+SWEP.ArmorRatio				= 1
+
 SWEP.Primary.Sound			= Sound( "Weapon_TMP.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 26
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.025
 SWEP.Primary.Delay			= 0.07
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.84
-SWEP.Primary.ArmorRatio		= 1.0
 
 SWEP.Primary.ClipSize		= 30
 SWEP.Primary.DefaultClip	= 30

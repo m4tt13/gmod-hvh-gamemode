@@ -10,6 +10,7 @@ AddCSLuaFile( "cl_targetid.lua" )
 AddCSLuaFile( "cl_weapons.lua" )
 AddCSLuaFile( "player_shd.lua" )
 AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "util.lua" )
 
 include( "shared.lua" )
 include( "menu.lua" )
@@ -146,16 +147,6 @@ local function GoToIntermission()
 
 end
 
-local function PlaySound( snd )
-
-	net.Start( "HvH_PlaySound" )
-		
-		net.WriteString( snd )
-	
-	net.Broadcast()
-
-end
-
 local function TerminateRound( delay, reason )
 
 	local winnerTeam = WINNER_NONE
@@ -168,7 +159,7 @@ local function TerminateRound( delay, reason )
 		
 		PrintMessage( HUD_PRINTCENTER, reason_info.Msg )
 		
-		PlaySound( reason_info.Sound )
+		util.PlaySound( reason_info.Sound )
 	
 	end
 
@@ -356,7 +347,7 @@ local function CheckFreezePeriodExpired()
 
 	SetGlobalBool( "FreezePeriod", false )
 	
-	PlaySound( round_start_snds[ math.random( #round_start_snds ) ] )
+	util.PlaySound( round_start_snds[ math.random( #round_start_snds ) ] )
 
 end
 

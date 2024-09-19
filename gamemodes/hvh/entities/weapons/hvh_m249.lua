@@ -20,15 +20,16 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_mach_m249para.mdl"	
 SWEP.WorldModel				= "models/weapons/w_mach_m249para.mdl"	
 
+SWEP.Range					= 8192
+SWEP.RangeModifier			= 0.97
+SWEP.ArmorRatio				= 1.5
+
 SWEP.Primary.Sound			= Sound( "Weapon_M249.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 32
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.016
 SWEP.Primary.Delay			= 0.08
-SWEP.Primary.Range			= 8192
-SWEP.Primary.RangeModifier	= 0.97
-SWEP.Primary.ArmorRatio		= 1.5
 
 SWEP.Primary.ClipSize		= 100
 SWEP.Primary.DefaultClip	= 100

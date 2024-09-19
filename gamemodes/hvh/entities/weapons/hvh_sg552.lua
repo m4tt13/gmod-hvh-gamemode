@@ -20,24 +20,27 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_sg552.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_sg552.mdl"	
 
+SWEP.Range					= 8192
+SWEP.RangeModifier			= 0.955
+SWEP.ArmorRatio				= 1.4
+
 SWEP.Primary.Sound			= Sound( "Weapon_SG552.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 33
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.012
 SWEP.Primary.Delay			= 0.0825
-SWEP.Primary.Range			= 8192
-SWEP.Primary.RangeModifier	= 0.955
-SWEP.Primary.ArmorRatio		= 1.4
 
 SWEP.Primary.ClipSize		= 30
 SWEP.Primary.DefaultClip	= 30
 SWEP.Primary.Automatic		= true
 SWEP.Primary.Ammo			= "BULLET_PLAYER_556MM"
 
+SWEP.Secondary.Delay		= 0.3
+
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 3, "ZoomLevel" )
+	self:NetworkVar( "Int", 0, "ZoomLevel" )
 	
 end
 
@@ -85,7 +88,7 @@ function SWEP:SecondaryAttack()
 		
 	end
 
-	self:SetNextSecondaryFire( CurTime() + 0.3 )
+	self:SetNextSecondaryFire( CurTime() + self.Secondary.Delay )
 
 end
 

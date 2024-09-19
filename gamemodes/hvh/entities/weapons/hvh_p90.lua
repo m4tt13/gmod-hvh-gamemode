@@ -20,15 +20,16 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_smg_p90.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_p90.mdl"	
 
+SWEP.Range					= 4096
+SWEP.RangeModifier			= 0.84
+SWEP.ArmorRatio				= 1.5
+
 SWEP.Primary.Sound			= Sound( "Weapon_P90.Single" )
 SWEP.Primary.Recoil			= 2
 SWEP.Primary.Damage			= 26
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.027
 SWEP.Primary.Delay			= 0.066
-SWEP.Primary.Range			= 4096
-SWEP.Primary.RangeModifier	= 0.84
-SWEP.Primary.ArmorRatio		= 1.5
 
 SWEP.Primary.ClipSize		= 50
 SWEP.Primary.DefaultClip	= 50
