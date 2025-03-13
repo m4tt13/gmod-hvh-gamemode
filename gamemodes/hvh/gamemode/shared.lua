@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2"
+GM.Version = "1.2.1"
 
 GM.TeamBased = true
 
@@ -58,13 +58,16 @@ function GM:IsFreezePeriod()
 	
 end
 
+local nextlevel = GetConVar( "nextlevel" )
+local mp_timelimit = GetConVar( "mp_timelimit" )
+
 function GM:GetMapRemainingTime()
 
-	if ( GetConVarString( "nextlevel" ) != "" ) then
+	if ( nextlevel:GetString() != "" ) then
 		return 0
 	end
 
-	local timelimit = GetConVarNumber( "mp_timelimit" )
+	local timelimit = mp_timelimit:GetInt()
 
 	if ( timelimit <= 0 ) then
 		return -1

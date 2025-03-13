@@ -15,7 +15,7 @@ function Menu_Display( ply )
 
 	ply.CurrentMenu.RefreshTime = CurTime() + MENU_UPDATETIME
 	
-	net.Start( "HvH_ShowMenu" )
+	net.Start( "hvh_showmenu" )
 	
 		net.WriteUInt( #ply.CurrentMenu.MenuLines, 8 )
 	
@@ -101,7 +101,7 @@ function Menu_Close( ply )
 
 	ply.CurrentMenu = nil
 
-	net.Start( "HvH_ShowMenu" )
+	net.Start( "hvh_showmenu" )
 	
 		net.WriteUInt( 0, 8 )
 	

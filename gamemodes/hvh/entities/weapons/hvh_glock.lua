@@ -8,7 +8,7 @@ SWEP.IconLetter				= "c"
 SWEP.CanBuy        		 	= true
 
 if CLIENT then
-	killicon.AddFont( "hvh_glock", "HvH_KillIcon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_glock", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
@@ -162,6 +162,21 @@ function SWEP:Deploy()
 	
 	return true
 	
+end
+
+function SWEP:OnTraceAttack( dmginfo, dir, trace )
+
+	local rangeModifier = self.RangeModifier
+	
+	if ( self:GetBurstMode() ) then	
+		rangeModifier = 0.9
+	end
+
+	local travelledDistance = trace.Fraction * self.Range
+	local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
+
+	dmginfo:ScaleDamage( damageScale )
+
 end
 
 function SWEP:ShootEffects() end

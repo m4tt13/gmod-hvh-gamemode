@@ -8,7 +8,7 @@ SWEP.IconLetter				= "j"
 SWEP.CanBuy        		 	= true
 
 if CLIENT then
-	killicon.AddFont( "hvh_knife", "HvH_KillIcon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_knife", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_MELEE
@@ -21,8 +21,6 @@ SWEP.HoldType				= "knife"
 SWEP.ViewModel				= "models/weapons/v_knife_t.mdl"	
 SWEP.WorldModel				= "models/weapons/w_knife_t.mdl"	
 
-SWEP.Range					= 0
-SWEP.RangeModifier			= 1
 SWEP.ArmorRatio				= 1.7
 
 SWEP.Primary.ClipSize		= -1
@@ -38,6 +36,8 @@ local snd_hitwall 	= Sound( "Weapon_Knife.HitWall" )
 
 local head_hull_mins = Vector( -16, -16, -18 )
 local head_hull_maxs = Vector( 16, 16, 18 )
+
+local phys_pushscale = GetConVar( "phys_pushscale" )
 
 function SWEP:SwingOrStab( bStab )
 
@@ -124,7 +124,7 @@ function SWEP:SwingOrStab( bStab )
 				dmgInfo:SetDamage( damage )
 				dmgInfo:SetAttacker( ply )
 				dmgInfo:SetInflictor( ply )
-				dmgInfo:SetDamageForce( vecDir * 300 )
+				dmgInfo:SetDamageForce( vecDir * 300 * phys_pushscale:GetFloat() )
 				dmgInfo:SetDamagePosition( tr.HitPos )
 				dmgInfo:SetDamageType( DMG_SLASH )
 
@@ -197,3 +197,5 @@ function SWEP:Deploy()
 	return true
 	
 end
+
+function SWEP:OnTraceAttack( dmginfo, dir, trace ) end

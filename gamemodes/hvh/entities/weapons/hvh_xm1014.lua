@@ -8,7 +8,7 @@ SWEP.IconLetter				= "B"
 SWEP.CanBuy        		 	= true
 
 if CLIENT then
-	killicon.AddFont( "hvh_xm1014", "HvH_KillIcon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_xm1014", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY

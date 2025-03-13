@@ -1,4 +1,4 @@
-surface.CreateFont( "HvH_KillIcon", {
+surface.CreateFont( "hvh_killicon", {
 
 	font = "csd",
 	size = 64,
@@ -12,8 +12,8 @@ local Color_Icon = Color( 255, 80, 0, 255 )
 local NPC_Color_Enemy = Color( 250, 50, 50, 255 )
 local NPC_Color_Friendly = Color( 50, 200, 50, 255 )
 
-killicon.AddFont( "suicide", "HvH_KillIcon", "C", Color_Icon )
-killicon.AddFont( "headshot", "HvH_KillIcon", "D", Color_Icon )
+killicon.AddFont( "suicide", "hvh_killicon", "C", Color_Icon )
+killicon.AddFont( "headshot", "hvh_killicon", "D", Color_Icon )
 
 local Deaths = {}
 
@@ -84,9 +84,11 @@ local function DrawDeath( x, y, death, time )
 
 end
 
+local cl_drawhud = GetConVar( "cl_drawhud" )
+
 function GM:DrawDeathNotice()
 
-	if ( GetConVarNumber( "cl_drawhud" ) == 0 ) then return end
+	if ( !cl_drawhud:GetBool() ) then return end
 
 	local time = GetConVarNumber( "hud_deathnotice_time" )
 	local reset = Deaths[1] != nil

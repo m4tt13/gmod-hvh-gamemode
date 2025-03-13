@@ -11,10 +11,10 @@ local clr_prefix = Color( 127, 127, 255 )
 
 function Stats_Load()
 	
-	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC, knife_kills NUMERIC)" )
+	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC, knifekills NUMERIC)" )
 	
 	if ( result == false ) then
-		Msg( Format( "[HvH Rank] Could not create SQL table: %s\n", sql.LastError() ) )
+		MsgC( Color( 255, 0, 0 ), Format( "[HvH Rank] Could not create SQL table: %s\n", sql.LastError() ) )
 	else
 		table_exist = true
 	end
@@ -37,7 +37,7 @@ function Stats_LoadPlayer( ply, steamid )
 			Kills = tonumber( result[1].kills ), 
 			Deaths = tonumber( result[1].deaths ), 
 			Headshots = tonumber( result[1].headshots ),
-			KnifeKills = tonumber( result[1].knife_kills )
+			KnifeKills = tonumber( result[1].knifekills )
 			
 		}
 		
@@ -67,7 +67,7 @@ function Stats_SavePlayer( ply )
 		return
 	end
 
-	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i, knife_kills = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, ply.Stats.KnifeKills, sql.SQLStr( ply:SteamID() ) ) )
+	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i, knifekills = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, ply.Stats.KnifeKills, sql.SQLStr( ply:SteamID() ) ) )
 
 end
 

@@ -2,7 +2,7 @@ AddCSLuaFile()
 
 if CLIENT then
 
-	surface.CreateFont( "HvH_SelectionIcon", {
+	surface.CreateFont( "hvh_selectionicon", {
 
 		font = "csd",
 		size = 80,
@@ -47,7 +47,7 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
-CreateConVar( "sv_infinite_ammo", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
+local sv_infinite_ammo = CreateConVar( "sv_infinite_ammo", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
 
 function SWEP:Initialize()
 
@@ -103,7 +103,7 @@ end
 
 function SWEP:TakePrimaryAmmo( num )
 
-	if ( GetConVarNumber( "sv_infinite_ammo" ) != 0 ) then return end
+	if ( sv_infinite_ammo:GetBool() ) then return end
 	
 	if ( self:Clip1() <= 0 ) then
 
@@ -119,11 +119,20 @@ function SWEP:TakePrimaryAmmo( num )
 
 end
 
+function SWEP:OnTraceAttack( dmginfo, dir, trace )
+
+	local travelledDistance = trace.Fraction * self.Range
+	local damageScale = math.pow( self.RangeModifier, ( travelledDistance / 500 ) )
+
+	dmginfo:ScaleDamage( damageScale )
+
+end
+
 if CLIENT then
 
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 	
-		draw.SimpleText( self.IconLetter, "HvH_SelectionIcon", x + wide / 2, y + tall * 0.3, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
+		draw.SimpleText( self.IconLetter, "hvh_selectionicon", x + wide / 2, y + tall * 0.3, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
 	
 	end
 

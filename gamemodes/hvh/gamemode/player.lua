@@ -1,20 +1,21 @@
 DEFINE_BASECLASS( "gamemode_base" )
 
-CreateConVar( "mp_flood_time", "0.75", FCVAR_NONE, "Amount of time allowed between chat messages." )
-CreateConVar( "mp_join_grace_time", "15.0", FCVAR_NONE, "Number of seconds after round start to allow a player to join a game.", 0, 30 )
-CreateConVar( "mp_teamswitch_cooldown", "10.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
-CreateConVar( "sv_noplayercollision", "1", FCVAR_NONE, "Disable player collision." )
-CreateConVar( "sv_nodamageforces", "1", FCVAR_NONE, "Disable forces from physics damage." )
-CreateConVar( "sv_jump_impulse", "270", FCVAR_NONE, "Initial upward velocity for player jumps; sqrt(2*gravity*height)." )
-CreateConVar( "sv_falldamage_scale", "1" )
-CreateConVar( "mp_damage_scale_head", "4.0" )
-CreateConVar( "mp_damage_scale_chest", "1.0" )
-CreateConVar( "mp_damage_scale_stomach", "1.25" )
-CreateConVar( "mp_damage_scale_arms", "1.0" )
-CreateConVar( "mp_damage_scale_legs", "0.75" )
-CreateConVar( "mp_deathsound", "0" )
-CreateConVar( "mp_allowtaunts", "0" )
-CreateConVar( "mp_startarmor", "1" )
+local mp_flood_time = CreateConVar( "mp_flood_time", "0.75", FCVAR_NONE, "Amount of time allowed between chat messages." )
+local mp_join_grace_time = CreateConVar( "mp_join_grace_time", "15.0", FCVAR_NONE, "Number of seconds after round start to allow a player to join a game.", 0, 30 )
+local mp_teamswitch_cooldown = CreateConVar( "mp_teamswitch_cooldown", "10.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
+local sv_noplayercollision = CreateConVar( "sv_noplayercollision", "1", FCVAR_NONE, "Disable player collision." )
+local sv_nodamageforces = CreateConVar( "sv_nodamageforces", "1", FCVAR_NONE, "Disable forces from physics damage." )
+local sv_jump_impulse = CreateConVar( "sv_jump_impulse", "270", FCVAR_NONE, "Initial upward velocity for player jumps; sqrt(2*gravity*height)." )
+local sv_falldamage_scale = CreateConVar( "sv_falldamage_scale", "1" )
+local mp_damage_scale_head = CreateConVar( "mp_damage_scale_head", "4.0" )
+local mp_damage_scale_chest = CreateConVar( "mp_damage_scale_chest", "1.0" )
+local mp_damage_scale_stomach = CreateConVar( "mp_damage_scale_stomach", "1.25" )
+local mp_damage_scale_arms = CreateConVar( "mp_damage_scale_arms", "1.0" )
+local mp_damage_scale_legs = CreateConVar( "mp_damage_scale_legs", "0.75" )
+local mp_deathsound = CreateConVar( "mp_deathsound", "0" )
+local mp_allowtaunts = CreateConVar( "mp_allowtaunts", "0" )
+local mp_startarmor = CreateConVar( "mp_startarmor", "1" )
+local mp_damagelog = CreateConVar( "mp_damagelog", "1" )
 
 local function IsValidObsTarget( ply, target )
 
@@ -198,7 +199,7 @@ local function GetWeaponByAlias( alias )
 	
 		local tbl = {}
 		
-		for k, v in pairs( weapons.GetList() ) do
+		for k, v in ipairs( weapons.GetList() ) do
 		
 			if ( v && v.Alias ) then
 				tbl[ v.Alias ] = v
@@ -216,7 +217,7 @@ end
 
 local function StockPlayerAmmo( pl )
 
-	for id, wpn in pairs( pl:GetWeapons() ) do
+	for id, wpn in ipairs( pl:GetWeapons() ) do
 	
 		local ammoType = wpn:GetPrimaryAmmoType()
 	
@@ -249,7 +250,7 @@ local function GiveWeapon( ply, weapon, translate )
 		return false
 	end
 	
-	for id, wpn in pairs( ply:GetWeapons() ) do
+	for id, wpn in ipairs( ply:GetWeapons() ) do
 	
 		if ( wpn:GetSlot() == swep.Slot ) then
 			ply:StripWeapon( wpn:GetClass() )
@@ -267,7 +268,7 @@ concommand.Add( "giveweapon", function( pl, cmd, args ) GiveWeapon( pl, args[1],
 
 local function PlayerFloodCheck( ply )
 
-	local maxChat = GetConVarNumber( "mp_flood_time" )
+	local maxChat = mp_flood_time:GetFloat()
 	
 	if ( maxChat <= 0 ) then
 		return false
@@ -303,6 +304,9 @@ local function PlayerFloodCheck( ply )
 
 end
 
+local nextlevel = GetConVar( "nextlevel" )
+local mp_timelimit = GetConVar( "mp_timelimit" )
+
 function GM:PlayerSay( ply, text, teamonly )
 
 	if ( PlayerFloodCheck( ply ) ) then
@@ -329,7 +333,7 @@ function GM:PlayerSay( ply, text, teamonly )
 
 	if ( ltext == "nextmap" ) then
 	
-		local nextmap = GetConVarString( "nextlevel" )
+		local nextmap = nextlevel:GetString()
 		
 		if ( nextmap == "" ) then
 			nextmap = game.GetMapNext()
@@ -343,7 +347,7 @@ function GM:PlayerSay( ply, text, teamonly )
 	
 	elseif ( ltext == "timeleft" ) then
 	
-		if ( GetConVarNumber( "mp_timelimit" ) > 0 ) then
+		if ( mp_timelimit:GetInt() > 0 ) then
 		
 			local TimeLeft = GAMEMODE:GetMapRemainingTime()
 			
@@ -486,6 +490,8 @@ function GM:PostPlayerDeath( ply )
 	ply:RemoveEffects( EF_NODRAW )
 
 	GAMEMODE:CheckWinConditions()
+	
+	ply:OutputDamageStatsAndReset()
 
 end
 
@@ -520,21 +526,21 @@ local function SetUpPlayerVars( ply )
 	ply:SetCrouchedWalkSpeed( 0.3 )
 	ply:SetDuckSpeed( 0.3 )
 	ply:SetUnDuckSpeed( 0.2 )
-	ply:SetJumpPower( GetConVarNumber( "sv_jump_impulse" ) )
+	ply:SetJumpPower( sv_jump_impulse:GetFloat() )
 	ply:AllowFlashlight( true )
 	ply:SetMaxHealth( 100 )
 	ply:SetMaxArmor( 100 )
 	ply:SetHealth( 100 )
-	ply:SetArmor( GetConVarNumber( "mp_startarmor" ) != 0 && 100 || 0 )
+	ply:SetArmor( mp_startarmor:GetBool() && 100 || 0 )
 	ply:ShouldDropWeapon( false )
 	ply:SetNoCollideWithTeammates( false )
 	ply:SetAvoidPlayers( false )
 	
-	if ( GetConVarNumber( "sv_noplayercollision" ) != 0 ) then
+	if ( sv_noplayercollision:GetBool() ) then
 		ply:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 	end
 	
-	if ( GetConVarNumber( "sv_nodamageforces" ) != 0 ) then
+	if ( sv_nodamageforces:GetBool() ) then
 		ply:AddEFlags( EFL_NO_DAMAGE_FORCES ) 
 	end
 
@@ -606,7 +612,7 @@ function GM:PlayerLoadout( pl )
 		
 	}
 
-	for id, wpn in pairs( pl:GetWeapons() ) do
+	for id, wpn in ipairs( pl:GetWeapons() ) do
 		loadouts[ wpn:GetSlot() ] = nil
 	end
 	
@@ -628,13 +634,15 @@ end
 
 function GM:PlayerDeathSound()
 
-	return GetConVarNumber( "mp_deathsound" ) == 0
+	return !mp_deathsound:GetBool()
 	
 end
 
+local mp_flashlight = GetConVar( "mp_flashlight" )
+
 function GM:PlayerSwitchFlashlight( ply, enabled )
 
-	if ( enabled && GetConVarNumber( "mp_flashlight" ) == 0 ) then
+	if ( enabled && !mp_flashlight:GetBool() ) then
 		return false
 	end
 
@@ -651,7 +659,7 @@ function GM:PlayerCanJoinTeam( ply, teamid )
 		
 	end
 	
-	local TimeBetweenSwitches = GetConVarNumber( "mp_teamswitch_cooldown" )
+	local TimeBetweenSwitches = mp_teamswitch_cooldown:GetFloat()
 
 	if ( TimeBetweenSwitches > 0 && ply.LastTeamSwitch ) then
 	
@@ -722,7 +730,7 @@ local function PlayerCanRespawn( ply )
 			return false
 		end
 		
-		if ( CurTime() > ( GAMEMODE:GetRoundStartTime() + GetConVarNumber( "mp_join_grace_time" ) ) ) then
+		if ( CurTime() > ( GAMEMODE:GetRoundStartTime() + mp_join_grace_time:GetFloat() ) ) then
 			return false
 		end
 		
@@ -758,49 +766,28 @@ end
 
 function GM:GetFallDamage( ply, flFallSpeed )
 
-	return BaseClass.GetFallDamage( self, ply, flFallSpeed ) * GetConVarNumber( "sv_falldamage_scale" )
+	return BaseClass.GetFallDamage( self, ply, flFallSpeed ) * sv_falldamage_scale:GetFloat()
 
 end
 
 function GM:PlayerShouldTaunt( ply, actid )
 
-	return GetConVarNumber( "mp_allowtaunts" ) != 0
+	return mp_allowtaunts:GetBool()
 
 end
 
 function GM:PlayerTraceAttack( ply, dmginfo, dir, trace )
 
-	if ( dmginfo:IsBulletDamage() ) then
-
-		local attacker = dmginfo:GetAttacker()
+	local attacker = dmginfo:GetAttacker()
+	
+	if ( IsValid( attacker ) && attacker:IsPlayer() ) then
+	
+		local weapon = attacker:GetActiveWeapon()
 		
-		if ( IsValid( attacker ) && attacker:IsPlayer() ) then
-		
-			local weapon = attacker:GetActiveWeapon()
-			
-			if ( IsValid( weapon ) && weapon.Range && weapon.RangeModifier ) then
-			
-				local rangeModifier = weapon.RangeModifier
-				
-				if ( weapon:GetClass() == "hvh_glock" && weapon:GetBurstMode() ) then
-				
-					rangeModifier = 0.9
-				
-				elseif ( weapon:GetClass() == "hvh_m4a1" && weapon:GetSilencerOn() ) then
-				
-					rangeModifier = 0.95
-				
-				end
-
-				local travelledDistance = trace.Fraction * weapon.Range
-				local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
-
-				dmginfo:ScaleDamage( damageScale )
-			
-			end
-		
+		if ( IsValid( weapon ) && weapon.OnTraceAttack ) then
+			weapon:OnTraceAttack( dmginfo, dir, trace )
 		end
-		
+	
 	end
 	
 	return false
@@ -809,13 +796,13 @@ end
 
 local hitgroup_dmgscale = {
 
-	[HITGROUP_HEAD]		= "mp_damage_scale_head",
-	[HITGROUP_CHEST]	= "mp_damage_scale_chest",
-	[HITGROUP_STOMACH]	= "mp_damage_scale_stomach",
-	[HITGROUP_LEFTARM]	= "mp_damage_scale_arms",
-	[HITGROUP_RIGHTARM]	= "mp_damage_scale_arms",
-	[HITGROUP_LEFTLEG]	= "mp_damage_scale_legs",
-	[HITGROUP_RIGHTLEG]	= "mp_damage_scale_legs"
+	[HITGROUP_HEAD]		= mp_damage_scale_head,
+	[HITGROUP_CHEST]	= mp_damage_scale_chest,
+	[HITGROUP_STOMACH]	= mp_damage_scale_stomach,
+	[HITGROUP_LEFTARM]	= mp_damage_scale_arms,
+	[HITGROUP_RIGHTARM]	= mp_damage_scale_arms,
+	[HITGROUP_LEFTLEG]	= mp_damage_scale_legs,
+	[HITGROUP_RIGHTLEG]	= mp_damage_scale_legs
 
 }
 
@@ -828,16 +815,18 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 	local dmgscale = hitgroup_dmgscale[hitgroup]
 	
 	if ( dmgscale ) then
-		dmginfo:ScaleDamage( GetConVarNumber( dmgscale ) )
+		dmginfo:ScaleDamage( dmgscale:GetFloat() )
 	end
 
 	return false
 
 end
 
+local mp_friendlyfire = GetConVar( "mp_friendlyfire" )
+
 function GM:PlayerShouldTakeDamage( ply, attacker )
 
-	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
+	if ( !mp_friendlyfire:GetBool() ) then
 	
 		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
 			return false
@@ -904,6 +893,63 @@ function GM:HandlePlayerArmorReduction( ply, dmginfo )
 	
 	damage = damageToHealth
 	dmginfo:SetDamage( damage )
+
+end
+
+function GM:PostEntityTakeDamage( victim, dmginfo, took )
+
+	if ( mp_damagelog:GetBool() && victim:IsPlayer() ) then
+	
+		local attacker = dmginfo:GetAttacker()
+		local attacker_name = "world"
+		local victim_name = victim:Name()
+		local damage = dmginfo:GetDamage()
+		
+		if ( IsValid( attacker ) && attacker:IsPlayer() ) then
+		
+			attacker.DamageGivenList = attacker.DamageGivenList || {}
+			
+			local record = attacker.DamageGivenList[ victim_name ]
+			
+			if ( record ) then
+			
+				record.Damage = record.Damage + damage
+				record.NumHits = record.NumHits + 1
+			
+			else
+
+				record = {}
+				record.Damage = damage
+				record.NumHits = 1
+				
+				attacker.DamageGivenList[ victim_name ] = record
+			
+			end
+
+			attacker_name = attacker:Name()
+		
+		end
+		
+		victim.DamageTakenList = victim.DamageTakenList || {}
+		
+		local record = victim.DamageTakenList[ attacker_name ]
+		
+		if ( record ) then
+		
+			record.Damage = record.Damage + damage
+			record.NumHits = record.NumHits + 1
+		
+		else
+
+			record = {}
+			record.Damage = damage
+			record.NumHits = 1
+			
+			victim.DamageTakenList[ attacker_name ] = record
+		
+		end
+		
+	end
 
 end
 

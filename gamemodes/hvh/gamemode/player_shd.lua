@@ -1,5 +1,5 @@
 CreateConVar( "mp_damage_headshot_only", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
-CreateConVar( "sv_jump_boost", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
+local sv_jump_boost = CreateConVar( "sv_jump_boost", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
 
 function GM:StartCommand( ply, ucmd )
 
@@ -24,7 +24,7 @@ end
 
 function GM:FinishMove( ply, mv )
 
-	local jump_boost = GetConVarNumber( "sv_jump_boost" )
+	local jump_boost = sv_jump_boost:GetFloat()
 
 	if ( JUMPING && jump_boost > 0 ) then
 

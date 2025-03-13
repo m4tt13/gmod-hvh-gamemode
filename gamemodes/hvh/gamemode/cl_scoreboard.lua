@@ -1,4 +1,4 @@
-surface.CreateFont( "HvH_Scoreboard", {
+surface.CreateFont( "hvh_scoreboard", {
 
 	font = "Verdana",
 	size = 13,
@@ -6,7 +6,7 @@ surface.CreateFont( "HvH_Scoreboard", {
 
 } )
 
-surface.CreateFont( "HvH_ScoreboardSmall", {
+surface.CreateFont( "hvh_scoreboardsmall", {
 
 	font = "Verdana",
 	size = 13,
@@ -288,7 +288,7 @@ local function TeamLatency( index )
 	local pingsum = 0
 	local numcounted = 0
 	
-	for id, pl in pairs( player.GetAll() ) do
+	for id, pl in ipairs( player.GetAll() ) do
 	
 		if ( pl:Team() == index )  then
 		
@@ -316,12 +316,12 @@ end
 local function AddHeader( pnl )
 
 	local header = pnl:Add( "Panel" )
-	header:SetHeight( draw.GetFontHeight( "HvH_ScoreboardSmall" ) + 7 )
+	header:SetHeight( draw.GetFontHeight( "hvh_scoreboardsmall" ) + 7 )
 	header:DockMargin( 0, 0, 0, 8 )
 	header:Dock( TOP )
 	
 	header.Ping = header:Add( "DLabel" )
-	header.Ping:SetFont( "HvH_ScoreboardSmall" )
+	header.Ping:SetFont( "hvh_scoreboardsmall" )
 	header.Ping:SetTextInset( 2, 0 )
 	header.Ping:SetTextColor( clr_text )
 	header.Ping:SetText( "Latency" )
@@ -330,7 +330,7 @@ local function AddHeader( pnl )
 	header.Ping:Dock( RIGHT )
 	
 	header.Deaths = header:Add( "DLabel" )
-	header.Deaths:SetFont( "HvH_ScoreboardSmall" )
+	header.Deaths:SetFont( "hvh_scoreboardsmall" )
 	header.Deaths:SetTextInset( 2, 0 )
 	header.Deaths:SetTextColor( clr_text )
 	header.Deaths:SetText( "Deaths" )
@@ -339,7 +339,7 @@ local function AddHeader( pnl )
 	header.Deaths:Dock( RIGHT )
 	
 	header.Score = header:Add( "DLabel" )
-	header.Score:SetFont( "HvH_ScoreboardSmall" )
+	header.Score:SetFont( "hvh_scoreboardsmall" )
 	header.Score:SetTextInset( 2, 0 )
 	header.Score:SetTextColor( clr_text )
 	header.Score:SetText( "Score" )
@@ -369,7 +369,7 @@ local function AddPlayerLine( pnl, pl, isspec )
 	if ( !isspec ) then
 	
 		playerline.Ping = playerline:Add( "DLabel" )
-		playerline.Ping:SetFont( "HvH_Scoreboard" )
+		playerline.Ping:SetFont( "hvh_scoreboard" )
 		playerline.Ping:SetTextInset( 2, 0 )
 		playerline.Ping:SetTextColor( clr )
 		playerline.Ping:SetWidth( 57 )
@@ -377,7 +377,7 @@ local function AddPlayerLine( pnl, pl, isspec )
 		playerline.Ping:Dock( RIGHT )
 		
 		playerline.Deaths = playerline:Add( "DLabel" )
-		playerline.Deaths:SetFont( "HvH_Scoreboard" )
+		playerline.Deaths:SetFont( "hvh_scoreboard" )
 		playerline.Deaths:SetTextInset( 2, 0 )
 		playerline.Deaths:SetTextColor( clr )
 		playerline.Deaths:SetWidth( 57 )
@@ -385,7 +385,7 @@ local function AddPlayerLine( pnl, pl, isspec )
 		playerline.Deaths:Dock( RIGHT )
 		
 		playerline.Frags = playerline:Add( "DLabel" )
-		playerline.Frags:SetFont( "HvH_Scoreboard" )
+		playerline.Frags:SetFont( "hvh_scoreboard" )
 		playerline.Frags:SetTextInset( 2, 0 )
 		playerline.Frags:SetTextColor( clr )
 		playerline.Frags:SetWidth( 50 )
@@ -393,7 +393,7 @@ local function AddPlayerLine( pnl, pl, isspec )
 		playerline.Frags:Dock( RIGHT )
 		
 		playerline.Class = playerline:Add( "DLabel" )
-		playerline.Class:SetFont( "HvH_Scoreboard" )
+		playerline.Class:SetFont( "hvh_scoreboard" )
 		playerline.Class:SetTextInset( 2, 0 )
 		playerline.Class:SetTextColor( clr )
 		playerline.Class:SetWidth( 70 )
@@ -403,7 +403,7 @@ local function AddPlayerLine( pnl, pl, isspec )
 	end
 	
 	playerline.Name = playerline:Add( "DLabel" )
-	playerline.Name:SetFont( "HvH_Scoreboard" )
+	playerline.Name:SetFont( "hvh_scoreboard" )
 	playerline.Name:SetTextInset( 6, 0 )
 	playerline.Name:SetTextColor( clr )
 	playerline.Name:SetContentAlignment( 4 )
@@ -484,7 +484,7 @@ end
 local function AddSection( pnl, teamindex )
 
 	local header = pnl:Add( "Panel" )
-	header:SetHeight( draw.GetFontHeight( "HvH_ScoreboardSmall" ) + 7 )
+	header:SetHeight( draw.GetFontHeight( "hvh_scoreboardsmall" ) + 7 )
 	header:Dock( TOP )
 	header.TeamIndex = teamindex
 	
@@ -497,7 +497,7 @@ local function AddSection( pnl, teamindex )
 		header_clr = team.GetColor( teamindex )
 	
 		header.Ping = header:Add( "DLabel" )
-		header.Ping:SetFont( "HvH_ScoreboardSmall" )
+		header.Ping:SetFont( "hvh_scoreboardsmall" )
 		header.Ping:SetTextInset( 2, 0 )
 		header.Ping:SetTextColor( header_clr )
 		header.Ping:SetWidth( 115 )
@@ -505,7 +505,7 @@ local function AddSection( pnl, teamindex )
 		header.Ping:Dock( RIGHT )
 		
 		header.Score = header:Add( "DLabel" )
-		header.Score:SetFont( "HvH_ScoreboardSmall" )
+		header.Score:SetFont( "hvh_scoreboardsmall" )
 		header.Score:SetTextInset( 2, 0 )
 		header.Score:SetTextColor( header_clr )
 		header.Score:SetWidth( 50 )
@@ -515,7 +515,7 @@ local function AddSection( pnl, teamindex )
 	end
 	
 	header.TeamInfo = header:Add( "DLabel" )
-	header.TeamInfo:SetFont( "HvH_ScoreboardSmall" )
+	header.TeamInfo:SetFont( "hvh_scoreboardsmall" )
 	header.TeamInfo:SetTextInset( 2, 0 )
 	header.TeamInfo:SetTextColor( header_clr )
 	header.TeamInfo:SetContentAlignment( 4 )
@@ -590,7 +590,7 @@ local function AddSection( pnl, teamindex )
 	
 	section.Think = function( self )
 	
-		for id, pl in pairs( player.GetAll() ) do
+		for id, pl in ipairs( player.GetAll() ) do
 
 			if ( IsValid( pl.ScoreEntry ) ) then continue end
 
@@ -625,7 +625,7 @@ local function CreateScoreboard()
 	scoreboard.ServerName = scoreboard:Add( "DLabel" )
 	scoreboard.ServerName:SetSize( 312, 30 )
 	scoreboard.ServerName:SetPos( 3, 2 )
-	scoreboard.ServerName:SetFont( "HvH_Scoreboard" )
+	scoreboard.ServerName:SetFont( "hvh_scoreboard" )
 	scoreboard.ServerName:SetTextColor( clr_text )
 	scoreboard.ServerName:SetContentAlignment( 7 )
 

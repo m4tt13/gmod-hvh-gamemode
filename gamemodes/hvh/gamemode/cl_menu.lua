@@ -103,14 +103,14 @@ local function OpenMenu()
 	
 	local height = 10
 	local width = 0
-	local h_step = draw.GetFontHeight( "HvH_Menu" )
+	local h_step = draw.GetFontHeight( "hvh_menu" )
 	
 	for _, menu_line in ipairs( menu_lines ) do
 	
 		if ( menu_line.Text ) then
 		
 			local line = menu_panel:Add( "DLabel" )
-			line:SetFont( "HvH_Menu" )
+			line:SetFont( "hvh_menu" )
 			line:SetTextColor( menu_line.Colored && clr_item || clr_menu )
 			line:SetText( ( item2num[ menu_line.Item ] && item2num[ menu_line.Item ] || "" ) .. menu_line.Text )
 			line:SizeToContentsX()
@@ -204,4 +204,4 @@ local function RecvShowMenu()
 	end
 
 end
-net.Receive( "HvH_ShowMenu", RecvShowMenu )
+net.Receive( "hvh_showmenu", RecvShowMenu )

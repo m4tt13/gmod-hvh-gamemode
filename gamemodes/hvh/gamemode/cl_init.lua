@@ -9,7 +9,7 @@ include( "cl_weapons.lua" )
 
 DEFINE_BASECLASS( "gamemode_base" )
 
-surface.CreateFont( "HvH_Menu", {
+surface.CreateFont( "hvh_menu", {
 
 	font = "Verdana",
 	size = 14,
@@ -18,7 +18,7 @@ surface.CreateFont( "HvH_Menu", {
 
 } )
 
-surface.CreateFont( "HvH_MenuSmall", {
+surface.CreateFont( "hvh_menusmall", {
 
 	font = "Verdana",
 	size = 13,
@@ -27,7 +27,7 @@ surface.CreateFont( "HvH_MenuSmall", {
 
 } )
 
-surface.CreateFont( "HvH_MenuTitle", {
+surface.CreateFont( "hvh_menutitle", {
 
 	font = "Verdana",
 	size = 20,
@@ -124,9 +124,11 @@ function GM:ChatText( playerindex, playername, text, filter )
 
 end
 
+local mp_friendlyfire = GetConVar( "mp_friendlyfire" )
+
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
+	if ( !mp_friendlyfire:GetBool() ) then
 	
 		local attacker = dmginfo:GetAttacker()
 
@@ -159,4 +161,4 @@ local function RecvPlaySound()
 	surface.PlaySound( Sound( snd ) )
 
 end
-net.Receive( "HvH_PlaySound", RecvPlaySound )
+net.Receive( "hvh_playsound", RecvPlaySound )

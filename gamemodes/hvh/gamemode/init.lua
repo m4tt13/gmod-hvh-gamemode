@@ -29,15 +29,15 @@ REASON_CT_WIN 			= 2
 REASON_ROUND_DRAW 		= 3
 REASON_GAME_COMMENCING	= 4
 
-CreateConVar( "mp_round_restart_delay", "5.0", FCVAR_NONE, "Number of seconds to delay before restarting a round after a win.", 0, 10 )
-CreateConVar( "mp_roundtime", "2.5", FCVAR_NONE, "How many minutes each round takes.", 1, 9 )
-CreateConVar( "mp_freezetime", "6", FCVAR_NONE, "How many seconds to keep players frozen when the round starts.", 0, 60 )
-CreateConVar( "mp_maxrounds", "0", FCVAR_NONE, "Max number of rounds to play before server changes maps.", 0 )
-CreateConVar( "mp_winlimit", "0", FCVAR_NONE, "Max number of rounds one team can win before server changes maps.", 0 )
-CreateConVar( "mp_ignore_round_win_conditions", "0", FCVAR_NONE, "Ignore conditions which would end the current round." )
+local mp_round_restart_delay = CreateConVar( "mp_round_restart_delay", "5.0", FCVAR_NONE, "Number of seconds to delay before restarting a round after a win.", 0, 10 )
+local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NONE, "How many minutes each round takes.", 1, 9 )
+local mp_freezetime = CreateConVar( "mp_freezetime", "6", FCVAR_NONE, "How many seconds to keep players frozen when the round starts.", 0, 60 )
+local mp_maxrounds = CreateConVar( "mp_maxrounds", "0", FCVAR_NONE, "Max number of rounds to play before server changes maps.", 0 )
+local mp_winlimit = CreateConVar( "mp_winlimit", "0", FCVAR_NONE, "Max number of rounds one team can win before server changes maps.", 0 )
+local mp_ignore_round_win_conditions = CreateConVar( "mp_ignore_round_win_conditions", "0", FCVAR_NONE, "Ignore conditions which would end the current round." )
 
-util.AddNetworkString( "HvH_PlaySound" )
-util.AddNetworkString( "HvH_ShowMenu" )
+util.AddNetworkString( "hvh_playsound" )
+util.AddNetworkString( "hvh_showmenu" )
 
 local round_end_info = {
 
@@ -86,12 +86,16 @@ local round_start_snds = {
 
 local function ReadMultiplayCvars()
 
-	GAMEMODE.FreezeTime = GetConVarNumber( "mp_freezetime" )
-	SetGlobalInt( "RoundTime", math.floor( GetConVarNumber( "mp_roundtime" ) * 60 ) )
+	GAMEMODE.FreezeTime = mp_freezetime:GetInt()
+	SetGlobalInt( "RoundTime", math.floor( mp_roundtime:GetFloat() * 60 ) )
 
 end
 
 function GM:Initialize()
+
+	if ( !IsMounted( "cstrike" ) ) then
+		MsgC( Color( 255, 0, 0 ), "[HvH] WARNING: cstrike content not mounted!\n" )
+	end
 
 	GAMEMODE.GameOver				= false
 	GAMEMODE.FirstConnected 		= false
@@ -124,6 +128,8 @@ local function UpdateTeamScores()
 
 end
 
+local mp_chattime = GetConVar( "mp_chattime" )
+
 local function GoToIntermission()
 
 	if ( GAMEMODE.GameOver ) then
@@ -134,11 +140,11 @@ local function GoToIntermission()
 
 	GAMEMODE.GameOver = true
 	
-	GAMEMODE.IntermissionEndTime = CurTime() + GetConVarNumber( "mp_chattime" )
+	GAMEMODE.IntermissionEndTime = CurTime() + mp_chattime:GetInt()
 	
 	SetGlobalBool( "FreezePeriod", true )
 
-	for id, pl in pairs( player.GetAll() ) do
+	for id, pl in ipairs( player.GetAll() ) do
 
 		pl:Freeze( true )
 		pl:SendLua( "GAMEMODE:ScoreboardShow()" )
@@ -174,7 +180,7 @@ end
 
 function GM:CheckWinConditions()
 
-	if ( GetConVarNumber( "mp_ignore_round_win_conditions" ) != 0 ) then
+	if ( mp_ignore_round_win_conditions:GetBool() ) then
 		return
 	end
 
@@ -183,7 +189,7 @@ function GM:CheckWinConditions()
 	local numCT 			= 0
 	local numAliveCT		= 0
 
-	for id, pl in pairs( player.GetAll() ) do
+	for id, pl in ipairs( player.GetAll() ) do
 	
 		if ( pl:Team() == TEAM_TERRORIST ) then
 		
@@ -236,20 +242,20 @@ function GM:CheckWinConditions()
 			GAMEMODE.NumCTWins = GAMEMODE.NumCTWins + 1
 			UpdateTeamScores()
 			
-			TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_CT_WIN )
+			TerminateRound( mp_round_restart_delay:GetFloat(), REASON_CT_WIN )
 			
 		elseif ( numAliveCT == 0 ) then
 	
 			GAMEMODE.NumTerroristWins = GAMEMODE.NumTerroristWins + 1
 			UpdateTeamScores()
 	
-			TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_TER_WIN )
+			TerminateRound( mp_round_restart_delay:GetFloat(), REASON_TER_WIN )
 	
 		end
 		
 	elseif ( numAliveTerrorist == 0 && numAliveCT == 0 && ( numTerrorist > 0 || numCT > 0 ) ) then
 	
-		TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_ROUND_DRAW )
+		TerminateRound( mp_round_restart_delay:GetFloat(), REASON_ROUND_DRAW )
 	
 	end
 
@@ -271,15 +277,17 @@ local function CheckGameOver()
 	
 end
 
+local mp_fraglimit = GetConVar( "mp_fraglimit" )
+
 local function CheckFragLimit()
 
-	local fraglimit = GetConVarNumber( "mp_fraglimit" )
+	local fraglimit = mp_fraglimit:GetInt()
 
 	if ( fraglimit <= 0 ) then
 		return false
 	end
 	
-	for id, pl in pairs( player.GetAll() ) do
+	for id, pl in ipairs( player.GetAll() ) do
 
 		if ( pl:Frags() >= fraglimit ) then
 		
@@ -296,7 +304,7 @@ end
 
 local function CheckMaxRounds()
 
-	local maxrounds = GetConVarNumber( "mp_maxrounds" )
+	local maxrounds = mp_maxrounds:GetInt()
 
 	if ( maxrounds != 0 ) then
 	
@@ -315,7 +323,7 @@ end
 
 local function CheckWinLimit()
 
-	local winlimit = GetConVarNumber( "mp_winlimit" )
+	local winlimit = mp_winlimit:GetInt()
 
 	if ( winlimit != 0 ) then
 	
@@ -353,7 +361,7 @@ end
 
 local function CheckRoundTimeExpired()
 
-	if ( GetConVarNumber( "mp_ignore_round_win_conditions" ) != 0 ) then
+	if ( mp_ignore_round_win_conditions:GetBool() ) then
 		return
 	end
 
@@ -365,7 +373,7 @@ local function CheckRoundTimeExpired()
 		return
 	end
 
-	TerminateRound( GetConVarNumber( "mp_round_restart_delay" ), REASON_ROUND_DRAW )
+	TerminateRound( mp_round_restart_delay:GetFloat(), REASON_ROUND_DRAW )
 	
 end
 
@@ -392,10 +400,11 @@ local function RestartRound()
 	
 	SetGlobalFloat( "RoundStartTime", CurTime() + GAMEMODE.FreezeTime )
 	
-	for id, pl in pairs( player.GetAll() ) do
+	for id, pl in ipairs( player.GetAll() ) do
 	
 		pl.SpawnedThisRound = false
-	
+		pl:OutputDamageStatsAndReset()
+		
 		if ( pl:Team() == TEAM_TERRORIST || pl:Team() == TEAM_CT ) then
 			pl:Spawn()
 		end

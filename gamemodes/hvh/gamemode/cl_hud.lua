@@ -1,4 +1,4 @@
-surface.CreateFont( "HvH_HudNumbers", {
+surface.CreateFont( "hvh_hudnumbers", {
 
 	font = "Tahoma",
 	size = 45,
@@ -8,7 +8,7 @@ surface.CreateFont( "HvH_HudNumbers", {
 
 } )
 
-surface.CreateFont( "HvH_HudIcon", {
+surface.CreateFont( "hvh_hudicon", {
 
 	font = "csd",
 	size = 50,
@@ -18,7 +18,7 @@ surface.CreateFont( "HvH_HudIcon", {
 
 } )
 
-surface.CreateFont( "HvH_HudIconSmall", {
+surface.CreateFont( "hvh_hudiconsmall", {
 
 	font = "csd",
 	size = 28,
@@ -75,8 +75,8 @@ local function HUD_DrawHealth()
 	end
 
 	draw.RoundedBox( 5, 15, scrh - 55, 120, 40, clr_bg )
-	draw.SimpleText( health, "HvH_HudNumbers", 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "F", "HvH_HudIcon", 20, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( health, "hvh_hudnumbers", 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( "F", "hvh_hudicon", 20, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 end
 
@@ -92,8 +92,8 @@ local function HUD_DrawArmor()
 	end
 
 	draw.RoundedBox( 5, 170, scrh - 55, 120, 40, clr_bg )
-	draw.SimpleText( armor, "HvH_HudNumbers", 285, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( ( armor > 0 ) && "E" || "p", "HvH_HudIcon", 175, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( armor, "hvh_hudnumbers", 285, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( ( armor > 0 ) && "E" || "p", "hvh_hudicon", 175, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 end
 
@@ -102,8 +102,8 @@ local function HUD_DrawRoundTimer()
 	local scrw, scrh = ScrW(), ScrH()
 
 	draw.RoundedBox( 5, ( scrw / 2 ) - 70, scrh - 55, 140, 40, clr_bg )
-	draw.SimpleText( string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "HvH_HudNumbers", ( scrw / 2 ) + 65, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "G", "HvH_HudIcon", ( scrw / 2 ) - 65, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "hvh_hudnumbers", ( scrw / 2 ) + 65, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( "G", "hvh_hudicon", ( scrw / 2 ) - 65, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 end
 
@@ -128,7 +128,7 @@ local function HUD_DrawAmmo()
 	
 	if ( wpn:GetMaxClip1() != -1 ) then
 	
-		draw.SimpleText( wpn:Clip1(), "HvH_HudNumbers", scrw - 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+		draw.SimpleText( wpn:Clip1(), "hvh_hudnumbers", scrw - 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
 
 		draw.NoTexture()
 		surface.SetDrawColor( clr_numbers )
@@ -136,12 +136,12 @@ local function HUD_DrawAmmo()
 		
 	end
 
-	draw.SimpleText( ply:GetAmmoCount( ammoType ), "HvH_HudNumbers", scrw - 55, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( ply:GetAmmoCount( ammoType ), "hvh_hudnumbers", scrw - 55, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
 	
 	local ammoLetter = ammo_letters[ game.GetAmmoName( ammoType ) ]
 	
 	if ( ammoLetter ) then
-		draw.SimpleText( ammoLetter, "HvH_HudIcon", scrw - 50, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		draw.SimpleText( ammoLetter, "hvh_hudicon", scrw - 50, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	end
 
 end
@@ -154,16 +154,16 @@ local function HUD_DrawSpec()
 	surface.DrawRect( 0, 0, scrw, 60 )
 	surface.DrawRect( 0, scrh - 60, scrw, 60 )
 	
-	draw.SimpleText( team.GetName( TEAM_CT ) .. " :", "HvH_Menu", scrw - 45, 10, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
-	draw.SimpleText( team.GetScore( TEAM_CT ), "HvH_Menu", scrw - 40, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetName( TEAM_CT ) .. " :", "hvh_menu", scrw - 45, 10, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_menu", scrw - 40, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
-	draw.SimpleText( team.GetName( TEAM_TERRORIST ) .. " :", "HvH_Menu", scrw - 45, 30, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
-	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "HvH_Menu", scrw - 40, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetName( TEAM_TERRORIST ) .. " :", "hvh_menu", scrw - 45, 30, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_menu", scrw - 40, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
-	draw.SimpleText( "Map : " .. game.GetMap(), "HvH_Menu", 20, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "Map : " .. game.GetMap(), "hvh_menu", 20, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
-	draw.SimpleText( "G", "HvH_HudIconSmall", 16, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	draw.SimpleText( " : " .. string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "HvH_Menu", 35, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "G", "hvh_hudiconsmall", 16, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( " : " .. string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "hvh_menu", 35, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()
@@ -183,15 +183,17 @@ local function HUD_DrawSpec()
 			strHealth = " (" .. health .. ")"
 		end
 		
-		draw.SimpleText( obsTarget:Name() .. strHealth, "HvH_Menu", scrw / 2, scrh - 30, team.GetColor( obsTarget:Team() ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		draw.SimpleText( obsTarget:Name() .. strHealth, "hvh_menu", scrw / 2, scrh - 30, team.GetColor( obsTarget:Team() ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 		
 	end
 
 end
 
+local cl_drawhud = GetConVar( "cl_drawhud" )
+
 function GM:HUDDrawGeneral()
 	
-	if ( GetConVarNumber( "cl_drawhud" ) == 0 ) then return end
+	if ( !cl_drawhud:GetBool() ) then return end
 	
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()

@@ -89,7 +89,7 @@ function GM:ShowHelp()
 
 	local header = self.WeaponSelectPnl:Add( "DLabel" )
 	header:SetHeight( 50 )
-	header:SetFont( "HvH_MenuTitle" )
+	header:SetFont( "hvh_menutitle" )
 	header:SetTextInset( 15, 0 )
 	header:SetTextColor( clr_text )
 	header:SetText( "Weapon Menu" )
@@ -173,7 +173,7 @@ function GM:ShowHelp()
 		
 		local wpntypeButton = mainMenu:Add( "DLabel" )
 		wpntypeButton:SetHeight( 20 )
-		wpntypeButton:SetFont( "HvH_Menu" )
+		wpntypeButton:SetFont( "hvh_menu" )
 		wpntypeButton:SetTextInset( 10, 0 )
 		wpntypeButton:SetTextColor( clr_text )
 		wpntypeButton:SetText( wpntype.Name )
@@ -217,7 +217,7 @@ function GM:ShowHelp()
 		
 			local weaponButton = wpnTypePnl:Add( "DLabel" )
 			weaponButton:SetHeight( 20 )
-			weaponButton:SetFont( "HvH_Menu" )
+			weaponButton:SetFont( "hvh_menu" )
 			weaponButton:SetTextInset( 10, 0 )
 			weaponButton:SetTextColor( clr_text )
 			weaponButton:SetText( swep.PrintName )
@@ -261,7 +261,7 @@ function GM:ShowHelp()
 	
 	local getlastButton = mainMenu:Add( "DLabel" )
 	getlastButton:SetHeight( 20 )
-	getlastButton:SetFont( "HvH_Menu" )
+	getlastButton:SetFont( "hvh_menu" )
 	getlastButton:SetTextInset( 10, 0 )
 	getlastButton:SetTextColor( clr_text )
 	getlastButton:SetText( "Last loadout" )
@@ -301,7 +301,7 @@ function GM:ShowHelp()
 	
 	local savecurButton = mainMenu:Add( "DLabel" )
 	savecurButton:SetHeight( 20 )
-	savecurButton:SetFont( "HvH_Menu" )
+	savecurButton:SetFont( "hvh_menu" )
 	savecurButton:SetTextInset( 10, 0 )
 	savecurButton:SetTextColor( clr_text )
 	savecurButton:SetText( "Save loadout" )
@@ -325,7 +325,7 @@ function GM:ShowHelp()
 
 	savecurButton.DoClick = function( self )
 
-		for id, wpn in pairs( ply:GetWeapons() ) do
+		for id, wpn in ipairs( ply:GetWeapons() ) do
 		
 			local loadout = loadouts[ wpn:GetSlot() ]
 			
@@ -347,7 +347,7 @@ function GM:ShowHelp()
 	
 	local cancelButton = mainMenu:Add( "DLabel" )
 	cancelButton:SetHeight( 20 )
-	cancelButton:SetFont( "HvH_Menu" )
+	cancelButton:SetFont( "hvh_menu" )
 	cancelButton:SetTextInset( 10, 0 )
 	cancelButton:SetTextColor( clr_text )
 	cancelButton:SetText( "Cancel" )

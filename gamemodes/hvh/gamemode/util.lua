@@ -25,7 +25,7 @@ if SERVER then
 
 	function util.PlaySound( snd )
 
-		net.Start( "HvH_PlaySound" )
+		net.Start( "hvh_playsound" )
 			
 			net.WriteString( snd )
 		
