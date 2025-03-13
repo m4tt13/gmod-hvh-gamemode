@@ -6,9 +6,9 @@ Counter-Strike: Source style with a round-based gamemode for Garry's Mod which f
 * CS:S player models
 * HUD style like in CS:S
 * Scoreboard style like in CS:S
-* Team selection menu
-* Weapon selection menu 
-* Spectator system
+* Weapon selection menu (F1)
+* Team selection menu (F2)
+* Spectator system (!spec, !spectate)
 * Freeze time (mp_freezetime)
 * Completing a match with different conditions (mp_timelimit, mp_fraglimit, mp_winlimit, mp_maxrounds)
 * Getting weapons through chat (e.g. !ak47)
