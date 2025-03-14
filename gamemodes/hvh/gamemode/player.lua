@@ -446,8 +446,9 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 	end
 	
 	local isHeadshot = ( ply:LastHitGroup() == HITGROUP_HEAD )
+	local isKnifeKill = ( inflictor:GetClass() == "hvh_knife" )
 	
-	Stats_OnPlayerDeath( ply, attacker, isHeadshot, ( inflictor:GetClass() == "hvh_knife" ) )
+	Stats_OnPlayerDeath( ply, attacker, isHeadshot, isKnifeKill )
 	
 	if ( IsValidObsTarget( ply, attacker ) ) then
 		ply:SpectateEntity( attacker )

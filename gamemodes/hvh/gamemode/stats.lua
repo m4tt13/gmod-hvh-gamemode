@@ -71,7 +71,7 @@ function Stats_SavePlayer( ply )
 
 end
 
-function Stats_OnPlayerDeath( victim, attacker, headshot, knife_kill )
+function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 
 	if ( !victim.Stats || !attacker.Stats || victim == attacker ) then
 		return
@@ -93,7 +93,7 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knife_kill )
 		
 	end
 
-	if ( knife_kill ) then
+	if ( knifekill ) then
 	
 		attacker.Stats.KnifeKills = attacker.Stats.KnifeKills + 1
 		
