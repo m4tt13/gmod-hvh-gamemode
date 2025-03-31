@@ -18,6 +18,10 @@ function GM:ShowTeam()
 		
 	end
 	
+	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
+		return
+	end
+	
 	GAMEMODE:HideHelp()
 
 	self.TeamSelectPnl = vgui.Create( "EditablePanel" )

@@ -67,6 +67,10 @@ function GM:ShowHelp()
 		
 	end
 	
+	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
+		return
+	end
+	
 	local ply = LocalPlayer()
 
 	if ( !ply:Alive() ) then

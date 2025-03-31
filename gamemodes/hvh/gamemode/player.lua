@@ -476,6 +476,9 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 		return
 		
 	end
+	
+	if ( !IsValid( attacker ) ) then attacker = game.GetWorld() end
+ 	if ( !IsValid( inflictor ) ) then inflictor = attacker end
 
 	self:SendDeathNotice( self:GetDeathNoticeEntityName( attacker ), inflictor:GetClass(), ply, 0 )
 
@@ -897,9 +900,9 @@ function GM:HandlePlayerArmorReduction( ply, dmginfo )
 
 end
 
-function GM:PostEntityTakeDamage( victim, dmginfo, took )
+function GM:PostEntityTakeDamage( victim, dmginfo, wasDamageTaken )
 
-	if ( mp_damagelog:GetBool() && victim:IsPlayer() ) then
+	if ( mp_damagelog:GetBool() && victim:IsPlayer() && wasDamageTaken ) then
 	
 		local attacker = dmginfo:GetAttacker()
 		local attacker_name = "world"

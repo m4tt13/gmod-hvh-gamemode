@@ -16,7 +16,7 @@ surface.CreateFont( "hvh_scoreboardsmall", {
 
 local clr_black 	= Color( 0, 0, 0, 255 )
 local clr_text 		= Color( 255, 176, 0, 255 )
-local clr_selected	= Color( 255, 255, 255, 32 )
+local clr_selected	= Color( 200, 200, 200, 32 )
 local clr_bg 		= Color( 0, 0, 0, 90 )
 local clr_border	= Color( 255, 176, 0, 255 )
 
@@ -662,6 +662,14 @@ end
 
 function GM:ScoreboardShow()
 
+	if ( IsValid( self.TeamSelectPnl ) ) then
+		self.TeamSelectPnl:Hide()
+	end
+
+	if ( IsValid( self.WeaponSelectPnl ) ) then
+		self.WeaponSelectPnl:Hide()
+	end
+
 	if ( !IsValid( self.ScoreboardPnl ) ) then
 		self.ScoreboardPnl = CreateScoreboard()
 	end
@@ -681,6 +689,22 @@ function GM:ScoreboardHide()
 
 	if ( IsValid( self.ScoreboardPnl ) ) then
 		self.ScoreboardPnl:Hide()
+	end
+
+	if ( IsValid( self.TeamSelectPnl ) ) then
+	
+		self.TeamSelectPnl:Show()
+		self.TeamSelectPnl:MakePopup()
+		self.TeamSelectPnl:SetKeyboardInputEnabled( false )
+		
+	end
+
+	if ( IsValid( self.WeaponSelectPnl ) ) then
+	
+		self.WeaponSelectPnl:Show()
+		self.WeaponSelectPnl:MakePopup()
+		self.WeaponSelectPnl:SetKeyboardInputEnabled( false )
+		
 	end
 
 end
