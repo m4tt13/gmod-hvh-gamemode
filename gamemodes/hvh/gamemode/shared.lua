@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.2"
+GM.Version = "1.2.3"
 
 GM.TeamBased = true
 
@@ -34,7 +34,7 @@ WPNSLOT_SECONDARY	= 1
 WPNSLOT_MELEE		= 2
 
 COLOR_NICKNAME		= Color( 127, 255, 127 )
-COLOR_MAPNAME		= Color( 220, 50, 100 )
+COLOR_MAPNAME		= Color( 185, 220, 85 )
 
 function GM:CreateTeams()
 

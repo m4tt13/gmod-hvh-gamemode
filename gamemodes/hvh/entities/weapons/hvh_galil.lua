@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.98
 SWEP.ArmorRatio				= 1.55
 
 SWEP.Primary.Sound			= Sound( "Weapon_Galil.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0.65
 SWEP.Primary.Damage			= 30
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.027

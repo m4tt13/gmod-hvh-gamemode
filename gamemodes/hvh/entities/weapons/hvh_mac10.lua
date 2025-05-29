@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.82
 SWEP.ArmorRatio				= 0.95
 
 SWEP.Primary.Sound			= Sound( "Weapon_MAC10.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0.775
 SWEP.Primary.Damage			= 29
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.028

@@ -82,7 +82,7 @@ function SWEP:PrimaryAttack()
 	
 	self:EmitSound( self.Primary.Sound )
 
-	self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, cone )
+	self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, cone )
 
 	self:TakePrimaryAmmo( 1 )
 	

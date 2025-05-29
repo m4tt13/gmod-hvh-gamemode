@@ -62,7 +62,7 @@ function SWEP:PrimaryAttack()
 
 	self:EmitSound( self.Primary.Sound )
 
-	self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, self.Primary.Cone )
+	self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, self.Primary.Cone )
 
 	self:TakePrimaryAmmo( 1 )
 	
@@ -80,25 +80,40 @@ function SWEP:Deploy()
 	
 end
 
-function SWEP:ShootBullet( damage, num_bullets, aimcone, ammo_type, force, tracer, distance )
+function SWEP:ShootBullet( damage, recoil, num_bullets, aimcone )
 
 	local owner = self:GetOwner()
 
 	local bullet = {}
-	bullet.Num		= num_bullets
-	bullet.Src		= owner:GetShootPos()
-	bullet.Dir		= owner:GetAimVector()
-	bullet.Spread	= Vector( aimcone, aimcone, 0 )
-	bullet.Tracer	= tracer || 1
-	bullet.Force	= force || 1
-	bullet.Damage	= damage
-	bullet.AmmoType = ammo_type || self.Primary.Ammo
-	bullet.Distance	= distance || self.Range
+	bullet.Num			= num_bullets
+	bullet.Src			= owner:GetShootPos()
+	bullet.Dir			= owner:GetAimVector()
+	bullet.Spread		= Vector( aimcone, aimcone, 0 )
+	bullet.Tracer		= 1
+	bullet.TracerName	= "Tracer"
+	bullet.Force		= 1
+	bullet.Damage		= damage
+	bullet.Distance		= self.Range
+	bullet.AmmoType 	= self.Primary.Ammo
+	bullet.Attacker 	= owner
+	bullet.Inflictor 	= self
 
 	owner:FireBullets( bullet )
 
 	self:ShootEffects()
-
+	
+	if ( owner:IsNPC() ) then return end
+	
+	owner:ViewPunch( Angle( util.SharedRandom( self:GetClass(), -0.2, -0.1, 0 ) * recoil, util.SharedRandom( self:GetClass(), -0.1, 0.1, 1 ) * recoil, 0 ) )
+	
+	if ( ( SERVER && game.SinglePlayer() ) || ( CLIENT && !game.SinglePlayer() && IsFirstTimePredicted() ) ) then
+	
+		local eyeang = owner:EyeAngles()
+		eyeang.pitch = eyeang.pitch - recoil
+		owner:SetEyeAngles( eyeang )
+	
+	end
+   
 end
 
 function SWEP:TakePrimaryAmmo( num )

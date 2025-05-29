@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05
 
 SWEP.Primary.Sound			= Sound( "Weapon_Glock.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0
 SWEP.Primary.Damage			= 25
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.023
@@ -80,7 +80,7 @@ function SWEP:PrimaryAttack()
 
 	self:EmitSound( self.Primary.Sound )
 
-	self:ShootBullet( damage, self.Primary.NumShots, cone )
+	self:ShootBullet( damage, self.Primary.Recoil, self.Primary.NumShots, cone )
 
 	self:SendWeaponAnim( self:GetBurstMode() && ACT_VM_SECONDARYATTACK || ACT_VM_PRIMARYATTACK )
 	self.Owner:MuzzleFlash()
@@ -126,7 +126,7 @@ function SWEP:Think()
 		
 		self:EmitSound( self.Primary.Sound )
 
-		self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, 0.05 )
+		self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, 0.05 )
 
 		self.Owner:SetAnimation( PLAYER_ATTACK1 )
 

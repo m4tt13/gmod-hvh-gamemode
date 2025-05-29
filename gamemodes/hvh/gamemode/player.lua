@@ -377,7 +377,15 @@ function GM:PlayerSay( ply, text, teamonly )
 		
 	elseif ( prefix ) then
 	
-		if ( ltext == "spec" || ltext == "spectate" ) then
+		if ( ltext == "guns" ) then
+	
+			ply:ConCommand( "buymenu" )
+			
+		elseif ( ltext == "team" ) then
+
+			ply:ConCommand( "teammenu" )
+	
+		elseif ( ltext == "spec" || ltext == "spectate" ) then
 		
 			ply:ConCommand( "changeteam " .. TEAM_SPECTATOR )
 	

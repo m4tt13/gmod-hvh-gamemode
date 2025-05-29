@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.84
 SWEP.ArmorRatio				= 1.5
 
 SWEP.Primary.Sound			= Sound( "Weapon_P90.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0.3
 SWEP.Primary.Damage			= 26
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.027

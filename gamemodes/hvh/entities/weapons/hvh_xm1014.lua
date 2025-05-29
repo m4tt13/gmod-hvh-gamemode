@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1
 
 SWEP.Primary.Sound			= Sound( "Weapon_XM1014.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 4
 SWEP.Primary.Damage			= 20
 SWEP.Primary.NumShots		= 6
 SWEP.Primary.Cone			= 0.0725
@@ -65,7 +65,7 @@ function SWEP:PrimaryAttack()
 
 	self:EmitSound( self.Primary.Sound )
 
-	self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, self.Primary.Cone )
+	self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, self.Primary.Cone )
 
 	self:TakePrimaryAmmo( 1 )
 	

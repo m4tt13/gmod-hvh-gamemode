@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.82
 SWEP.ArmorRatio				= 1
 
 SWEP.Primary.Sound			= Sound( "Weapon_UMP45.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0.275
 SWEP.Primary.Damage			= 30
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.024

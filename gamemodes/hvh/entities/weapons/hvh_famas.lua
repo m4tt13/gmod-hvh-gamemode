@@ -25,7 +25,7 @@ SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1.4
 
 SWEP.Primary.Sound			= Sound( "Weapon_FAMAS.Single" )
-SWEP.Primary.Recoil			= 2
+SWEP.Primary.Recoil			= 0.625
 SWEP.Primary.Damage			= 30
 SWEP.Primary.NumShots		= 1
 SWEP.Primary.Cone			= 0.017
@@ -64,11 +64,13 @@ function SWEP:PrimaryAttack()
 
 	if ( !self:CanPrimaryAttack() ) then return end
 	
+	local recoil = self.Primary.Recoil
 	local cone = self.Primary.Cone
 	local delay = self.Primary.Delay
 	
 	if ( self:GetBurstMode() ) then
 	
+		recoil = 0.25
 		cone = 0.008
 		delay = 0.55
 		self:SetBurstShotsRemaining( 2 )
@@ -78,7 +80,7 @@ function SWEP:PrimaryAttack()
 
 	self:EmitSound( self.Primary.Sound )
 
-	self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, cone )
+	self:ShootBullet( self.Primary.Damage, recoil, self.Primary.NumShots, cone )
 
 	self:TakePrimaryAmmo( 1 )
 	
@@ -118,7 +120,7 @@ function SWEP:Think()
 		
 		self:EmitSound( self.Primary.Sound )
 
-		self:ShootBullet( self.Primary.Damage, self.Primary.NumShots, 0.008 )
+		self:ShootBullet( self.Primary.Damage, 0.25, self.Primary.NumShots, 0.008 )
 
 		self:TakePrimaryAmmo( 1 )
 		

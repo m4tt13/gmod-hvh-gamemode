@@ -169,9 +169,66 @@ local snd_button_press2 = Sound( "buttons/combine_button7.wav" )
 
 local ShowMenu = nil
 
+local function HandlePlayerInfoItem( ply, item )
+
+	if ( item == 1 ) then
+
+		ply:PlaySound( snd_button_press1 )
+
+		ShowMenu( ply, ply.MenuSection )
+	
+	elseif ( item == 10 ) then
+	
+		ply:PlaySound( snd_button_press2 )
+	
+		Menu_Close( ply )
+	
+	end
+
+end
+
 local function HandleMenuItem( ply, item )
 
-	if ( item == 8 ) then
+	if ( item >= 1 && item <= 7 ) then
+	
+		local info = ply.DisplayedPlayersInfo[ item ]
+		
+		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "[HvH Rank] Player Info:" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Name: " .. info.name .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "SteamID: " .. info.steamid .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Rank: " .. info.rank .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, Format( "KDR: %.2f\n", info.kdr ) )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Kills: " .. info.kills .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Deaths: " .. info.deaths .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Headshots: " .. info.headshots .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Knife Kills: " .. info.knifekills .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
+	
+		Menu_Start()
+		
+			Menu_AddLine( "[HvH Rank] Player Info:" )
+			Menu_AddLine( "------------------------------" )
+			Menu_AddLine( "Name: " .. info.name )
+			Menu_AddLine( "SteamID: " .. info.steamid )
+			Menu_AddLine( "Rank: " .. info.rank )
+			Menu_AddLine( Format( "KDR: %.2f", info.kdr ) )
+			Menu_AddLine( "Kills: " .. info.kills )
+			Menu_AddLine( "Deaths: " .. info.deaths )
+			Menu_AddLine( "Headshots: " .. info.headshots )
+			Menu_AddLine( "Knife Kills: " .. info.knifekills )
+
+			Menu_AddLine()
+			
+			Menu_AddLine( "Back", true, 1 )
+			Menu_AddLine( "Exit", false, 10 )
+			
+		Menu_End( ply, HandlePlayerInfoItem )
+		
+		ply:PlaySound( snd_button_press1 )
+
+	elseif ( item == 8 ) then
 
 		ply:PlaySound( snd_button_press1 )
 
@@ -195,45 +252,51 @@ end
 
 ShowMenu = function( ply, section )
 
-	local offset = ( section - 1 ) * 10
-	local result = sql.Query( Format( "SELECT * FROM hvhrank ORDER BY score DESC LIMIT 11 OFFSET %i", offset ) )
+	local result = sql.Query( "SELECT * FROM hvhrank ORDER BY score DESC" )
 	
 	if ( result ) then
 	
 		ply.MenuSection = section
+		ply.DisplayedPlayersInfo = {}
 	
 		Menu_Start()
 		
-			Menu_AddLine( "[HvH Rank] Top Players:" )
-			
+			local infocount = #result
+			local start_index = ( section * 7 ) - 6
+			local end_index = math.min( start_index + 6, infocount )
 			local item = 1
 			
-			for _, row in ipairs( result ) do
+			Menu_AddLine( Format( "[HvH Rank] Showing from %i to %i of %i:", start_index, end_index, infocount ) )
 			
-				local deaths = tonumber( row.deaths ) != 0 && tonumber( row.deaths ) || 1
-				local kdr = tonumber( row.kills ) / deaths
-				local rank = offset + item
+			for i = start_index, end_index do
+			
+				local info = result[ i ]
+				local kills = tonumber( info.kills )
+				local deaths = tonumber( info.deaths )
+				info.kdr = kills / ( ( deaths != 0 ) && deaths || 1 )
+				info.rank = i
 				
-				Menu_AddLine( Format( "%i. %s - %.2f KDR - %i points", rank, row.name, kdr, tonumber( row.score ) ) )
+				Menu_AddLine( Format( "%s - %.2f KDR - %s points", info.name, info.kdr, info.score ), true, item )
+				
+				table.insert( ply.DisplayedPlayersInfo, item, info )
 				
 				item = item + 1
-				if ( item > 10 ) then break end
 			
 			end
 			
-			for i = item, 10 do
+			for i = item, 7 do
 				Menu_AddLine()
 			end
 			
 			Menu_AddLine()
 			
-			if ( offset > 1 ) then
+			if ( start_index > 1 ) then
 				Menu_AddLine( "Previous", true, 8 )
 			else
 				Menu_AddLine()
 			end
 
-			if ( #result > 10 ) then
+			if ( ( start_index + 7 ) <= infocount ) then
 				Menu_AddLine( "Next", true, 9 )
 			else
 				Menu_AddLine()
