@@ -26,6 +26,7 @@ SWEP.ViewModelFlip			= false
 SWEP.UseHands				= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.0
 SWEP.DeploySpeed 			= 1.0
 SWEP.HoldType				= "pistol"
 SWEP.IconLetter        	 	= "c"
@@ -47,7 +48,7 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
-local sv_infinite_ammo = CreateConVar( "sv_infinite_ammo", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY } )
+local sv_infinite_ammo = CreateConVar( "sv_infinite_ammo", "0", FCVAR_REPLICATED, "Player's active weapon will never run out of ammo." )
 
 function SWEP:Initialize()
 
@@ -107,11 +108,11 @@ function SWEP:ShootBullet( damage, recoil, num_bullets, aimcone )
 	owner:ViewPunch( Angle( util.SharedRandom( self:GetClass(), -0.2, -0.1, 0 ) * recoil, util.SharedRandom( self:GetClass(), -0.1, 0.1, 1 ) * recoil, 0 ) )
 	
 	if ( ( SERVER && game.SinglePlayer() ) || ( CLIENT && !game.SinglePlayer() && IsFirstTimePredicted() ) ) then
-	
+		
 		local eyeang = owner:EyeAngles()
 		eyeang.pitch = eyeang.pitch - recoil
 		owner:SetEyeAngles( eyeang )
-	
+		
 	end
    
 end
@@ -144,6 +145,30 @@ function SWEP:OnTraceAttack( dmginfo, dir, trace )
 end
 
 if CLIENT then
+
+	function SWEP:FireAnimationEvent( pos, ang, event, options )
+
+		if ( !self.CSMuzzleFlashes ) then return end
+
+		if ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) then
+
+			local data = EffectData()
+			data:SetFlags( 0 )
+			data:SetEntity( self:GetOwner():GetViewModel() )
+			data:SetAttachment( math.floor( ( event - 4991 ) / 10 ) )
+			data:SetScale( self.CSMuzzleScale )
+
+			if ( self.CSMuzzleX ) then
+				util.Effect( "CS_MuzzleFlash_X", data )
+			else
+				util.Effect( "CS_MuzzleFlash", data )
+			end
+
+			return true
+			
+		end
+
+	end
 
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 	

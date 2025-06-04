@@ -16,6 +16,7 @@ SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.1
 SWEP.HoldType				= "smg"
 SWEP.ViewModel				= "models/weapons/v_smg_mp5.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_mp5.mdl"	

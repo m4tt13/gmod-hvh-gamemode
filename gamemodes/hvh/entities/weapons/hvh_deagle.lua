@@ -16,6 +16,7 @@ SWEP.Weight					= 7
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.2
 SWEP.HoldType				= "revolver"
 SWEP.ViewModel				= "models/weapons/v_pist_deagle.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_deagle.mdl"	

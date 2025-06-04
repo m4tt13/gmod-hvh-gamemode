@@ -30,10 +30,12 @@ REASON_ROUND_DRAW 		= 3
 REASON_GAME_COMMENCING	= 4
 
 local mp_round_restart_delay = CreateConVar( "mp_round_restart_delay", "5.0", FCVAR_NONE, "Number of seconds to delay before restarting a round after a win.", 0, 10 )
-local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NONE, "How many minutes each round takes.", 1, 9 )
-local mp_freezetime = CreateConVar( "mp_freezetime", "6", FCVAR_NONE, "How many seconds to keep players frozen when the round starts.", 0, 60 )
-local mp_maxrounds = CreateConVar( "mp_maxrounds", "0", FCVAR_NONE, "Max number of rounds to play before server changes maps.", 0 )
-local mp_winlimit = CreateConVar( "mp_winlimit", "0", FCVAR_NONE, "Max number of rounds one team can win before server changes maps.", 0 )
+local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NOTIFY, "How many minutes each round takes.", 1, 9 )
+local mp_freezetime = CreateConVar( "mp_freezetime", "6", FCVAR_NOTIFY, "How many seconds to keep players frozen when the round starts.", 0, 60 )
+local mp_chattime = CreateConVar( "mp_chattime", "10", FCVAR_NONE, "Amount of time players can chat after the game is over.", 1, 120 )
+local mp_maxrounds = CreateConVar( "mp_maxrounds", "0", FCVAR_NOTIFY, "Max number of rounds to play before server changes maps.", 0 )
+local mp_winlimit = CreateConVar( "mp_winlimit", "0", FCVAR_NOTIFY, "Max score one team can reach before server changes maps.", 0 )
+local mp_fraglimit = CreateConVar( "mp_fraglimit", "0", FCVAR_NOTIFY, "The number of kills at which the map ends." )
 local mp_ignore_round_win_conditions = CreateConVar( "mp_ignore_round_win_conditions", "0", FCVAR_NONE, "Ignore conditions which would end the current round." )
 
 util.AddNetworkString( "hvh_playsound" )
@@ -127,8 +129,6 @@ local function UpdateTeamScores()
 	team.SetScore( TEAM_CT, GAMEMODE.NumCTWins )
 
 end
-
-local mp_chattime = GetConVar( "mp_chattime" )
 
 local function GoToIntermission()
 
@@ -276,8 +276,6 @@ local function CheckGameOver()
 	return false
 	
 end
-
-local mp_fraglimit = GetConVar( "mp_fraglimit" )
 
 local function CheckFragLimit()
 

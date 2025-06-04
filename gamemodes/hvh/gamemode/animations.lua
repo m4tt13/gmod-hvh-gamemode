@@ -1,5 +1,5 @@
-local mp_vaulting_anim = CreateConVar( "mp_vaulting_anim", "0", FCVAR_REPLICATED )
-local mp_typing_anim = CreateConVar( "mp_typing_anim", "0", FCVAR_REPLICATED )
+local mp_vaulting_anim = CreateConVar( "mp_vaulting_anim", "1", FCVAR_REPLICATED )
+local mp_typing_anim = CreateConVar( "mp_typing_anim", "1", FCVAR_REPLICATED )
 
 function GM:HandlePlayerVaulting( ply, velocity, plyTable )
 

@@ -16,6 +16,7 @@ SWEP.Weight					= 25
 SWEP.ViewModelFlip			= false
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= true
+SWEP.CSMuzzleScale			= 1.6
 SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_galil.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_galil.mdl"	

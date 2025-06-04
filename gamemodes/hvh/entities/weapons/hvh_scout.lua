@@ -17,6 +17,7 @@ SWEP.Weight					= 30
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.1
 SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_snip_scout.mdl"	
 SWEP.WorldModel				= "models/weapons/w_snip_scout.mdl"	

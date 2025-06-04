@@ -8,6 +8,9 @@ surface.CreateFont( "hvh_killicon", {
 
 } )
 
+local hud_deathnotice_time = CreateConVar( "hud_deathnotice_time", "6", FCVAR_REPLICATED, "Amount of time to show death notice (kill feed) for" )
+local cl_drawhud = GetConVar( "cl_drawhud" )
+
 local Color_Icon = Color( 255, 80, 0, 255 )
 local NPC_Color_Enemy = Color( 250, 50, 50, 255 )
 local NPC_Color_Friendly = Color( 50, 200, 50, 255 )
@@ -84,13 +87,11 @@ local function DrawDeath( x, y, death, time )
 
 end
 
-local cl_drawhud = GetConVar( "cl_drawhud" )
-
 function GM:DrawDeathNotice()
 
-	if ( !cl_drawhud:GetBool() ) then return end
+	if ( cl_drawhud:GetInt() == 0 ) then return end
 
-	local time = GetConVarNumber( "hud_deathnotice_time" )
+	local time = hud_deathnotice_time:GetFloat()
 	local reset = Deaths[1] != nil
 
 	local x = ScrW() - 15

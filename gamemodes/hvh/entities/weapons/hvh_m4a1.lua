@@ -16,6 +16,7 @@ SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= true
+SWEP.CSMuzzleScale			= 1.6
 SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_m4a1.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_m4a1.mdl"	

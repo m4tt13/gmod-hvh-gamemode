@@ -124,11 +124,9 @@ function GM:ChatText( playerindex, playername, text, filter )
 
 end
 
-local mp_friendlyfire = GetConVar( "mp_friendlyfire" )
-
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( !mp_friendlyfire:GetBool() ) then
+	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
 	
 		local attacker = dmginfo:GetAttacker()
 

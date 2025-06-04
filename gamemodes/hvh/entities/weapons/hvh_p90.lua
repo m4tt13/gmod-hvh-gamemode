@@ -16,6 +16,7 @@ SWEP.Weight					= 26
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= true
+SWEP.CSMuzzleScale			= 1.2
 SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_smg_p90.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_p90.mdl"	

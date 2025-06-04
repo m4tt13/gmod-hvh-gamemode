@@ -17,6 +17,7 @@ SWEP.Weight					= 0
 SWEP.ViewModelFlip			= false
 SWEP.CSMuzzleFlashes 		= false
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.0
 SWEP.HoldType				= "knife"
 SWEP.ViewModel				= "models/weapons/v_knife_t.mdl"	
 SWEP.WorldModel				= "models/weapons/w_knife_t.mdl"	

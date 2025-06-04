@@ -16,6 +16,7 @@ SWEP.Weight					= 5
 SWEP.ViewModelFlip			= false
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
+SWEP.CSMuzzleScale			= 1.0
 SWEP.HoldType				= "duel"
 SWEP.ViewModel				= "models/weapons/v_pist_elite.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_elite.mdl"	
@@ -57,28 +58,42 @@ end
 
 if CLIENT then
 
-	function SWEP:FireAnimationEvent( pos, ang, event, options )
+	function SWEP:GetTracerOrigin()
+	
+		local ent = self
+		local owner = self:GetOwner()
+		local ply = LocalPlayer()
 
-		if ( !self.CSMuzzleFlashes ) then return end
-
-		if ( event == 5001 ) then
-
-			local data = EffectData()
-			data:SetFlags( 0 )
-			data:SetEntity( self.Owner:GetViewModel() )
-			data:SetAttachment( self:FiringLeft() && 2 || 1 )
-			data:SetScale( 1 )
-
-			if ( self.CSMuzzleX ) then
-				util.Effect( "CS_MuzzleFlash_X", data )
-			else
-				util.Effect( "CS_MuzzleFlash", data )
+		if ( ( ( owner == ply ) && !owner:ShouldDrawLocalPlayer() ) || ( ( owner != ply ) && owner:IsPlayer() && ply:GetObserverMode() == OBS_MODE_IN_EYE && ply:GetObserverTarget() == owner ) ) then
+		
+			local viewmodel = owner:GetViewModel()
+			
+			if ( viewmodel ) then
+				ent = viewmodel
 			end
 
-			return true
-			
 		end
 
+		if ( self:FiringLeft() ) then
+		
+			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle" ) ) || ent:GetAttachment( ent:LookupAttachment( "1" ) )
+			return att.Pos
+			
+		else
+		
+			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle2" ) ) || ent:GetAttachment( ent:LookupAttachment( "2" ) )
+			return att.Pos
+			
+		end
+		
+	end
+
+	function SWEP:FireAnimationEvent( pos, ang, event, options )
+
+		if ( event == 5001 && self:FiringLeft() ) then 
+			event = 5011 
+		end
+		
 		return self.BaseClass.FireAnimationEvent( self, pos, ang, event, options )
 
 	end

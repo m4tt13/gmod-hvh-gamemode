@@ -16,6 +16,7 @@ SWEP.Weight					= 25
 SWEP.ViewModelFlip			= false
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= true
+SWEP.CSMuzzleScale			= 1.5
 SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_mach_m249para.mdl"	
 SWEP.WorldModel				= "models/weapons/w_mach_m249para.mdl"	

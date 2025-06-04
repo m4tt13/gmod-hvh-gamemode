@@ -13,7 +13,7 @@ local mp_damage_scale_stomach = CreateConVar( "mp_damage_scale_stomach", "1.25" 
 local mp_damage_scale_arms = CreateConVar( "mp_damage_scale_arms", "1.0" )
 local mp_damage_scale_legs = CreateConVar( "mp_damage_scale_legs", "0.75" )
 local mp_deathsound = CreateConVar( "mp_deathsound", "0" )
-local mp_allowtaunts = CreateConVar( "mp_allowtaunts", "0" )
+local mp_allowtaunts = CreateConVar( "mp_allowtaunts", "1" )
 local mp_startarmor = CreateConVar( "mp_startarmor", "1" )
 local mp_damagelog = CreateConVar( "mp_damagelog", "1" )
 
@@ -244,7 +244,13 @@ local function GiveWeapon( ply, weapon, translate )
 		return false
 	end
 	
-	local swep = translate && GetWeaponByAlias( weapon ) || weapons.GetStored( weapon )
+	local swep
+	
+	if ( translate ) then
+		swep = GetWeaponByAlias( weapon )
+	else
+		swep = weapons.GetStored( weapon )
+	end
 	
 	if ( !swep || !swep.CanBuy ) then 
 		return false
@@ -650,18 +656,6 @@ function GM:PlayerDeathSound()
 	
 end
 
-local mp_flashlight = GetConVar( "mp_flashlight" )
-
-function GM:PlayerSwitchFlashlight( ply, enabled )
-
-	if ( enabled && !mp_flashlight:GetBool() ) then
-		return false
-	end
-
-	return BaseClass.PlayerSwitchFlashlight( self, ply, enabled )
-
-end
-
 function GM:PlayerCanJoinTeam( ply, teamid )
 	
 	if ( !team.Joinable( teamid ) ) then
@@ -834,11 +828,9 @@ function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
 end
 
-local mp_friendlyfire = GetConVar( "mp_friendlyfire" )
-
 function GM:PlayerShouldTakeDamage( ply, attacker )
 
-	if ( !mp_friendlyfire:GetBool() ) then
+	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
 	
 		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
 			return false
