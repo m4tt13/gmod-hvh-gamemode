@@ -13,7 +13,7 @@ end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
 SWEP.Weight					= 5
-SWEP.ViewModelFlip			= false
+SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
 SWEP.CSMuzzleX 				= false
 SWEP.CSMuzzleScale			= 1.0
@@ -37,21 +37,48 @@ SWEP.Primary.DefaultClip	= 30
 SWEP.Primary.Automatic		= false
 SWEP.Primary.Ammo			= "BULLET_PLAYER_9MM"
 
-function SWEP:FiringLeft()
+function SWEP:SetupDataTables()
 
-	return ( bit.band( self:Clip1(), 1 ) == 0 )
+	self:NetworkVar( "Bool", 0, "FireRight" )
 	
+end
+
+function SWEP:Initialize()
+
+	self.BaseClass.Initialize( self )
+	
+	if ( SERVER ) then
+		self:SetFireRight( false )
+	end
+
+end
+
+function SWEP:PrimaryAttack()
+
+	if ( !self:CanPrimaryAttack() ) then return end
+
+	self:SetFireRight( !self:GetFireRight() )
+
+	self:EmitSound( self.Primary.Sound )
+
+	self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, self.Primary.Cone )
+
+	self:TakePrimaryAmmo( 1 )
+	
+	self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+
 end
 
 function SWEP:ShootEffects()
 
-	if ( self:FiringLeft() ) then
-		self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-	else
+	if ( self:GetFireRight() ) then
 		self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+	else
+		self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
 	end
 
 	self.Owner:MuzzleFlash()
+	
 	self.Owner:SetAnimation( PLAYER_ATTACK1 )
 
 end
@@ -73,15 +100,15 @@ if CLIENT then
 			end
 
 		end
-
-		if ( self:FiringLeft() ) then
 		
-			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle" ) ) || ent:GetAttachment( ent:LookupAttachment( "1" ) )
+		if ( self:GetFireRight() ) then
+		
+			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle" ) ) || ent:GetAttachment( ent:LookupAttachment( "2" ) )
 			return att.Pos
 			
 		else
 		
-			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle2" ) ) || ent:GetAttachment( ent:LookupAttachment( "2" ) )
+			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle2" ) ) || ent:GetAttachment( ent:LookupAttachment( "1" ) )
 			return att.Pos
 			
 		end
@@ -89,8 +116,8 @@ if CLIENT then
 	end
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
-
-		if ( event == 5001 && self:FiringLeft() ) then 
+		
+		if ( event == 5001 && self:GetFireRight() ) then 
 			event = 5011 
 		end
 		

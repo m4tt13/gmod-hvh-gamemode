@@ -47,6 +47,13 @@ local ammo_letters = {
 	
 }
 
+local spec_modes = {
+
+	[OBS_MODE_IN_EYE] 	= "First Person",
+	[OBS_MODE_CHASE]	= "Chase"
+	
+}
+
 local function GetRoundTimer()
 
 	local timer = math.ceil( GAMEMODE:GetRoundRemainingTime() )
@@ -168,25 +175,33 @@ local function HUD_DrawSpec()
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()
 	
-	if ( mode != OBS_MODE_IN_EYE && mode != OBS_MODE_CHASE ) then
-		return
-	end
-	
-	local obsTarget = ply:GetObserverTarget()
-	
-	if ( IsValid( obsTarget ) && obsTarget:IsPlayer() ) then
+	if ( mode == OBS_MODE_IN_EYE || mode == OBS_MODE_CHASE ) then
 
-		local health = obsTarget:Health()
-		local strHealth = ""
+		local obsTarget = ply:GetObserverTarget()
+		
+		if ( IsValid( obsTarget ) && obsTarget:IsPlayer() ) then
 
-		if ( health > 0 && obsTarget:Alive() ) then
-			strHealth = " (" .. health .. ")"
+			local health = obsTarget:Health()
+			local strHealth = ""
+
+			if ( health > 0 && obsTarget:Alive() ) then
+				strHealth = " (" .. health .. ")"
+			end
+			
+			draw.SimpleText( obsTarget:Name() .. strHealth, "hvh_menu", scrw / 2, scrh - 30, team.GetColor( obsTarget:Team() ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+			
 		end
-		
-		draw.SimpleText( obsTarget:Name() .. strHealth, "hvh_menu", scrw / 2, scrh - 30, team.GetColor( obsTarget:Team() ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-		
-	end
 
+	else
+	
+		local potential_mode = spec_modes[ ply:GetNWInt( "ObserverPotentialMode", OBS_MODE_NONE ) ]
+		
+		if ( potential_mode ) then
+			draw.SimpleText( "Potential Camera: " .. potential_mode, "hvh_menu", scrw / 2, scrh - 30, clr_text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+		end
+	
+	end
+	
 end
 
 local cl_drawhud = GetConVar( "cl_drawhud" )

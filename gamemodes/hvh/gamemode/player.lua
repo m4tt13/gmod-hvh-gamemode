@@ -51,8 +51,16 @@ local function GetNextObsSearchStartPoint( ply, reverse )
 
 	local curObsTarget = ply:GetObserverTarget()
 	
-	if ( !IsValid( curObsTarget ) ) then
+	if ( IsValid( curObsTarget ) ) then
+		
+		if ( curObsTarget:IsPlayer() && !curObsTarget:Alive() && IsValid( curObsTarget:GetObserverTarget() ) ) then
+			return curObsTarget:GetObserverTarget():EntIndex()
+		end
+		
+	else
+	
 		curObsTarget = ply
+		
 	end
 	
 	local dir = reverse && -1 || 1
@@ -96,23 +104,126 @@ local function FindNextObsTarget( ply, reverse )
 	
 end
 
+local function ValidateCurObsTarget( ply )
+
+	local potential_mode = ply:GetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+
+	if ( potential_mode != OBS_MODE_NONE ) then
+	
+		local obsTarget = ply:GetObserverTarget()
+		
+		if ( !IsValidObsTarget( ply, obsTarget ) ) then
+			obsTarget = FindNextObsTarget( ply, false )
+		end
+		
+		if ( IsValid( obsTarget ) ) then
+			
+			ply:Spectate( potential_mode )
+			ply:SpectateEntity( obsTarget )
+			ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+			
+		end
+	
+	else
+	
+		local mode = ply:GetObserverMode()
+		
+		if ( ( mode == OBS_MODE_IN_EYE || mode == OBS_MODE_CHASE ) && !IsValidObsTarget( ply, ply:GetObserverTarget() ) ) then
+		
+			local obsTarget = FindNextObsTarget( ply, false )
+			
+			if ( IsValid( obsTarget ) ) then
+			
+				ply:SpectateEntity( obsTarget )
+				
+			else
+			
+				local oldObsTarget = ply:GetInternalVariable( "m_hObserverTarget" )
+				ply:SetSaveValue( "m_hObserverTarget", nil )
+				ply:Spectate( OBS_MODE_ROAMING )
+				ply:SetSaveValue( "m_hObserverTarget", oldObsTarget )
+				ply:SetNWInt( "ObserverPotentialMode", mode )
+
+			end
+		
+		end
+		
+	end
+
+end
+
+local function StartObserverMode( ply, mode )
+
+	ply:SetHealth( 1 )
+
+	if ( mode == OBS_MODE_ROAMING && !IsValidObsTarget( ply, ply:GetObserverTarget() ) ) then
+	
+		local oldObsTarget = ply:GetInternalVariable( "m_hObserverTarget" )
+		ply:SetSaveValue( "m_hObserverTarget", nil )
+		ply:Spectate( OBS_MODE_ROAMING )
+		ply:SetSaveValue( "m_hObserverTarget", oldObsTarget )
+		
+	else
+	
+		ply:Spectate( mode )
+	
+	end
+	
+	ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+
+	ValidateCurObsTarget( ply )
+	
+end
+
+local function StopObserverMode( ply )
+
+	ply:UnSpectate()
+	ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+	
+end
+
+local function GetSpectatorMode( ply )
+
+	if ( !ply.SpectatorMode ) then
+		
+		local mode = ply:GetInfoNum( "cl_default_spec_mode", OBS_MODE_ROAMING )
+		
+		if ( mode < OBS_MODE_IN_EYE ) then
+			mode = OBS_MODE_IN_EYE
+		elseif ( mode > OBS_MODE_ROAMING ) then
+			mode = OBS_MODE_ROAMING
+		end
+		
+		ply.SpectatorMode = mode
+		
+	end
+	
+	return ply.SpectatorMode
+
+end
+
+local function SetSpectatorMode( ply, mode )
+
+	ply.SpectatorMode = mode
+	ply:ConCommand( "cl_default_spec_mode " .. mode )
+
+end
+
 function GM:KeyPress( player, key )
 
 	if ( key == IN_RELOAD ) then
 	
-		local mode = player:GetObserverMode()
+		if ( player:GetObserverMode() > OBS_MODE_FIXED ) then
 		
-		if ( mode > OBS_MODE_FIXED ) then
-		
-			mode = mode + 1
+			local mode = GetSpectatorMode( player ) + 1
 		
 			if ( mode > OBS_MODE_ROAMING ) then
-				mode = OBS_MODE_IN_EYE;
+				mode = OBS_MODE_IN_EYE
 			end
 			
-			player:SetObserverMode( mode )
-			player.ObserverLastMode = mode
-
+			StartObserverMode( player, mode )
+			SetSpectatorMode( player, mode )
+			
 		end
 		
 	elseif ( key == IN_ATTACK ) then
@@ -143,32 +254,10 @@ function GM:KeyPress( player, key )
 	
 end
 
-local function ValidateCurObsTarget( ply )
-
-	local mode = ply:GetObserverMode()
-	
-	if ( mode != OBS_MODE_IN_EYE && mode != OBS_MODE_CHASE ) then
-		return
-	end
-
-	if ( !IsValidObsTarget( ply, ply:GetObserverTarget() ) ) then
-	
-		local obsTarget = FindNextObsTarget( ply, false )
-		
-		if ( IsValid( obsTarget ) ) then
-			ply:SpectateEntity( obsTarget )
-		else
-			ply:SetObserverMode( OBS_MODE_ROAMING )
-		end
-	
-	end
-
-end
-
 function GM:PlayerPostThink( ply )
 
 	ValidateCurObsTarget( ply )
-	
+
 	Menu_Display( ply )
 
 end
@@ -424,14 +513,7 @@ function GM:PlayerDeathThink( pl )
 		return
 	end
 	
-	pl:Spectate( pl.ObserverLastMode || OBS_MODE_ROAMING )
-
-end
-
-function GM:PlayerSilentDeath( victim )
-
-	victim.NextSpawnTime = CurTime() + 2
-	victim.DeathTime = CurTime()
+	StartObserverMode( pl, GetSpectatorMode( pl ) )
 
 end
 
@@ -459,57 +541,55 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 
 	end
 	
-	local isHeadshot = ( ply:LastHitGroup() == HITGROUP_HEAD )
-	local isKnifeKill = ( inflictor:GetClass() == "hvh_knife" )
+	local is_headshot = ( ply:LastHitGroup() == HITGROUP_HEAD )
 	
-	Stats_OnPlayerDeath( ply, attacker, isHeadshot, isKnifeKill )
-	
-	if ( IsValidObsTarget( ply, attacker ) ) then
-		ply:SpectateEntity( attacker )
-	end
-
 	if ( attacker == ply ) then
 
 		self:SendDeathNotice( nil, "suicide", ply, 0 )
 
 		MsgAll( attacker:Nick() .. " suicided!\n" )
 
-		return
-		
-	end
-
-	if ( attacker:IsPlayer() ) then
+	elseif ( attacker:IsPlayer() ) then
 		
 		local flags = 0
-		if ( isHeadshot ) then flags = flags + DEATH_NOTICE_HEADSHOT end
+		if ( is_headshot ) then flags = flags + DEATH_NOTICE_HEADSHOT end
 		
 		self:SendDeathNotice( attacker, inflictor:GetClass(), ply, flags )
 
 		MsgAll( attacker:Nick() .. " killed " .. ply:Nick() .. " using " .. inflictor:GetClass() .. "\n" )
 
-		return
+	else
+	
+		if ( !IsValid( attacker ) ) then attacker = game.GetWorld() end
+		if ( !IsValid( inflictor ) ) then inflictor = attacker end
+
+		self:SendDeathNotice( self:GetDeathNoticeEntityName( attacker ), inflictor:GetClass(), ply, 0 )
+
+		MsgAll( ply:Nick() .. " was killed by " .. attacker:GetClass() .. "\n" )
 		
 	end
 	
-	if ( !IsValid( attacker ) ) then attacker = game.GetWorld() end
- 	if ( !IsValid( inflictor ) ) then inflictor = attacker end
-
-	self:SendDeathNotice( self:GetDeathNoticeEntityName( attacker ), inflictor:GetClass(), ply, 0 )
-
-	MsgAll( ply:Nick() .. " was killed by " .. attacker:GetClass() .. "\n" )
+	local is_knifekill = ( inflictor:GetClass() == "hvh_knife" )
+	
+	Stats_OnPlayerDeath( ply, attacker, is_headshot, is_knifekill )
+	
+	if ( IsValidObsTarget( ply, attacker ) ) then
+		ply:SpectateEntity( attacker )
+	else
+		ply:SetSaveValue( "m_hObserverTarget", nil )
+	end
+	
+	StartObserverMode( ply, OBS_MODE_DEATHCAM )
+	ply:RemoveEffects( EF_NODRAW )
 
 end
 
 function GM:PostPlayerDeath( ply )
 
-	ply:StripWeapons()
-
-	ply:Spectate( OBS_MODE_DEATHCAM )
-	ply:RemoveEffects( EF_NODRAW )
-
 	GAMEMODE:CheckWinConditions()
 	
 	ply:OutputDamageStatsAndReset()
+	ply:SetMoveType( MOVETYPE_NONE )
 
 end
 
@@ -522,17 +602,23 @@ end
 
 function GM:PlayerSpawnAsSpectator( pl )
 
-	pl:StripWeapons()
+	if ( pl:Alive() ) then
+	
+		local oldViewOffset = pl:GetCurrentViewOffset()
+		pl:KillSilent()
+		pl:SetCurrentViewOffset( oldViewOffset )
+		
+	end
 
 	if ( pl:Team() == TEAM_UNASSIGNED ) then
-
-		pl:Spectate( OBS_MODE_FIXED )
+		
+		StartObserverMode( pl, OBS_MODE_FIXED )
 		return
 
 	end
 
 	pl:SetTeam( TEAM_SPECTATOR )
-	pl:Spectate( pl.ObserverLastMode || OBS_MODE_ROAMING )
+	StartObserverMode( pl, GetSpectatorMode( pl ) )
 
 end
 
@@ -573,7 +659,7 @@ function GM:PlayerSpawn( pl, transiton )
 
 	end
 	
-	pl:UnSpectate()
+	StopObserverMode( pl )
 	
 	pl.SpawnedThisRound = true
 
@@ -660,7 +746,7 @@ function GM:PlayerCanJoinTeam( ply, teamid )
 	
 	if ( !team.Joinable( teamid ) ) then
 	
-		ply:ChatPrint( "You can't join that team" )
+		ply:ChatPrint( "You can't join that team!" )
 		return false
 		
 	end
@@ -705,22 +791,16 @@ end
 
 function GM:PlayerJoinTeam( ply, teamid )
 
-	local iOldTeam = ply:Team()
-
 	if ( ply:Alive() ) then
-	
-		if ( iOldTeam == TEAM_SPECTATOR || iOldTeam == TEAM_UNASSIGNED ) then
-			ply:KillSilent()
-		else
-			ply:Kill()
-		end
-		
+		ply:Kill()
 	end
-
+	
+	local oldteam = ply:Team()
+	
 	ply:SetTeam( teamid )
 	ply.LastTeamSwitch = CurTime()
 	
-	GAMEMODE:OnPlayerChangedTeam( ply, iOldTeam, teamid )
+	GAMEMODE:OnPlayerChangedTeam( ply, oldteam, teamid )
 
 end
 
@@ -748,20 +828,10 @@ end
 
 function GM:OnPlayerChangedTeam( ply, oldteam, newteam )
 
-	if ( newteam == TEAM_SPECTATOR ) then
-
-		local pos = ply:EyePos()
+	if ( ( newteam == TEAM_TERRORIST || newteam == TEAM_CT ) && PlayerCanRespawn( ply ) ) then
 		ply:Spawn()
-		ply:SetPos( pos )
-
-	elseif ( newteam == TEAM_TERRORIST || newteam == TEAM_CT ) then
-
-		if ( PlayerCanRespawn( ply ) ) then
-			ply:Spawn()
-		else
-			ply:Spectate( ply.ObserverLastMode || OBS_MODE_ROAMING )
-		end
-
+	else
+		StartObserverMode( ply, GetSpectatorMode( ply ) )
 	end
 	
 	GAMEMODE:CheckWinConditions()
@@ -842,7 +912,7 @@ function GM:PlayerShouldTakeDamage( ply, attacker )
 	
 end
 
-local hitgroup_armored = {
+local hitgroups_armored = {
 
 	[HITGROUP_GENERIC] 	= true,
 	[HITGROUP_HEAD] 	= true,
@@ -855,7 +925,7 @@ local hitgroup_armored = {
 
 function GM:HandlePlayerArmorReduction( ply, dmginfo )
 
-	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 || !hitgroup_armored[ ply:LastHitGroup() ] ) then return end
+	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 || !hitgroups_armored[ ply:LastHitGroup() ] ) then return end
 
 	local armorBonus = 0.5
 	local armorRatio = 0.5

@@ -169,7 +169,7 @@ local function TerminateRound( delay, reason )
 	
 	end
 
-	GAMEMODE.RoundWinStatus 	= winnerTeam;
+	GAMEMODE.RoundWinStatus 	= winnerTeam
 	GAMEMODE.RestartRoundTime 	= CurTime() + delay
 	
 	if ( GAMEMODE:GetMapRemainingTime() == 0 ) then

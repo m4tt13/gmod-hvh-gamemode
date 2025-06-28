@@ -36,6 +36,8 @@ surface.CreateFont( "hvh_menutitle", {
 
 } )
 
+CreateClientConVar( "cl_default_spec_mode", tostring( OBS_MODE_ROAMING ), true, true, "Default Spectator Mode" )
+
 function GM:Initialize()
 
 	BaseClass.Initialize( self )
@@ -69,6 +71,47 @@ function GM:HUDPaint()
 	hook.Run( "HUDDrawTargetID" )
 	hook.Run( "HUDDrawPickupHistory" )
 	hook.Run( "DrawDeathNotice" )
+
+end
+
+function GM:OnPlayerChat( player, strText, bTeamOnly, bPlayerIsDead )
+
+	local tab = {}
+	
+	if ( IsValid( player ) && ( player:Team() == TEAM_CONNECTING || player:Team() == TEAM_UNASSIGNED || player:Team() == TEAM_SPECTATOR ) ) then
+	
+		table.insert( tab, Color( 255, 180, 30 ) )
+		table.insert( tab, "*SPEC* " )
+		
+	elseif ( bPlayerIsDead ) then
+	
+		table.insert( tab, Color( 255, 30, 40 ) )
+		table.insert( tab, "*DEAD* " )
+		
+	end
+
+	if ( bTeamOnly ) then
+	
+		table.insert( tab, Color( 30, 160, 40 ) )
+		table.insert( tab, "(TEAM) " )
+		
+	end
+
+	if ( IsValid( player ) ) then
+		table.insert( tab, player )
+	else
+		table.insert( tab, "Console" )
+	end
+
+	local filter_context = TEXT_FILTER_GAME_CONTENT
+	if ( bit.band( GetConVarNumber( "cl_chatfilters" ), 64 ) != 0 ) then filter_context = TEXT_FILTER_CHAT end
+
+	table.insert( tab, color_white )
+	table.insert( tab, ": " .. util.FilterText( strText, filter_context, IsValid( player ) and player or nil ) )
+
+	chat.AddText( unpack( tab ) )
+
+	return true
 
 end
 

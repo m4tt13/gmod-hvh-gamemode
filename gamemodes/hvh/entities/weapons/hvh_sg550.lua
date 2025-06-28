@@ -166,5 +166,25 @@ if CLIENT then
 		return nil
 
 	end
+	
+	function SWEP:GetTracerOrigin()
+
+		if ( self:GetZoomLevel() != 0 ) then 
+		
+			local owner = self:GetOwner()
+			local ply = LocalPlayer()
+
+			if ( ( ( owner == ply ) && !owner:ShouldDrawLocalPlayer() ) || 
+				 ( ( owner != ply ) && owner:IsPlayer() && ply:GetObserverMode() == OBS_MODE_IN_EYE && ply:GetObserverTarget() == owner ) ) then
+				
+				local tracerOrigin = owner:GetShootPos()
+				tracerOrigin.z = tracerOrigin.z - 1
+				return tracerOrigin
+				
+			end
+			
+		end
+		
+	end
 
 end

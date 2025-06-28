@@ -4,8 +4,12 @@ local sv_jump_boost = CreateConVar( "sv_jump_boost", "0", FCVAR_REPLICATED )
 
 function GM:StartCommand( ply, ucmd )
 
-	if ( GAMEMODE:IsFreezePeriod() && ply:GetObserverMode() == OBS_MODE_NONE ) then
+	if ( ply:GetObserverMode() != OBS_MODE_NONE ) then
 	
+		ucmd:RemoveKey( IN_DUCK )
+	
+	elseif ( GAMEMODE:IsFreezePeriod() ) then
+
 		ucmd:ClearMovement()
 		ucmd:ClearButtons()
 	
@@ -30,13 +34,9 @@ function GM:FinishMove( ply, mv )
 	if ( JUMPING && jump_boost > 0 ) then
 
 		local addVel = mv:GetVelocity() 
-		
 		addVel.z = 0
-		
 		addVel:Normalize()
-		
 		addVel = addVel * jump_boost
-		
 		mv:SetVelocity( mv:GetVelocity() + addVel )
 		
 	end

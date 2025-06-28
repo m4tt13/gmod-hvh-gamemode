@@ -135,7 +135,7 @@ local function DrawRoundedBackground( wide, tall )
 	
 	-- paint between top right and bottom right -------------------------------
 	x1 = wide - coord[numSegments]
-	x2 = wide;
+	x2 = wide
 	y1 = coord[numSegments]
 	y2 = tall - coord[numSegments]
 	surface.DrawRect( x1, y1, x2 - x1, y2 - y1 )
@@ -259,7 +259,7 @@ local function DrawRoundedBorder( wide, tall )
 	x1 = 0
 	x2 = 1
 	y1 = coord[numSegments]
-	y2 = tall - coord[numSegments];
+	y2 = tall - coord[numSegments]
 	surface.DrawRect( x1, y1, x2 - x1, y2 - y1 )
 
 	-- right ------------------------------------------------------------------

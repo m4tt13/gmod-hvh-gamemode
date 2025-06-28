@@ -1,7 +1,7 @@
 local loadouts = {
 
-	[WPNSLOT_PRIMARY] 	= CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary weapon" ),
-	[WPNSLOT_SECONDARY] = CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary weapon" )
+	[WPNSLOT_PRIMARY] 	= CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary Weapon" ),
+	[WPNSLOT_SECONDARY] = CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary Weapon" )
 	
 }
 
