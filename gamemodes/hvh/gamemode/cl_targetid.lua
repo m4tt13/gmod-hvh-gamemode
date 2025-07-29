@@ -17,8 +17,7 @@ function GM:HUDDrawTargetID()
 		
 	end
 	
-	local tr = util.GetPlayerTrace( ply )
-	local trace = util.TraceLine( tr )
+	local trace = ply:GetEyeTrace()
 	if ( !trace.Hit ) then return end
 	if ( !trace.HitNonWorld ) then return end
 	

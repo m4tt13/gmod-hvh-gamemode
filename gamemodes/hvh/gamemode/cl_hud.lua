@@ -47,13 +47,6 @@ local ammo_letters = {
 	
 }
 
-local spec_modes = {
-
-	[OBS_MODE_IN_EYE] 	= "First Person",
-	[OBS_MODE_CHASE]	= "Chase"
-	
-}
-
 local function GetRoundTimer()
 
 	local timer = math.ceil( GAMEMODE:GetRoundRemainingTime() )
@@ -192,14 +185,6 @@ local function HUD_DrawSpec()
 			
 		end
 
-	else
-	
-		local potential_mode = spec_modes[ ply:GetNWInt( "ObserverPotentialMode", OBS_MODE_NONE ) ]
-		
-		if ( potential_mode ) then
-			draw.SimpleText( "Potential Camera: " .. potential_mode, "hvh_menu", scrw / 2, scrh - 30, clr_text, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-		end
-	
 	end
 	
 end

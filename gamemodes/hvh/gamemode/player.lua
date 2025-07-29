@@ -106,9 +106,7 @@ end
 
 local function ValidateCurObsTarget( ply )
 
-	local potential_mode = ply:GetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
-
-	if ( potential_mode != OBS_MODE_NONE ) then
+	if ( ply.ObserverPotentialMode ) then
 	
 		local obsTarget = ply:GetObserverTarget()
 		
@@ -118,9 +116,9 @@ local function ValidateCurObsTarget( ply )
 		
 		if ( IsValid( obsTarget ) ) then
 			
-			ply:Spectate( potential_mode )
+			ply:Spectate( ply.ObserverPotentialMode )
 			ply:SpectateEntity( obsTarget )
-			ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+			ply.ObserverPotentialMode = nil
 			
 		end
 	
@@ -142,7 +140,7 @@ local function ValidateCurObsTarget( ply )
 				ply:SetSaveValue( "m_hObserverTarget", nil )
 				ply:Spectate( OBS_MODE_ROAMING )
 				ply:SetSaveValue( "m_hObserverTarget", oldObsTarget )
-				ply:SetNWInt( "ObserverPotentialMode", mode )
+				ply.ObserverPotentialMode = mode
 
 			end
 		
@@ -169,8 +167,7 @@ local function StartObserverMode( ply, mode )
 	
 	end
 	
-	ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
-
+	ply.ObserverPotentialMode = nil
 	ValidateCurObsTarget( ply )
 	
 end
@@ -178,7 +175,7 @@ end
 local function StopObserverMode( ply )
 
 	ply:UnSpectate()
-	ply:SetNWInt( "ObserverPotentialMode", OBS_MODE_NONE )
+	ply.ObserverPotentialMode = nil
 	
 end
 
@@ -209,6 +206,14 @@ local function SetSpectatorMode( ply, mode )
 
 end
 
+local spec_modes = {
+
+	[OBS_MODE_IN_EYE] 	= "First Person",
+	[OBS_MODE_CHASE]	= "Chase Camera",
+	[OBS_MODE_ROAMING]	= "Free Look"
+	
+}
+
 function GM:KeyPress( player, key )
 
 	if ( key == IN_RELOAD ) then
@@ -223,6 +228,12 @@ function GM:KeyPress( player, key )
 			
 			StartObserverMode( player, mode )
 			SetSpectatorMode( player, mode )
+			
+			local strSpecMode = spec_modes[ mode ]
+			
+			if ( strSpecMode ) then
+				player:PrintMessage( HUD_PRINTCENTER, "Switched to " .. strSpecMode )
+			end
 			
 		end
 		
@@ -479,6 +490,14 @@ function GM:PlayerSay( ply, text, teamonly )
 		elseif ( ltext == "team" ) then
 
 			ply:ConCommand( "teammenu" )
+			
+		elseif ( ltext == "t" || ltext == "ter" ) then
+
+			ply:ConCommand( "changeteam " .. TEAM_TERRORIST )
+			
+		elseif ( ltext == "ct" ) then
+
+			ply:ConCommand( "changeteam " .. TEAM_CT )
 	
 		elseif ( ltext == "spec" || ltext == "spectate" ) then
 		
@@ -572,6 +591,8 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 	local is_knifekill = ( inflictor:GetClass() == "hvh_knife" )
 	
 	Stats_OnPlayerDeath( ply, attacker, is_headshot, is_knifekill )
+	
+	ply:RemoveAllItems()
 	
 	if ( IsValidObsTarget( ply, attacker ) ) then
 		ply:SpectateEntity( attacker )
@@ -912,7 +933,7 @@ function GM:PlayerShouldTakeDamage( ply, attacker )
 	
 end
 
-local hitgroups_armored = {
+local hitgroup_armored = {
 
 	[HITGROUP_GENERIC] 	= true,
 	[HITGROUP_HEAD] 	= true,
@@ -925,7 +946,7 @@ local hitgroups_armored = {
 
 function GM:HandlePlayerArmorReduction( ply, dmginfo )
 
-	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 || !hitgroups_armored[ ply:LastHitGroup() ] ) then return end
+	if ( ply:Armor() <= 0 || bit.band( dmginfo:GetDamageType(), DMG_FALL + DMG_DROWN + DMG_POISON + DMG_RADIATION ) != 0 || !hitgroup_armored[ ply:LastHitGroup() ] ) then return end
 
 	local armorBonus = 0.5
 	local armorRatio = 0.5
