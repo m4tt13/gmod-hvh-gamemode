@@ -6,7 +6,7 @@ local votemap_initialdelay = CreateConVar( "votemap_initialdelay", "30.0", FCVAR
 local maplist = {}
 local votemap_allowed = true
 
-local clr_prefix = Color( 250, 100, 0 )
+local clr_prefix = Color( 250, 130, 30 )
 
 function VoteMap_Init()
 

@@ -166,14 +166,79 @@ end
 
 if CLIENT then
 
-	function SWEP:DrawHUD()
+	local matScopeArc = Material( "sprites/scope_arc" )
+	local matScopeDust = Material( "overlays/scope_lens" )
+
+	function SWEP:DrawHUDBackground()
 
 		if ( self:GetZoomLevel() != 0 ) then 
 		
-			surface.SetDrawColor( 0, 0, 0, 255 )
+			local screenWide = ScrW()
+			local screenTall = ScrH()
+	
+			local inset = screenTall / 16
+			local y1 = inset
+			local x1 = ( screenWide - screenTall ) / 2 + inset
+			local y2 = screenTall - inset
+			local x2 = screenWide - x1
+
+			local x = screenWide / 2
+			local y = screenTall / 2
+
+			local uv1 = 0.5 / 256.0
+			local uv2 = 1.0 - uv1
+
+			local xMod = ( screenWide / 2 )
+			local yMod = ( screenTall / 2 )
+
+			local iMiddleX = ( screenWide / 2 )
+			local iMiddleY = ( screenTall / 2 )
 			
-			surface.DrawLine( ScrW() / 2, 0, ScrW() / 2, ScrH() )
-			surface.DrawLine( 0, ScrH() / 2, ScrW(), ScrH() / 2 )
+			surface.SetMaterial( matScopeDust )
+			surface.SetDrawColor( color_white )
+			
+			local vert = {}
+			vert[1] = { x = iMiddleX + xMod, y = iMiddleY + yMod, u = uv2, v = uv1 }
+			vert[2] = { x = iMiddleX - xMod, y = iMiddleY + yMod, u = uv1, v = uv1 }
+			vert[3] = { x = iMiddleX - xMod, y = iMiddleY - yMod, u = uv1, v = uv2 }
+			vert[4] = { x = iMiddleX + xMod, y = iMiddleY - yMod, u = uv2, v = uv2 }
+			surface.DrawPoly( vert )
+
+			surface.SetDrawColor( color_black )
+
+			surface.DrawLine( 0, y, screenWide, y )
+			surface.DrawLine( x, 0, x, screenTall )
+			
+			surface.SetMaterial( matScopeArc )
+
+			vert[1] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[2] = { x = x2, y = y, u = uv2, v = uv1 }
+			vert[3] = { x = x2, y = y2, u = uv2, v = uv2 }
+			vert[4] = { x = x, y = y2, u = uv1, v = uv2 }
+			surface.DrawPoly( vert )
+			
+			vert[1] = { x = x - 1, y = y1, u = uv1, v = uv2 }
+			vert[2] = { x = x2, y = y1, u = uv2, v = uv2 }
+			vert[3] = { x = x2, y = y + 1, u = uv2, v = uv1 }
+			vert[4] = { x = x - 1, y = y + 1, u = uv1, v = uv1 }
+			surface.DrawPoly( vert )
+
+			vert[1] = { x = x1, y = y, u = uv2, v = uv1 }
+			vert[2] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[3] = { x = x, y = y2, u = uv1, v = uv2 }
+			vert[4] = { x = x1, y = y2, u = uv2, v = uv2 }
+			surface.DrawPoly( vert )
+
+			vert[1] = { x = x1, y = y1, u = uv2, v = uv2 }
+			vert[2] = { x = x, y = y1, u = uv1, v = uv2 }
+			vert[3] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[4] = { x = x1, y = y, u = uv2, v = uv1 }
+			surface.DrawPoly( vert )
+
+			surface.DrawRect( 0, 0, screenWide, y1 )
+			surface.DrawRect( 0, y2, screenWide, screenTall )
+			surface.DrawRect( 0, y1, x1, screenTall )
+			surface.DrawRect( x2, y1, screenWide, screenTall )
 			
 		end
 		

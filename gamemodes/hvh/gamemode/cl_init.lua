@@ -195,6 +195,12 @@ function GM:PlayerButtonDown( ply, button )
 
 end
 
+function GM:OnSpawnMenuOpen()
+
+	RunConsoleCommand( "lastinv" )
+
+end
+
 local function RecvPlaySound()
 
 	local snd = net.ReadString()

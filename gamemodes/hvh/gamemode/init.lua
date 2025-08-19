@@ -400,6 +400,13 @@ local function RestartRound()
 	
 	for id, pl in ipairs( player.GetAll() ) do
 	
+		if ( GAMEMODE.CompleteReset ) then
+		
+			pl:SetFrags( 0 )
+			pl:SetDeaths( 0 )
+			
+		end
+	
 		pl.SpawnedThisRound = false
 		pl:OutputDamageStatsAndReset()
 		
