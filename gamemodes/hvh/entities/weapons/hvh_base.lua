@@ -172,7 +172,12 @@ if CLIENT then
 
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 	
-		draw.SimpleText( self.IconLetter, "hvh_selectionicon", x + wide / 2, y + tall * 0.3, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
+		local pos_x = x + wide / 2
+		local pos_y = y + tall * 0.2
+	
+		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x, pos_y, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
+		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x + math.Rand( -4, 4 ), pos_y + math.Rand( -14, 14 ), Color( 255, 210, 0, math.Rand( 10, 120 ) ), TEXT_ALIGN_CENTER )
+		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x + math.Rand( -4, 4 ), pos_y + math.Rand( -9, 9 ), Color( 255, 210, 0, math.Rand( 10, 120 ) ), TEXT_ALIGN_CENTER )
 	
 	end
 

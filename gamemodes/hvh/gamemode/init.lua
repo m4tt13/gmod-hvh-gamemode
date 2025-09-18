@@ -46,7 +46,7 @@ local round_end_info = {
 	[REASON_TER_WIN] = {
 	
 		Winner = WINNER_TER,
-		Sound  = Sound( "radio/terwin.wav" ),
+		Sound  = "radio/terwin.wav",
 		Msg	   = "Terrorists Win!"
 	
 	},
@@ -54,7 +54,7 @@ local round_end_info = {
 	[REASON_CT_WIN] = {
 	
 		Winner = WINNER_CT,
-		Sound  = Sound( "radio/ctwin.wav" ),
+		Sound  = "radio/ctwin.wav",
 		Msg	   = "Counter-Terrorists Win!"
 	
 	},
@@ -62,7 +62,7 @@ local round_end_info = {
 	[REASON_ROUND_DRAW] = {
 	
 		Winner = WINNER_DRAW,
-		Sound  = Sound( "radio/rounddraw.wav" ),
+		Sound  = "radio/rounddraw.wav",
 		Msg	   = "Round Draw!"
 	
 	},
@@ -70,19 +70,19 @@ local round_end_info = {
 	[REASON_GAME_COMMENCING] = {
 	
 		Winner = WINNER_DRAW,
-		Sound  = Sound( "radio/rounddraw.wav" ),
+		Sound  = "radio/rounddraw.wav",
 		Msg	   = "Game Commencing!"
 	
 	}
 
 }
 
-local round_start_snds = {
+local round_start_sounds = {
 
-	Sound( "radio/go.wav" ),
-	Sound( "radio/letsgo.wav" ),
-	Sound( "radio/locknload.wav" ),
-	Sound( "radio/moveout.wav" )
+	"radio/go.wav",
+	"radio/letsgo.wav",
+	"radio/locknload.wav",
+	"radio/moveout.wav"
 
 }
 
@@ -94,10 +94,6 @@ local function ReadMultiplayCvars()
 end
 
 function GM:Initialize()
-
-	if ( !IsMounted( "cstrike" ) ) then
-		MsgC( Color( 255, 0, 0 ), "[HvH] WARNING: cstrike content not mounted!\n" )
-	end
 
 	GAMEMODE.GameOver				= false
 	GAMEMODE.FirstConnected 		= false
@@ -353,7 +349,7 @@ local function CheckFreezePeriodExpired()
 
 	SetGlobalBool( "FreezePeriod", false )
 	
-	util.PlaySound( round_start_snds[ math.random( #round_start_snds ) ] )
+	util.PlaySound( round_start_sounds[ math.random( #round_start_sounds ) ] )
 
 end
 

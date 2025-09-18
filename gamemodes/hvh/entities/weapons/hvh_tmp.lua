@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "TMP"
 SWEP.Alias 					= "tmp"
+SWEP.Image        		 	= "vgui/gfx/vgui/tmp"
 SWEP.IconLetter				= "d"
 SWEP.CanBuy        		 	= true
 

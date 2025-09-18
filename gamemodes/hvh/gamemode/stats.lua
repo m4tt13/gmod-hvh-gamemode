@@ -164,22 +164,19 @@ function Stats_ShowRank( ply )
 
 end
 
-local snd_button_press1 = Sound( "buttons/button14.wav" )
-local snd_button_press2 = Sound( "buttons/combine_button7.wav" )
-
 local ShowMenu = nil
 
 local function HandlePlayerInfoItem( ply, item )
 
 	if ( item == 1 ) then
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 		ShowMenu( ply, ply.MenuSection )
 	
 	elseif ( item == 10 ) then
 	
-		ply:PlaySound( snd_button_press2 )
+		ply:PlaySound( "buttons/combine_button7.wav" )
 	
 		Menu_Close( ply )
 	
@@ -199,6 +196,7 @@ local function HandleMenuItem( ply, item )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Name: " .. info.name .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "SteamID: " .. info.steamid .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Rank: " .. info.rank .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Points: " .. info.score .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, Format( "KDR: %.2f\n", info.kdr ) )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Kills: " .. info.kills .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Deaths: " .. info.deaths .. "\n" )
@@ -213,6 +211,7 @@ local function HandleMenuItem( ply, item )
 			Menu_AddLine( "Name: " .. info.name )
 			Menu_AddLine( "SteamID: " .. info.steamid )
 			Menu_AddLine( "Rank: " .. info.rank )
+			Menu_AddLine( "Points: " .. info.score )
 			Menu_AddLine( Format( "KDR: %.2f", info.kdr ) )
 			Menu_AddLine( "Kills: " .. info.kills )
 			Menu_AddLine( "Deaths: " .. info.deaths )
@@ -226,23 +225,23 @@ local function HandleMenuItem( ply, item )
 			
 		Menu_End( ply, HandlePlayerInfoItem )
 		
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 	elseif ( item == 8 ) then
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 		ShowMenu( ply, ply.MenuSection - 1 )
 
 	elseif ( item == 9 ) then
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 		ShowMenu( ply, ply.MenuSection + 1 )
 	
 	elseif ( item == 10 ) then
 	
-		ply:PlaySound( snd_button_press2 )
+		ply:PlaySound( "buttons/combine_button7.wav" )
 	
 		Menu_Close( ply )
 	
@@ -276,7 +275,7 @@ ShowMenu = function( ply, section )
 				info.kdr = kills / ( ( deaths != 0 ) && deaths || 1 )
 				info.rank = i
 				
-				Menu_AddLine( Format( "%s - %.2f KDR - %s points", info.name, info.kdr, info.score ), true, item )
+				Menu_AddLine( Format( "%s (%s) - KDR: %.2f", info.name, info.score, info.kdr ), true, item )
 				
 				table.insert( ply.DisplayedPlayersInfo, item, info )
 				

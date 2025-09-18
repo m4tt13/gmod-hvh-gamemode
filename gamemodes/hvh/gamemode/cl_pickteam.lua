@@ -3,6 +3,13 @@ local clr_hovered	= Color( 192, 28, 0, 140 )
 local clr_bg		= Color( 0, 0, 0, 196 )
 local clr_border	= Color( 188, 112, 0, 128 )
 
+local class_random_image = {
+
+	[TEAM_TERRORIST] 	= "vgui/gfx/vgui/t_random",
+	[TEAM_CT] 			= "vgui/gfx/vgui/ct_random"
+	
+}
+
 function GM:ShowTeam()
 
 	local ply		= LocalPlayer()
@@ -56,44 +63,35 @@ function GM:ShowTeam()
 		
 	end
 	
-	local classModelCanvas = self.TeamSelectPnl:Add( "Panel" )
-	classModelCanvas:DockPadding( 0, 10, 10, 0 )
-	classModelCanvas:Dock( FILL )
-	classModelCanvas.Paint = function( self, w, h )
+	local classImageCanvas = self.TeamSelectPnl:Add( "Panel" )
+	classImageCanvas:DockPadding( 0, 10, 10, 0 )
+	classImageCanvas:Dock( FILL )
+	classImageCanvas.Paint = function( self, w, h )
 
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, false, false, false, true )
 		
 	end
 	
-	local classModel = classModelCanvas:Add( "DModelPanel" )
-	classModel:SetVisible( false )
-	classModel:SetHeight( 300 )
-	classModel:Dock( TOP )
-	classModel:SetLookAt( Vector( 0, 0, 40 ) )
-	classModel:SetCamPos( Vector( 50, 25, 50 ) )
-	classModel:SetAmbientLight( Color( 255, 255, 255 ) )
-	classModel.LayoutEntity = function( self ) return end
-	classModel.Paint = function( self, w, h )
-
-		DModelPanel.Paint( self, w, h )
+	local classImage = classImageCanvas:Add( "DImage" )
+	classImage:SetVisible( false )
+	classImage:Dock( TOP )
+	classImage.Paint = function( self, w, h )
+	
+		self:PaintAt( 0, 0, w, h )
 
 		surface.SetDrawColor( clr_border )
 		surface.DrawOutlinedRect( 0, 0, w, h, 1 ) 
 		
 	end
 	
-	classModel.DoClick = function( self )
+	classImage.PerformLayout = function( self, w, h )
 
-		if ( self.ClassButton ) then
-			self.ClassButton:DoClick()
-		end
-
+		self:SetHeight( w * ( self.ActualHeight / self.ActualWidth ) )
+		
 	end
 	
 	local activeTeamPnl = nil
-	local activeTeamButton = nil
-	
-	local teamPanels = {}
+	local bestAutoJoinTeam = team.BestAutoJoinTeam()
 	
 	for k, teamModels in ipairs( PlayerModels ) do
 	
@@ -110,14 +108,20 @@ function GM:ShowTeam()
 			
 		end
 		
+		if ( k == bestAutoJoinTeam ) then
+		
+			activeTeamPnl:SetVisible( false )
+			activeTeamPnl = teamPnl
+			activeTeamPnl:SetVisible( true )
+			
+		end
+		
 		teamPnl.Paint = function( self, w, h )
 		
 			surface.SetDrawColor( clr_bg )
 			surface.DrawRect( 0, 0, w, h )
 		
 		end
-		
-		teamPanels[k] = teamPnl
 		
 		local teamButton = mainMenu:Add( "DLabel" )
 		teamButton:SetHeight( 20 )
@@ -129,14 +133,9 @@ function GM:ShowTeam()
 		teamButton:SetMouseInputEnabled( true )
 		teamButton:DockMargin( 0, 0, 0, 10 )
 		teamButton:Dock( TOP )
-		
-		if ( !activeTeamButton ) then 
-			activeTeamButton = teamButton 
-		end
-		
 		teamButton.Paint = function( self, w, h )
 
-			if ( self:IsHovered() || self == activeTeamButton ) then
+			if ( self:IsHovered() || teamPnl == activeTeamPnl ) then
 			
 				surface.SetDrawColor( clr_hovered )
 				surface.DrawRect( 0, 0, w, h )
@@ -150,8 +149,6 @@ function GM:ShowTeam()
 
 		teamButton.DoClick = function( self )
 
-			activeTeamButton = self
-
 			activeTeamPnl:SetVisible( false )
 			activeTeamPnl = teamPnl
 			activeTeamPnl:SetVisible( true )
@@ -160,7 +157,7 @@ function GM:ShowTeam()
 		
 		teamButton.OnCursorEntered = function( self )
 		
-			classModel:SetVisible( false )
+			classImage:SetVisible( false )
 			
 		end
 
@@ -199,9 +196,9 @@ function GM:ShowTeam()
 			
 			classButton.OnCursorEntered = function( self )
 		
-				classModel.ClassButton = self
-				classModel:SetVisible( true )
-				classModel:SetModel( modelInfo.MDL )
+				classImage:SetVisible( true )
+				classImage:SetImage( modelInfo.Image )
+				classImage:InvalidateLayout()
 				
 			end
 			
@@ -240,55 +237,11 @@ function GM:ShowTeam()
 		
 		autoselectButton.OnCursorEntered = function( self )
 			
-			classModel:SetVisible( false )
+			classImage:SetVisible( true )
+			classImage:SetImage( class_random_image[k] )
+			classImage:InvalidateLayout()
 			
 		end
-		
-	end
-	
-	local autojoinButton = mainMenu:Add( "DLabel" )
-	autojoinButton:SetHeight( 20 )
-	autojoinButton:SetFont( "hvh_menu" )
-	autojoinButton:SetTextInset( 10, 0 )
-	autojoinButton:SetTextColor( clr_text )
-	autojoinButton:SetText( "Auto-Assign" )
-	autojoinButton:SetContentAlignment( 4 )
-	autojoinButton:SetMouseInputEnabled( true )
-	autojoinButton:DockMargin( 0, 30, 0, 10 )
-	autojoinButton:Dock( TOP )
-	autojoinButton.Paint = function( self, w, h )
-
-		if ( self:IsHovered() || self == activeTeamButton ) then
-		
-			surface.SetDrawColor( clr_hovered )
-			surface.DrawRect( 0, 0, w, h )
-			
-		end
-
-		surface.SetDrawColor( clr_border )
-		surface.DrawOutlinedRect( 0, 0, w, h, 1 ) 
-		
-	end
-
-	autojoinButton.DoClick = function( self )
-
-		local bestTeamPnl = teamPanels[team.BestAutoJoinTeam()]
-
-		if ( bestTeamPnl ) then
-		
-			activeTeamButton = self
-		
-			activeTeamPnl:SetVisible( false )
-			activeTeamPnl = bestTeamPnl
-			activeTeamPnl:SetVisible( true )
-			
-		end
-
-	end
-	
-	autojoinButton.OnCursorEntered = function( self )
-		
-		classModel:SetVisible( false )
 		
 	end
 	
@@ -300,7 +253,7 @@ function GM:ShowTeam()
 	spectateButton:SetText( "Spectate" )
 	spectateButton:SetContentAlignment( 4 )
 	spectateButton:SetMouseInputEnabled( true )
-	spectateButton:DockMargin( 0, 0, 0, 10 )
+	spectateButton:DockMargin( 0, 30, 0, 10 )
 	spectateButton:Dock( TOP )
 	spectateButton.Paint = function( self, w, h )
 
@@ -325,7 +278,7 @@ function GM:ShowTeam()
 	
 	spectateButton.OnCursorEntered = function( self )
 		
-		classModel:SetVisible( false )
+		classImage:SetVisible( false )
 		
 	end
 	
@@ -362,13 +315,11 @@ function GM:ShowTeam()
 		
 		cancelButton.OnCursorEntered = function( self )
 			
-			classModel:SetVisible( false )
+			classImage:SetVisible( false )
 			
 		end
 		
 	end
-	
-	autojoinButton:DoClick()
 	
 end
 

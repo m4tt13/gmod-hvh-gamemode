@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "UMP45"
 SWEP.Alias 					= "ump45"
+SWEP.Image        		 	= "vgui/gfx/vgui/ump45"
 SWEP.IconLetter				= "q"
 SWEP.CanBuy        		 	= true
 

@@ -1,28 +1,10 @@
 include( "shared.lua" )
-include( "cl_deathnotice.lua" )
-include( "cl_hud.lua" )
-include( "cl_menu.lua" )
-include( "cl_pickteam.lua" )
-include( "cl_scoreboard.lua" )
-include( "cl_targetid.lua" )
-include( "cl_weapons.lua" )
-
-DEFINE_BASECLASS( "gamemode_base" )
 
 surface.CreateFont( "hvh_menu", {
 
 	font = "Verdana",
 	size = 14,
 	weight = 700,
-	antialias = true
-
-} )
-
-surface.CreateFont( "hvh_menusmall", {
-
-	font = "Verdana",
-	size = 13,
-	weight = 0,
 	antialias = true
 
 } )
@@ -36,13 +18,17 @@ surface.CreateFont( "hvh_menutitle", {
 
 } )
 
+include( "cl_deathnotice.lua" )
+include( "cl_hud.lua" )
+include( "cl_menu.lua" )
+include( "cl_pickteam.lua" )
+include( "cl_scoreboard.lua" )
+include( "cl_targetid.lua" )
+include( "cl_weapons.lua" )
+
 CreateClientConVar( "cl_default_spec_mode", tostring( OBS_MODE_ROAMING ), true, true, "Default Spectator Mode" )
-
-function GM:Initialize()
-
-	BaseClass.Initialize( self )
-
-end
+CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary Weapon" )
+CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary Weapon" )
 
 local hud = {
 
@@ -57,11 +43,7 @@ function GM:HUDShouldDraw( name )
 
 	if ( hud[name] ) then return false end
 	
-	if ( name == "CHudWeaponSelection" && Menu_TakesInput() ) then
-		return false
-	end
-
-	return BaseClass.HUDShouldDraw( self, name )
+	return self.BaseClass.HUDShouldDraw( self, name )
 	
 end
 
@@ -73,6 +55,8 @@ function GM:HUDPaint()
 	hook.Run( "DrawDeathNotice" )
 
 end
+
+local cl_chatfilters = GetConVar( "cl_chatfilters" )
 
 function GM:OnPlayerChat( player, strText, bTeamOnly, bPlayerIsDead )
 
@@ -104,7 +88,7 @@ function GM:OnPlayerChat( player, strText, bTeamOnly, bPlayerIsDead )
 	end
 
 	local filter_context = TEXT_FILTER_GAME_CONTENT
-	if ( bit.band( GetConVarNumber( "cl_chatfilters" ), 64 ) != 0 ) then filter_context = TEXT_FILTER_CHAT end
+	if ( bit.band( cl_chatfilters:GetInt(), 64 ) != 0 ) then filter_context = TEXT_FILTER_CHAT end
 
 	table.insert( tab, color_white )
 	table.insert( tab, ": " .. util.FilterText( strText, filter_context, IsValid( player ) and player or nil ) )
@@ -163,36 +147,22 @@ function GM:ChatText( playerindex, playername, text, filter )
 		
 	end
 	
-	return BaseClass.ChatText( self, playerindex, playername, text, filter )
+	return self.BaseClass.ChatText( self, playerindex, playername, text, filter )
 
 end
 
-function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
+function GM:PlayerBindPress( pl, bind, down, code )
 
-	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
+	if ( down && code >= KEY_0 && code <= KEY_9 ) then
 	
-		local attacker = dmginfo:GetAttacker()
-
-		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
+		local item = ( ( code - KEY_0 ) % -10 ) + 10
+		
+		if ( Menu_HandleInput( item ) ) then
 			return true
 		end
 		
 	end
-
-	if ( GetConVarNumber( "mp_damage_headshot_only" ) != 0 && dmginfo:IsBulletDamage() && hitgroup != HITGROUP_HEAD ) then
-		return true
-	end
-
-	return false
-
-end
-
-function GM:PlayerButtonDown( ply, button )
-
-	if ( IsFirstTimePredicted() ) then
-		Menu_HandleKeyInput( button )
-	end
-
+	
 end
 
 function GM:OnSpawnMenuOpen()
@@ -205,7 +175,7 @@ local function RecvPlaySound()
 
 	local snd = net.ReadString()
 	
-	surface.PlaySound( Sound( snd ) )
+	surface.PlaySound( snd )
 
 end
 net.Receive( "hvh_playsound", RecvPlaySound )

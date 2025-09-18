@@ -1,11 +1,7 @@
-local loadouts = {
-
-	[WPNSLOT_PRIMARY] 	= CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary Weapon" ),
-	[WPNSLOT_SECONDARY] = CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary Weapon" )
-	
-}
-
-local last_weapons = {}
+local clr_text		= Color( 255, 176, 0, 255 )
+local clr_hovered	= Color( 192, 28, 0, 140 )
+local clr_bg		= Color( 0, 0, 0, 196 )
+local clr_border	= Color( 188, 112, 0, 128 )
 
 local allowed_weapons = {
 
@@ -52,11 +48,6 @@ local allowed_weapons = {
 	}
 	
 }
-
-local clr_text		= Color( 255, 176, 0, 255 )
-local clr_hovered	= Color( 192, 28, 0, 140 )
-local clr_bg		= Color( 0, 0, 0, 196 )
-local clr_border	= Color( 188, 112, 0, 128 )
 
 function GM:ShowHelp()
 
@@ -117,38 +108,34 @@ function GM:ShowHelp()
 		
 	end
 	
-	local wpnModelCanvas = self.WeaponSelectPnl:Add( "Panel" )
-	wpnModelCanvas:DockPadding( 0, 10, 10, 0 )
-	wpnModelCanvas:Dock( FILL )
-	wpnModelCanvas.Paint = function( self, w, h )
+	local wpnImageCanvas = self.WeaponSelectPnl:Add( "Panel" )
+	wpnImageCanvas:DockPadding( 0, 10, 10, 0 )
+	wpnImageCanvas:Dock( FILL )
+	wpnImageCanvas.Paint = function( self, w, h )
 
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, false, false, false, true )
 		
 	end
 	
-	local weaponModel = wpnModelCanvas:Add( "DModelPanel" )
-	weaponModel:SetVisible( false )
-	weaponModel:SetHeight( 170 )
-	weaponModel:Dock( TOP )
-	weaponModel:SetLookAt( Vector( 0, 0, 5 ) )
-	weaponModel:SetCamPos( Vector( 20, 35, 20 ) )
-	weaponModel:SetAmbientLight( Color( 255, 255, 255 ) )
-	weaponModel.LayoutEntity = function( self ) return end
-	weaponModel.Paint = function( self, w, h )
+	local weaponImage = wpnImageCanvas:Add( "DImage" )
+	weaponImage:SetVisible( false )
+	weaponImage:Dock( TOP )
+	weaponImage.Paint = function( self, w, h )
+	
+		local imgW = w * 0.9
+		local imgH = h * 0.9
 
-		DModelPanel.Paint( self, w, h )
-
+		self:PaintAt( ( w - imgW ) / 2, ( h - imgH ) / 2, imgW, imgH )
+ 
 		surface.SetDrawColor( clr_border )
 		surface.DrawOutlinedRect( 0, 0, w, h, 1 ) 
 		
 	end
 	
-	weaponModel.DoClick = function( self )
+	weaponImage.PerformLayout = function( self, w, h )
 
-		if ( self.WeaponButton ) then
-			self.WeaponButton:DoClick()
-		end
-
+		self:SetHeight( w * ( self.ActualHeight / self.ActualWidth ) )
+		
 	end
 
 	local activeWpnTypePnl = nil
@@ -209,7 +196,7 @@ function GM:ShowHelp()
 		
 		wpntypeButton.OnCursorEntered = function( self )
 		
-			weaponModel:SetVisible( false )
+			weaponImage:SetVisible( false )
 			
 		end
 		
@@ -245,7 +232,6 @@ function GM:ShowHelp()
 			
 			weaponButton.DoClick = function( self )
 
-				last_weapons[ swep.Slot ] = weapon
 				RunConsoleCommand( "giveweapon", weapon )
 				GAMEMODE:HideHelp() 
 				
@@ -253,99 +239,13 @@ function GM:ShowHelp()
 			
 			weaponButton.OnCursorEntered = function( self )
 		
-				weaponModel.WeaponButton = self
-				weaponModel:SetVisible( true )
-				weaponModel:SetModel( swep.WorldModel )
+				weaponImage:SetVisible( true )
+				weaponImage:SetImage( swep.Image )
+				weaponImage:InvalidateLayout()
 				
 			end
 			
 		end
-		
-	end
-	
-	local getlastButton = mainMenu:Add( "DLabel" )
-	getlastButton:SetHeight( 20 )
-	getlastButton:SetFont( "hvh_menu" )
-	getlastButton:SetTextInset( 10, 0 )
-	getlastButton:SetTextColor( clr_text )
-	getlastButton:SetText( "Last Loadout" )
-	getlastButton:SetContentAlignment( 4 )
-	getlastButton:SetMouseInputEnabled( true )
-	getlastButton:DockMargin( 0, 30, 0, 10 )
-	getlastButton:Dock( TOP )
-	getlastButton.Paint = function( self, w, h )
-
-		if ( self:IsHovered() ) then
-		
-			surface.SetDrawColor( clr_hovered )
-			surface.DrawRect( 0, 0, w, h )
-			
-		end
-
-		surface.SetDrawColor( clr_border )
-		surface.DrawOutlinedRect( 0, 0, w, h, 1 ) 
-		
-	end
-
-	getlastButton.DoClick = function( self )
-	
-		for k, v in pairs( last_weapons ) do
-			RunConsoleCommand( "giveweapon", v )
-		end
-		
-		GAMEMODE:HideHelp() 
-
-	end
-	
-	getlastButton.OnCursorEntered = function( self )
-		
-		weaponModel:SetVisible( false )
-		
-	end
-	
-	local savecurButton = mainMenu:Add( "DLabel" )
-	savecurButton:SetHeight( 20 )
-	savecurButton:SetFont( "hvh_menu" )
-	savecurButton:SetTextInset( 10, 0 )
-	savecurButton:SetTextColor( clr_text )
-	savecurButton:SetText( "Save Loadout" )
-	savecurButton:SetContentAlignment( 4 )
-	savecurButton:SetMouseInputEnabled( true )
-	savecurButton:DockMargin( 0, 0, 0, 10 )
-	savecurButton:Dock( TOP )
-	savecurButton.Paint = function( self, w, h )
-
-		if ( self:IsHovered() ) then
-		
-			surface.SetDrawColor( clr_hovered )
-			surface.DrawRect( 0, 0, w, h )
-			
-		end
-
-		surface.SetDrawColor( clr_border )
-		surface.DrawOutlinedRect( 0, 0, w, h, 1 ) 
-		
-	end
-
-	savecurButton.DoClick = function( self )
-
-		for id, wpn in ipairs( ply:GetWeapons() ) do
-		
-			local loadout = loadouts[ wpn:GetSlot() ]
-			
-			if ( loadout ) then
-				loadout:SetString( wpn:GetClass() )
-			end
-			
-		end
-
-		GAMEMODE:HideHelp() 
-	
-	end
-	
-	savecurButton.OnCursorEntered = function( self )
-		
-		weaponModel:SetVisible( false )
 		
 	end
 	
@@ -380,7 +280,7 @@ function GM:ShowHelp()
 	
 	cancelButton.OnCursorEntered = function( self )
 	
-		weaponModel:SetVisible( false )
+		weaponImage:SetVisible( false )
 		
 	end
 	

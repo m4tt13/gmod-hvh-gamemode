@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "AK47"
 SWEP.Alias 					= "ak47"
+SWEP.Image        		 	= "vgui/gfx/vgui/ak47"
 SWEP.IconLetter				= "b"
 SWEP.CanBuy        		 	= true
 

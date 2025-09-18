@@ -6,42 +6,6 @@ local clr_item 	= Color( 255, 167, 42, 255 )
 local clr_menu 	= Color( 233, 208, 173, 255 )
 local clr_bg 	= Color( 0, 0, 0, 100 )
 
-local key2item = {
-
-	[KEY_1] = 1,
-	[KEY_2] = 2,
-	[KEY_3] = 3,
-	[KEY_4] = 4,
-	[KEY_5] = 5,
-	[KEY_6] = 6,
-	[KEY_7] = 7,
-	[KEY_8] = 8,
-	[KEY_9] = 9,
-	[KEY_0] = 10,
-	
-}
-
-local item2num = {
-
-	"1. ", 
-	"2. ", 
-	"3. ", 
-	"4. ", 
-	"5. ", 
-	"6. ", 
-	"7. ", 
-	"8. ", 
-	"9. ", 
-	"0. "
-	
-}
-
-function Menu_TakesInput()
-
-	return ( IsValid( menu_panel ) && menu_panel.TakesInput )
-
-end
-
 local function RemoveMenuPnl()
 
 	if ( IsValid( menu_panel ) ) then
@@ -53,32 +17,28 @@ local function RemoveMenuPnl()
 
 end
 
-function Menu_HandleKeyInput( key )
+function Menu_HandleInput( item )
 
-	if ( !IsValid( menu_panel ) || !menu_panel.TakesInput ) then
-		return
+	if ( !IsValid( menu_panel ) || !menu_panel.TakesInput || !valid_items[item] ) then
+		return false
 	end
 	
-	local item = key2item[key]
+	menu_panel.TakesInput = false
+	menu_panel:AlphaTo( 0, 0.5, 0.5, function() RemoveMenuPnl() end )
 	
-	if ( item && valid_items[item] ) then
+	for k, v in ipairs( menu_panel:GetChildren() ) do
 	
-		menu_panel.TakesInput = false
-		menu_panel:AlphaTo( 0, 0.5, 0.5, function() RemoveMenuPnl() end )
-		
-		for k, v in ipairs( menu_panel:GetChildren() ) do
-		
-			if ( v.Colored && v.Item == item ) then
-				v:AlphaTo( 255, 0.5 )
-			else
-				v:AlphaTo( 0, 0.5 )
-			end
-		
+		if ( v.Colored && v.Item == item ) then
+			v:AlphaTo( 255, 0.5 )
+		else
+			v:AlphaTo( 0, 0.5 )
 		end
-		
-		RunConsoleCommand( "menuselect", item )
 	
 	end
+	
+	RunConsoleCommand( "menuselect", item )
+	
+	return true
 
 end
 
@@ -112,7 +72,7 @@ local function OpenMenu()
 			local line = menu_panel:Add( "DLabel" )
 			line:SetFont( "hvh_menu" )
 			line:SetTextColor( menu_line.Colored && clr_item || clr_menu )
-			line:SetText( ( item2num[ menu_line.Item ] || "" ) .. menu_line.Text )
+			line:SetText( ( menu_line.Item && ( ( menu_line.Item % 10 ) .. ". " ) || "" ) .. menu_line.Text )
 			line:SizeToContentsX()
 			line:SetHeight( h_step )
 			line:SetPos( 10, height )

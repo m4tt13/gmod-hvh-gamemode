@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "M249"
 SWEP.Alias 					= "m249"
+SWEP.Image        		 	= "vgui/gfx/vgui/m249"
 SWEP.IconLetter				= "z"
 SWEP.CanBuy        		 	= true
 

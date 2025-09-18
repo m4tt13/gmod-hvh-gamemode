@@ -1,12 +1,13 @@
-DEFINE_BASECLASS( "gamemode_base" )
-
 local mp_flood_time = CreateConVar( "mp_flood_time", "0.75", FCVAR_NONE, "Amount of time allowed between chat messages." )
 local mp_join_grace_time = CreateConVar( "mp_join_grace_time", "15.0", FCVAR_NONE, "Number of seconds after round start to allow a player to join a game.", 0, 30 )
 local mp_teamswitch_cooldown = CreateConVar( "mp_teamswitch_cooldown", "10.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
 local sv_noplayercollision = CreateConVar( "sv_noplayercollision", "1", FCVAR_NONE, "Disable player collision." )
 local sv_nodamageforces = CreateConVar( "sv_nodamageforces", "1", FCVAR_NONE, "Disable forces from physics damage." )
+local sv_disable_blood = CreateConVar( "sv_disable_blood", "1", FCVAR_NONE, "Disable player blood." )
 local sv_jump_impulse = CreateConVar( "sv_jump_impulse", "270", FCVAR_NONE, "Initial upward velocity for player jumps; sqrt(2*gravity*height)." )
 local sv_falldamage_scale = CreateConVar( "sv_falldamage_scale", "1" )
+local mp_friendlyfire = CreateConVar( "mp_friendlyfire", "0", FCVAR_NOTIFY, "Allows team members to injure other members of their team." )
+local mp_damage_headshot_only = CreateConVar( "mp_damage_headshot_only", "0", FCVAR_NONE, "Determines whether non-headshot hits do any damage." )
 local mp_damage_scale_head = CreateConVar( "mp_damage_scale_head", "4.0" )
 local mp_damage_scale_chest = CreateConVar( "mp_damage_scale_chest", "1.0" )
 local mp_damage_scale_stomach = CreateConVar( "mp_damage_scale_stomach", "1.25" )
@@ -228,12 +229,7 @@ function GM:KeyPress( player, key )
 			
 			StartObserverMode( player, mode )
 			SetSpectatorMode( player, mode )
-			
-			local strSpecMode = spec_modes[ mode ]
-			
-			if ( strSpecMode ) then
-				player:PrintMessage( HUD_PRINTCENTER, "Switched to " .. strSpecMode )
-			end
+			player:PrintMessage( HUD_PRINTCENTER, spec_modes[ mode ] )
 			
 		end
 		
@@ -332,6 +328,13 @@ local function StockPlayerAmmo( pl )
 
 end
 
+local loadout_cvars = {
+
+	[WPNSLOT_PRIMARY] 	= "cl_loadout_primary",
+	[WPNSLOT_SECONDARY] = "cl_loadout_secondary"
+	
+}
+
 local function GiveWeapon( ply, weapon, translate )
 
 	if ( !IsValid( ply ) || !ply:Alive() ) then 
@@ -362,6 +365,12 @@ local function GiveWeapon( ply, weapon, translate )
 			ply:StripWeapon( wpn:GetClass() )
 		end
 		
+	end
+	
+	local loadout_cvar = loadout_cvars[ swep.Slot ]
+	
+	if ( loadout_cvar ) then
+		ply:ConCommand( loadout_cvar .. " " .. swep.ClassName )
 	end
 	
 	ply:Give( swep.ClassName )
@@ -668,6 +677,10 @@ local function SetUpPlayerVars( ply )
 	if ( sv_nodamageforces:GetBool() ) then
 		ply:AddEFlags( EFL_NO_DAMAGE_FORCES ) 
 	end
+	
+	if ( sv_disable_blood:GetBool() ) then
+		ply:SetBloodColor( DONT_BLEED )
+	end
 
 end
 
@@ -704,7 +717,7 @@ function GM:PlayerSetModel( pl )
 			pl.PlayerModel = math.random( #teamModels )
 		end
 
-		modelName = teamModels[ pl.PlayerModel ].MDL
+		modelName = teamModels[ pl.PlayerModel ].Model
 		
 	end
 	
@@ -752,7 +765,6 @@ function GM:PlayerLoadout( pl )
 	end
 	
 	pl:Give( "hvh_knife" )
-	
 	StockPlayerAmmo( pl )
 
 end
@@ -863,7 +875,7 @@ end
 
 function GM:GetFallDamage( ply, flFallSpeed )
 
-	return BaseClass.GetFallDamage( self, ply, flFallSpeed ) * sv_falldamage_scale:GetFloat()
+	return self.BaseClass.GetFallDamage( self, ply, flFallSpeed ) * sv_falldamage_scale:GetFloat()
 
 end
 
@@ -905,7 +917,7 @@ local hitgroup_dmgscale = {
 
 function GM:ScalePlayerDamage( ply, hitgroup, dmginfo )
 
-	if ( GetConVarNumber( "mp_damage_headshot_only" ) != 0 && dmginfo:IsBulletDamage() && hitgroup != HITGROUP_HEAD ) then
+	if ( mp_damage_headshot_only:GetBool() && dmginfo:IsBulletDamage() && hitgroup != HITGROUP_HEAD ) then
 		return true
 	end
 
@@ -921,7 +933,7 @@ end
 
 function GM:PlayerShouldTakeDamage( ply, attacker )
 
-	if ( GetConVarNumber( "mp_friendlyfire" ) == 0 ) then
+	if ( !mp_friendlyfire:GetBool() ) then
 	
 		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
 			return false

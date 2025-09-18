@@ -5,7 +5,7 @@ function GM:HandlePlayerVaulting( ply, velocity, plyTable )
 
 	if ( !mp_vaulting_anim:GetBool() ) then return end
 	
-	return BaseClass.HandlePlayerVaulting( self, ply, velocity, plyTable )
+	return self.BaseClass.HandlePlayerVaulting( self, ply, velocity, plyTable )
 
 end
 
@@ -61,6 +61,6 @@ function GM:GrabEarAnimation( ply, plyTable )
 
 	if ( !mp_typing_anim:GetBool() ) then return end
 
-	BaseClass.GrabEarAnimation( self, ply, plyTable )
+	self.BaseClass.GrabEarAnimation( self, ply, plyTable )
 
 end
