@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "P228"	
 SWEP.Alias 					= "p228"
+SWEP.Image        		 	= "vgui/gfx/vgui/p228"
 SWEP.IconLetter				= "a"
 SWEP.CanBuy        		 	= true
 

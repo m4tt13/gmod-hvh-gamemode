@@ -10,32 +10,40 @@ local clr_prefix = Color( 250, 130, 30 )
 
 function VoteMap_Init()
 
-	local file = file.Open( "cfg/votemaplist.txt", "r", "MOD" )
+	local f = file.Open( "cfg/votemaplist.txt", "r", "MOD" )
 	
-	if ( file ) then
+	if ( f ) then
 	
-		while ( !file:EndOfFile() ) do
+		while ( !f:EndOfFile() ) do
 			
-			local line = string.Trim( file:ReadLine() )
+			local line = string.Trim( f:ReadLine() )
 			
 			if ( line != "" && string.sub( line, 1, 2 ) != "//" && line != game.GetMap() ) then
 			
-				local map = {
+				if ( file.Exists( "maps/" .. line .. ".bsp", "GAME" ) ) then
+			
+					local map = {
+					
+						Name = line,
+						Votes = 0
+					
+					}
+					
+					local index = table.insert( maplist, map )
+					
+					maplist[ index ].Index = index
+					
+				else
 				
-					Name = line,
-					Votes = 0
+					MsgC( Color( 255, 0, 0 ), "[VoteMap] No such map 'maps/", line, ".bsp'\n" )
 				
-				}
-				
-				local index = table.insert( maplist, map )
-				
-				maplist[ index ].Index = index
+				end
 			
 			end
 
 		end
 		
-		file:Close()
+		f:Close()
 	
 	end
 
@@ -141,9 +149,6 @@ local function VotingAllowed( ply )
 
 end
 
-local snd_button_press1 = Sound( "buttons/button14.wav" )
-local snd_button_press2 = Sound( "buttons/combine_button7.wav" )
-
 local ShowMenu = nil
 
 local function HandleMenuItem( ply, item )
@@ -170,7 +175,7 @@ local function HandleMenuItem( ply, item )
 			
 			local votes_needed = math.ceil( #player.GetHumans() * votemap_needed:GetFloat() )
 
-			PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] ", COLOR_NICKNAME, ply:Name(), color_white, " wants to change map to ", COLOR_MAPNAME, map.Name, color_white, " (", tostring( map.Votes ), "/", tostring( votes_needed ), ")" ) )
+			PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", clr_prefix, "VoteMap", color_white, "] ", COLOR_NICKNAME, ply:Name(), color_white, " wants to change map to ", COLOR_MAPNAME, map.Name, color_white, " (", tostring( map.Votes ), "/", tostring( votes_needed ), " needed)" ) )
 
 			if ( map.Votes >= votes_needed ) then
 				ChangeMap( map.Name )
@@ -178,25 +183,25 @@ local function HandleMenuItem( ply, item )
 		
 		end
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 		
 		Menu_Close( ply )
 
 	elseif ( item == 8 ) then
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 		ShowMenu( ply, ply.MenuSection - 1 )
 
 	elseif ( item == 9 ) then
 
-		ply:PlaySound( snd_button_press1 )
+		ply:PlaySound( "buttons/button14.wav" )
 
 		ShowMenu( ply, ply.MenuSection + 1 )
 	
 	elseif ( item == 10 ) then
 	
-		ply:PlaySound( snd_button_press2 )
+		ply:PlaySound( "buttons/combine_button7.wav" )
 	
 		Menu_Close( ply )
 	
@@ -224,9 +229,9 @@ ShowMenu = function( ply, section )
 			local map = maplist[ i ]
 
 			if ( ply.VotedMap == map ) then
-				Menu_AddLine( Format( "%i. %s (%i/%i)", item, map.Name, map.Votes, votes_needed ) )
+				Menu_AddLine( Format( "%i. %s [%i/%i]", item, map.Name, map.Votes, votes_needed ) )
 			else
-				Menu_AddLine( Format( "%s (%i/%i)", map.Name, map.Votes, votes_needed ), true, item )
+				Menu_AddLine( Format( "%s [%i/%i]", map.Name, map.Votes, votes_needed ), true, item )
 			end
 			
 			table.insert( ply.DisplayedMapList, item, map )

@@ -1,5 +1,3 @@
-CreateConVar( "mp_damage_headshot_only", "0", FCVAR_REPLICATED, "Determines whether non-headshot hits do any damage." )
-CreateConVar( "mp_friendlyfire", "0", { FCVAR_REPLICATED, FCVAR_NOTIFY }, "Allows team members to injure other members of their team." )
 local sv_jump_boost = CreateConVar( "sv_jump_boost", "0", FCVAR_REPLICATED )
 
 function GM:StartCommand( ply, ucmd )

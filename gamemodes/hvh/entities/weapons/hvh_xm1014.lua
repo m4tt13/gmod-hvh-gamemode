@@ -3,7 +3,8 @@ AddCSLuaFile()
 SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "XM1014"
-SWEP.Alias 					= "xm1014"	
+SWEP.Alias 					= "xm1014"
+SWEP.Image        		 	= "vgui/gfx/vgui/xm1014"
 SWEP.IconLetter				= "B"
 SWEP.CanBuy        		 	= true
 

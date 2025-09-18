@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "SG552"
 SWEP.Alias 					= "sg552"
+SWEP.Image        		 	= "vgui/gfx/vgui/sg552"
 SWEP.IconLetter				= "A"
 SWEP.CanBuy        		 	= true
 

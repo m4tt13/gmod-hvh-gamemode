@@ -4,6 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "AWP"
 SWEP.Alias 					= "awp"
+SWEP.Image        		 	= "vgui/gfx/vgui/awp"
 SWEP.IconLetter				= "r"
 SWEP.CanBuy        		 	= true
 

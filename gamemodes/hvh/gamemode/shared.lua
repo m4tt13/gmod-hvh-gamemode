@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.7"
+GM.Version = "1.2.8"
 
 GM.TeamBased = true
 
@@ -99,19 +99,19 @@ PlayerModels = {
 
 	[TEAM_TERRORIST] = {
 
-		[MODEL_T_PHOENIX] 	= { Name = "Phoenix",	MDL = Model( "models/player/phoenix.mdl" ) },
-		[MODEL_T_L33T] 		= { Name = "Elite",		MDL = Model( "models/player/leet.mdl" ) },
-		[MODEL_T_ARCTIC] 	= { Name = "Arctic",	MDL = Model( "models/player/arctic.mdl" ) },
-		[MODEL_T_GUERILLA] 	= { Name = "Guerilla",	MDL = Model( "models/player/guerilla.mdl" ) }
+		[MODEL_T_PHOENIX] 	= { Name = "Phoenix",	Model = "models/player/phoenix.mdl",	Image = "vgui/gfx/vgui/terror"  },
+		[MODEL_T_L33T] 		= { Name = "Elite",		Model = "models/player/leet.mdl", 		Image = "vgui/gfx/vgui/leet" },
+		[MODEL_T_ARCTIC] 	= { Name = "Arctic",	Model = "models/player/arctic.mdl", 	Image = "vgui/gfx/vgui/arctic" },
+		[MODEL_T_GUERILLA] 	= { Name = "Guerilla",	Model = "models/player/guerilla.mdl", 	Image = "vgui/gfx/vgui/guerilla" }
 		
 	},
 
 	[TEAM_CT] = {
 		
-		[MODEL_CT_SEAL] 	= { Name = "SEAL",		MDL = Model( "models/player/urban.mdl" ) },
-		[MODEL_CT_GSG9] 	= { Name = "GSG9",		MDL = Model( "models/player/riot.mdl" ) },
-		[MODEL_CT_SAS] 		= { Name = "SAS",		MDL = Model( "models/player/gasmask.mdl" ) },	
-		[MODEL_CT_GIGN] 	= { Name = "GIGN",		MDL = Model( "models/player/swat.mdl" ) }
+		[MODEL_CT_SEAL] 	= { Name = "SEAL",		Model = "models/player/urban.mdl", 		Image = "vgui/gfx/vgui/urban" },
+		[MODEL_CT_GSG9] 	= { Name = "GSG9",		Model = "models/player/riot.mdl", 		Image = "vgui/gfx/vgui/gsg9" },
+		[MODEL_CT_SAS] 		= { Name = "SAS",		Model = "models/player/gasmask.mdl",	Image = "vgui/gfx/vgui/sas" },	
+		[MODEL_CT_GIGN] 	= { Name = "GIGN",		Model = "models/player/swat.mdl", 		Image = "vgui/gfx/vgui/gign" }
 		
 	}
 }
