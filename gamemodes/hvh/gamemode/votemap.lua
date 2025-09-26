@@ -10,7 +10,7 @@ local clr_prefix = Color( 250, 130, 30 )
 
 function VoteMap_Init()
 
-	local f = file.Open( "cfg/votemaplist.txt", "r", "MOD" )
+	local f = file.Open( "cfg/votemaplist.txt", "r", "GAME" )
 	
 	if ( f ) then
 	

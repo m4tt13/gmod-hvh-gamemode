@@ -30,13 +30,13 @@ REASON_ROUND_DRAW 		= 3
 REASON_GAME_COMMENCING	= 4
 
 local mp_round_restart_delay = CreateConVar( "mp_round_restart_delay", "5.0", FCVAR_NONE, "Number of seconds to delay before restarting a round after a win.", 0, 10 )
-local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NOTIFY, "How many minutes each round takes.", 1, 9 )
 local mp_freezetime = CreateConVar( "mp_freezetime", "6", FCVAR_NOTIFY, "How many seconds to keep players frozen when the round starts.", 0, 60 )
 local mp_chattime = CreateConVar( "mp_chattime", "10", FCVAR_NONE, "Amount of time players can chat after the game is over.", 1, 120 )
 local mp_maxrounds = CreateConVar( "mp_maxrounds", "0", FCVAR_NOTIFY, "Max number of rounds to play before server changes maps.", 0 )
 local mp_winlimit = CreateConVar( "mp_winlimit", "0", FCVAR_NOTIFY, "Max score one team can reach before server changes maps.", 0 )
 local mp_fraglimit = CreateConVar( "mp_fraglimit", "0", FCVAR_NOTIFY, "The number of kills at which the map ends." )
 local mp_ignore_round_win_conditions = CreateConVar( "mp_ignore_round_win_conditions", "0", FCVAR_NONE, "Ignore conditions which would end the current round." )
+local mp_map_end_at_timelimit = CreateConVar( "mp_map_end_at_timelimit", "0", FCVAR_NOTIFY, "Allow map to end when mp_timelimit hits instead of waiting for the end of the current round." )
 
 util.AddNetworkString( "hvh_playsound" )
 util.AddNetworkString( "hvh_showmenu" )
@@ -86,13 +86,6 @@ local round_start_sounds = {
 
 }
 
-local function ReadMultiplayCvars()
-
-	GAMEMODE.FreezeTime = mp_freezetime:GetInt()
-	SetGlobalInt( "RoundTime", math.floor( mp_roundtime:GetFloat() * 60 ) )
-
-end
-
 function GM:Initialize()
 
 	GAMEMODE.GameOver				= false
@@ -101,7 +94,7 @@ function GM:Initialize()
 	GAMEMODE.RoundWinStatus 		= WINNER_NONE
 	GAMEMODE.RestartRoundTime 		= 0.1
 	GAMEMODE.IntermissionEndTime	= 0
-	GAMEMODE.FreezeTime				= 0
+	GAMEMODE.NextPeriodicThink		= 0
 	GAMEMODE.NumTerroristWins 		= 0
 	GAMEMODE.NumCTWins 				= 0
 	GAMEMODE.TotalRoundsPlayed		= -1
@@ -111,12 +104,30 @@ function GM:Initialize()
 	SetGlobalFloat( "RoundStartTime", 0 )
 	SetGlobalFloat( "GameStartTime", 0 )
 	
-	ReadMultiplayCvars()
-	
 	Stats_Load()
 	
 	VoteMap_Init()
 	
+end
+
+function GM:InitPostEntity()
+
+	timer.Simple( 0, function()
+		
+		local f = file.Open( "maps/cfg/" .. game.GetMap() .. ".cfg", "r", "GAME" )
+	
+		if ( f ) then
+		
+			while ( !f:EndOfFile() ) do
+				game.ConsoleCommand( f:ReadLine() .. "\n" )
+			end
+			
+			f:Close()
+		
+		end
+
+	end )
+
 end
 
 local function UpdateTeamScores()
@@ -149,6 +160,8 @@ local function GoToIntermission()
 
 end
 
+local nextlevel = GetConVar( "nextlevel" )
+
 local function TerminateRound( delay, reason )
 
 	local winnerTeam = WINNER_NONE
@@ -168,7 +181,7 @@ local function TerminateRound( delay, reason )
 	GAMEMODE.RoundWinStatus 	= winnerTeam
 	GAMEMODE.RestartRoundTime 	= CurTime() + delay
 	
-	if ( GAMEMODE:GetMapRemainingTime() == 0 ) then
+	if ( nextlevel:GetString() != "" || GAMEMODE:GetMapRemainingTime() == 0 ) then
 		GoToIntermission()
 	end
 
@@ -261,8 +274,12 @@ local function CheckGameOver()
 
 	if ( GAMEMODE.GameOver ) then
 
-		if ( GAMEMODE.IntermissionEndTime < CurTime() ) then
+		if ( GAMEMODE.IntermissionEndTime != 0 && GAMEMODE.IntermissionEndTime < CurTime() ) then
+		
 			game.LoadNextMap()
+			
+			GAMEMODE.IntermissionEndTime = 0
+			
 		end
 
 		return true
@@ -373,8 +390,6 @@ end
 
 local function RestartRound()
 	
-	GAMEMODE.TotalRoundsPlayed = GAMEMODE.TotalRoundsPlayed + 1
-	
 	if ( GAMEMODE.CompleteReset ) then
 	
 		SetGlobalFloat( "GameStartTime", CurTime() )
@@ -386,13 +401,14 @@ local function RestartRound()
 		
 		UpdateTeamScores()
 	
+	else
+	
+		GAMEMODE.TotalRoundsPlayed = GAMEMODE.TotalRoundsPlayed + 1
+		
 	end
 	
 	SetGlobalBool( "FreezePeriod", true )
-
-	ReadMultiplayCvars()
-	
-	SetGlobalFloat( "RoundStartTime", CurTime() + GAMEMODE.FreezeTime )
+	SetGlobalFloat( "RoundStartTime", CurTime() + mp_freezetime:GetInt() )
 	
 	for id, pl in ipairs( player.GetAll() ) do
 	
@@ -421,6 +437,30 @@ local function RestartRound()
 	
 end
 
+local mp_restartgame = GetConVar( "mp_restartgame" )
+
+local function CheckRestartRound()
+
+	local RestartDelay = mp_restartgame:GetInt()
+
+	if ( RestartDelay > 0 ) then
+	
+		if ( RestartDelay > 60 ) then
+			RestartDelay = 60
+		end
+		
+		PrintMessage( HUD_PRINTCENTER, Format( "The game will restart in %d %s", RestartDelay, ( RestartDelay == 1 ) && "SECOND" || "SECONDS" ) )
+		PrintMessage( HUD_PRINTCONSOLE, Format( "The game will restart in %d %s", RestartDelay, ( RestartDelay == 1 ) && "SECOND" || "SECONDS" ) )
+
+		GAMEMODE.RestartRoundTime = CurTime() + RestartDelay
+		GAMEMODE.CompleteReset = true
+		
+		RunConsoleCommand( "mp_restartgame", "0" )
+		
+	end
+		
+end
+
 function GM:Think()
 
 	if ( CheckGameOver() ) then
@@ -438,6 +478,13 @@ function GM:Think()
 	if ( CheckWinLimit() ) then
 		return
 	end
+	
+	if ( mp_map_end_at_timelimit:GetBool() && GAMEMODE:GetMapRemainingTime() == 0 ) then
+	
+		GoToIntermission()
+		return
+		
+	end
 
 	if ( GAMEMODE:IsFreezePeriod() ) then
 		CheckFreezePeriodExpired()
@@ -447,6 +494,13 @@ function GM:Think()
 
 	if ( GAMEMODE.RestartRoundTime > 0 && GAMEMODE.RestartRoundTime <= CurTime() ) then
 		RestartRound()
+	end
+	
+	if ( CurTime() > GAMEMODE.NextPeriodicThink ) then
+	
+		CheckRestartRound()
+		GAMEMODE.NextPeriodicThink = CurTime() + 1
+	
 	end
 	
 end
