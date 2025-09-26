@@ -165,6 +165,14 @@ function GM:PlayerBindPress( pl, bind, down, code )
 	
 end
 
+function GM:PlayerPostThink( ply )
+
+	if ( !ply:Alive() ) then
+		ply:SetSaveValue( "m_nNextThinkTick", math.floor( 0.5 + ( CurTime() + 0.1 ) / engine.TickInterval() ) )
+	end
+
+end
+
 function GM:OnSpawnMenuOpen()
 
 	RunConsoleCommand( "lastinv" )

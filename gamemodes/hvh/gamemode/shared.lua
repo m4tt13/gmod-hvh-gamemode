@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.8"
+GM.Version = "1.2.9"
 
 GM.TeamBased = true
 
@@ -58,14 +58,9 @@ function GM:IsFreezePeriod()
 	
 end
 
-local nextlevel = GetConVar( "nextlevel" )
 local mp_timelimit = GetConVar( "mp_timelimit" )
 
 function GM:GetMapRemainingTime()
-
-	if ( nextlevel:GetString() != "" ) then
-		return 0
-	end
 
 	local timelimit = mp_timelimit:GetInt()
 
@@ -83,9 +78,11 @@ function GM:GetMapRemainingTime()
 	
 end
 
+local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NOTIFY + FCVAR_REPLICATED, "How many minutes each round takes.", 1, 60 )
+
 function GM:GetRoundRemainingTime()
 
-	return ( GetGlobalFloat( "RoundStartTime", 0 ) + GetGlobalInt( "RoundTime", 150 ) ) - CurTime()
+	return ( GetGlobalFloat( "RoundStartTime", 0 ) + math.floor( mp_roundtime:GetFloat() * 60 ) ) - CurTime()
 	
 end
 

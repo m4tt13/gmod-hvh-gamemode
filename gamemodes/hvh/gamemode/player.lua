@@ -1,4 +1,6 @@
 local mp_flood_time = CreateConVar( "mp_flood_time", "0.75", FCVAR_NONE, "Amount of time allowed between chat messages." )
+local mp_deathcam_time = CreateConVar( "mp_deathcam_time", "3" )
+local mp_respawn_on_death = CreateConVar( "mp_respawn_on_death", "0", FCVAR_NONE, "When set to 1, players will respawn after dying." )
 local mp_join_grace_time = CreateConVar( "mp_join_grace_time", "15.0", FCVAR_NONE, "Number of seconds after round start to allow a player to join a game.", 0, 30 )
 local mp_teamswitch_cooldown = CreateConVar( "mp_teamswitch_cooldown", "10.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
 local sv_noplayercollision = CreateConVar( "sv_noplayercollision", "1", FCVAR_NONE, "Disable player collision." )
@@ -40,7 +42,7 @@ local function IsValidObsTarget( ply, target )
 		return true
 	end
 	
-	if ( target.DeathTime && CurTime() < ( target.DeathTime + 3 ) ) then
+	if ( target.DeathTime && CurTime() < ( target.DeathTime + mp_deathcam_time:GetFloat() ) ) then
 		return true
 	end
 	
@@ -361,7 +363,7 @@ local function GiveWeapon( ply, weapon, translate )
 	
 	for id, wpn in ipairs( ply:GetWeapons() ) do
 	
-		if ( wpn:GetSlot() == swep.Slot ) then
+		if ( weapons.IsBasedOn( wpn:GetClass(), "hvh_base" ) && wpn:GetSlot() == swep.Slot ) then
 			ply:StripWeapon( wpn:GetClass() )
 		end
 		
@@ -420,7 +422,6 @@ local function PlayerFloodCheck( ply )
 end
 
 local nextlevel = GetConVar( "nextlevel" )
-local mp_timelimit = GetConVar( "mp_timelimit" )
 
 function GM:PlayerSay( ply, text, teamonly )
 
@@ -462,20 +463,14 @@ function GM:PlayerSay( ply, text, teamonly )
 	
 	elseif ( ltext == "timeleft" ) then
 	
-		if ( mp_timelimit:GetInt() > 0 ) then
+		local TimeLeft = GAMEMODE:GetMapRemainingTime()
 		
-			local TimeLeft = GAMEMODE:GetMapRemainingTime()
-			
-			if ( TimeLeft <= 0 ) then
-				PrintMessage( HUD_PRINTTALK, "This is the last round!" )
-			else
-				PrintMessage( HUD_PRINTTALK, "Time remaining for map: " .. string.FormattedTime( TimeLeft, "%i:%02i" ) )
-			end
-			
-		else
-		
+		if ( TimeLeft < 0 ) then
 			PrintMessage( HUD_PRINTTALK, "No timelimit for map" )
-		
+		elseif ( TimeLeft == 0 ) then
+			PrintMessage( HUD_PRINTTALK, "This is the last round!" )
+		else
+			PrintMessage( HUD_PRINTTALK, Format( "Time remaining for map: %d:%02d", math.floor( TimeLeft / 60 ), math.floor( TimeLeft % 60 ) ) )
 		end
 	
 	elseif ( ltext == "rank" ) then
@@ -537,11 +532,15 @@ function GM:PlayerDeathThink( pl )
 		return
 	end
 	
-	if ( pl.DeathTime && CurTime() < ( pl.DeathTime + 3 ) ) then
+	if ( pl.DeathTime && CurTime() < ( pl.DeathTime + mp_deathcam_time:GetFloat() ) ) then
 		return
 	end
 	
-	StartObserverMode( pl, GetSpectatorMode( pl ) )
+	if ( mp_respawn_on_death:GetBool() ) then
+		pl:Spawn()
+	else
+		StartObserverMode( pl, GetSpectatorMode( pl ) )
+	end
 
 end
 
@@ -611,6 +610,7 @@ function GM:PlayerDeath( ply, inflictor, attacker )
 	
 	StartObserverMode( ply, OBS_MODE_DEATHCAM )
 	ply:RemoveEffects( EF_NODRAW )
+	ply:SetRenderFX( kRenderFxRagdoll )
 
 end
 
