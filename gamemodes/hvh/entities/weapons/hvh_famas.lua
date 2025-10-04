@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/famas"
 SWEP.IconLetter				= "t"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_famas", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_RIFLE
 SWEP.Weight					= 75
 SWEP.ViewModelFlip			= false
 SWEP.CSMuzzleFlashes 		= true
@@ -87,6 +88,7 @@ function SWEP:PrimaryAttack()
 	self:TakePrimaryAmmo( 1 )
 	
 	self:SetNextPrimaryFire( CurTime() + delay )
+	self:SetNextSecondaryFire( CurTime() + delay )
 
 end
 
@@ -95,12 +97,12 @@ function SWEP:SecondaryAttack()
 	if ( self:GetBurstMode() ) then
 	
 		self:SetBurstMode( false )
-		self.Owner:PrintMessage( HUD_PRINTCENTER, "Switched to automatic" )
+		self:GetOwner():PrintMessage( HUD_PRINTCENTER, "Switched to automatic" )
 	
 	else
 	
 		self:SetBurstMode( true )
-		self.Owner:PrintMessage( HUD_PRINTCENTER, "Switched to Burst-Fire mode" )
+		self:GetOwner():PrintMessage( HUD_PRINTCENTER, "Switched to Burst-Fire mode" )
 	
 	end
 	

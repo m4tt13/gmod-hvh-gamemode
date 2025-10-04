@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/p90"
 SWEP.IconLetter				= "m"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_p90", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_SMG
 SWEP.Weight					= 26
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true

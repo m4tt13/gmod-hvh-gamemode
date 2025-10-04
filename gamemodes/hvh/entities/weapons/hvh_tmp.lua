@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/tmp"
 SWEP.IconLetter				= "d"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_tmp", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_SMG
 SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= false
@@ -41,11 +42,11 @@ SWEP.Primary.Ammo			= "BULLET_PLAYER_9MM"
 function SWEP:ShootEffects()
 
 	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
 end
 
-if CLIENT then
+if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 	

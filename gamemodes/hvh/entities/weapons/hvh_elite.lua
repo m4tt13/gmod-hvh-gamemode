@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/elites"
 SWEP.IconLetter				= "s"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_elite", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
+SWEP.Type					= WPNTYPE_PITSOL
 SWEP.Weight					= 5
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -72,19 +73,13 @@ end
 
 function SWEP:ShootEffects()
 
-	if ( self:GetFireRight() ) then
-		self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-	else
-		self:SendWeaponAnim( ACT_VM_SECONDARYATTACK )
-	end
-
-	self.Owner:MuzzleFlash()
-	
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	self:SendWeaponAnim( self:GetFireRight() && ACT_VM_PRIMARYATTACK || ACT_VM_SECONDARYATTACK )
+	self:GetOwner():MuzzleFlash()
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
 end
 
-if CLIENT then
+if ( CLIENT ) then
 
 	function SWEP:GetTracerOrigin()
 	

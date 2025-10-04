@@ -1,11 +1,11 @@
 AddCSLuaFile()
 
-if CLIENT then
+if ( CLIENT ) then
 
 	surface.CreateFont( "hvh_selectionicon", {
 
 		font = "csd",
-		size = 80,
+		size = ScreenScale( 60 ),
 		weight = 0,
 		antialias = true,
 		additive = true
@@ -17,6 +17,7 @@ end
 SWEP.Base 					= "weapon_base"
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_UNKNOWN
 SWEP.DrawAmmo				= false
 SWEP.DrawCrosshair			= true
 SWEP.SwayScale				= 0.5
@@ -31,6 +32,8 @@ SWEP.DeploySpeed 			= 1.0
 SWEP.HoldType				= "pistol"
 SWEP.IconLetter        	 	= "c"
 SWEP.CanBuy        		 	= false
+SWEP.HideViewModelWhenZoomed = true
+SWEP.ScaleDamageByDistance	= true
 
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.75
@@ -135,21 +138,134 @@ function SWEP:TakePrimaryAmmo( num )
 
 end
 
-function SWEP:OnTraceAttack( dmginfo, dir, trace )
+function SWEP:GetRangeModifier()
 
-	local travelledDistance = trace.Fraction * self.Range
-	local damageScale = math.pow( self.RangeModifier, ( travelledDistance / 500 ) )
-
-	dmginfo:ScaleDamage( damageScale )
+	return self.RangeModifier
 
 end
 
-if CLIENT then
+function SWEP:IsZoomed()
+
+	return false
+	
+end
+
+if ( CLIENT ) then
+
+	local matScopeArc = Material( "sprites/scope_arc" )
+	local matScopeDust = Material( "overlays/scope_lens" )
+
+	function SWEP:DrawHUDBackground()
+
+		if ( self:IsZoomed() && self.Type == WPNTYPE_SNIPER ) then 
+		
+			local screenWide = ScrW()
+			local screenTall = ScrH()
+	
+			local inset = screenTall / 16
+			local y1 = inset
+			local x1 = ( screenWide - screenTall ) / 2 + inset
+			local y2 = screenTall - inset
+			local x2 = screenWide - x1
+
+			local x = screenWide / 2
+			local y = screenTall / 2
+
+			local uv1 = 0.5 / 256.0
+			local uv2 = 1.0 - uv1
+
+			local xMod = ( screenWide / 2 )
+			local yMod = ( screenTall / 2 )
+
+			local iMiddleX = ( screenWide / 2 )
+			local iMiddleY = ( screenTall / 2 )
+			
+			surface.SetMaterial( matScopeDust )
+			surface.SetDrawColor( color_white )
+			
+			local vert = {}
+			vert[1] = { x = iMiddleX + xMod, y = iMiddleY + yMod, u = uv2, v = uv1 }
+			vert[2] = { x = iMiddleX - xMod, y = iMiddleY + yMod, u = uv1, v = uv1 }
+			vert[3] = { x = iMiddleX - xMod, y = iMiddleY - yMod, u = uv1, v = uv2 }
+			vert[4] = { x = iMiddleX + xMod, y = iMiddleY - yMod, u = uv2, v = uv2 }
+			surface.DrawPoly( vert )
+
+			surface.SetDrawColor( color_black )
+
+			surface.DrawLine( 0, y, screenWide, y )
+			surface.DrawLine( x, 0, x, screenTall )
+			
+			surface.SetMaterial( matScopeArc )
+
+			vert[1] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[2] = { x = x2, y = y, u = uv2, v = uv1 }
+			vert[3] = { x = x2, y = y2, u = uv2, v = uv2 }
+			vert[4] = { x = x, y = y2, u = uv1, v = uv2 }
+			surface.DrawPoly( vert )
+			
+			vert[1] = { x = x - 1, y = y1, u = uv1, v = uv2 }
+			vert[2] = { x = x2, y = y1, u = uv2, v = uv2 }
+			vert[3] = { x = x2, y = y + 1, u = uv2, v = uv1 }
+			vert[4] = { x = x - 1, y = y + 1, u = uv1, v = uv1 }
+			surface.DrawPoly( vert )
+
+			vert[1] = { x = x1, y = y, u = uv2, v = uv1 }
+			vert[2] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[3] = { x = x, y = y2, u = uv1, v = uv2 }
+			vert[4] = { x = x1, y = y2, u = uv2, v = uv2 }
+			surface.DrawPoly( vert )
+
+			vert[1] = { x = x1, y = y1, u = uv2, v = uv2 }
+			vert[2] = { x = x, y = y1, u = uv1, v = uv2 }
+			vert[3] = { x = x, y = y, u = uv1, v = uv1 }
+			vert[4] = { x = x1, y = y, u = uv2, v = uv1 }
+			surface.DrawPoly( vert )
+
+			surface.DrawRect( 0, 0, screenWide, y1 )
+			surface.DrawRect( 0, y2, screenWide, screenTall )
+			surface.DrawRect( 0, y1, x1, screenTall )
+			surface.DrawRect( x2, y1, screenWide, screenTall )
+			
+		end
+		
+	end
+	
+	function SWEP:ShouldDrawViewModel()
+
+		return ( !self:IsZoomed() || !self.HideViewModelWhenZoomed ) 
+		
+	end
+	
+	function SWEP:AdjustMouseSensitivity()
+	
+		return -1
+
+	end
+	
+	function SWEP:GetTracerOrigin()
+
+		if ( self:IsZoomed() && self.Type == WPNTYPE_SNIPER ) then 
+		
+			local owner = self:GetOwner()
+			local ply = LocalPlayer()
+		
+			if ( ( ( owner == ply ) && !owner:ShouldDrawLocalPlayer() ) || 
+				 ( ( owner != ply ) && owner:IsPlayer() && ply:GetObserverMode() == OBS_MODE_IN_EYE && ply:GetObserverTarget() == owner ) ) then
+				
+				local tracerOrigin = owner:GetShootPos()
+				tracerOrigin.z = tracerOrigin.z - 1
+				return tracerOrigin
+				
+			end
+			
+		end
+		
+	end
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 
 		if ( !self.CSMuzzleFlashes ) then return end
-
+		
 		if ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) then
 
 			local data = EffectData()

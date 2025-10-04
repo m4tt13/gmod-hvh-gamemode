@@ -15,8 +15,9 @@ local Color_Icon = Color( 255, 80, 0, 255 )
 local NPC_Color_Enemy = Color( 250, 50, 50, 255 )
 local NPC_Color_Friendly = Color( 50, 200, 50, 255 )
 
-killicon.AddFont( "suicide", "hvh_killicon", "C", Color_Icon )
 killicon.AddFont( "headshot", "hvh_killicon", "D", Color_Icon )
+killicon.AddFont( "default", "hvh_killicon", "C", Color_Icon )
+killicon.AddAlias( "suicide", "default" )
 
 local Deaths = {}
 

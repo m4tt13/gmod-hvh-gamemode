@@ -6,12 +6,14 @@ SWEP.PrintName 				= "Knife"
 SWEP.Alias 					= "knife"
 SWEP.IconLetter				= "j"
 SWEP.CanBuy        		 	= true
+SWEP.ScaleDamageByDistance	= false
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_knife", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_MELEE
+SWEP.Type					= WPNTYPE_KNIFE
 SWEP.DrawCrosshair			= true
 SWEP.Weight					= 0
 SWEP.ViewModelFlip			= false
@@ -198,5 +200,3 @@ function SWEP:Deploy()
 	return true
 	
 end
-
-function SWEP:OnTraceAttack( dmginfo, dir, trace ) end

@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/fiveseven"
 SWEP.IconLetter				= "u"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_fiveseven", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
+SWEP.Type					= WPNTYPE_PITSOL
 SWEP.Weight					= 5
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
