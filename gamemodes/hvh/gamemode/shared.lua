@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.9"
+GM.Version = "1.2.10"
 
 GM.TeamBased = true
 
@@ -28,6 +28,8 @@ WPNTYPE_SMG			= 3
 WPNTYPE_RIFLE		= 4
 WPNTYPE_SNIPER		= 5
 WPNTYPE_MACHINEGUN	= 6
+WPNTYPE_KNIFE		= 7
+WPNTYPE_UNKNOWN		= 8
 
 WPNSLOT_PRIMARY		= 0
 WPNSLOT_SECONDARY	= 1

@@ -29,6 +29,7 @@ surface.CreateFont( "hvh_hudiconsmall", {
 
 local clr_text		= Color( 255, 176, 0, 255 )
 local clr_numbers	= Color( 255, 176, 0, 120 )
+local clr_flash		= Color( 160, 0, 0, 255 )
 local clr_bar		= Color( 0, 0, 0, 196 )
 local clr_bg		= Color( 0, 0, 0, 96 )
 
@@ -63,20 +64,70 @@ local function GetRoundTimer()
 
 end
 
+local health = 100
+local health_flash = true
+local health_toggle_time = 0
+local health_next_toggle = 0
+local health_toggle_num = 0
+
 local function HUD_DrawHealth()
 
 	local scrw, scrh = ScrW(), ScrH()
 	
-	local ply		= LocalPlayer()
-	local health	= ply:Health()
+	local ply			= LocalPlayer()
+	local real_health	= ply:Health()
 	
-	if ( health < 0 ) then
-		health = 0
+	if ( real_health < 0 ) then
+		real_health = 0
+	end
+	
+	if ( real_health < health ) then
+		health_toggle_num = health_flash && 11 || 10
+	elseif ( real_health > health ) then
+		health_toggle_num = 0
+	end
+	
+	health = real_health
+	
+	local clr
+
+	if ( real_health > 25 && health_toggle_num == 0 ) then
+	
+		health_flash = true
+		health_next_toggle = 0
+		clr = clr_numbers
+
+	else
+
+		if ( CurTime() > health_next_toggle ) then
+		
+			if ( real_health <= 25 ) then
+			
+				health_flash = !health_flash
+				health_toggle_time = CurTime()
+				health_next_toggle = CurTime() + 0.5
+				health_toggle_num = 0
+			
+			else
+			
+				health_flash = !health_flash
+				health_toggle_time = CurTime()
+				health_next_toggle = CurTime() + 0.1
+				health_toggle_num = health_toggle_num - 1
+			
+			end
+		
+		end
+		
+		local frac = ( CurTime() - health_toggle_time ) / ( health_next_toggle - health_toggle_time )
+		
+		clr = health_flash && clr_flash:Lerp( clr_numbers, frac ) || clr_numbers:Lerp( clr_flash, frac )
+		
 	end
 
 	draw.RoundedBox( 5, 15, scrh - 55, 120, 40, clr_bg )
-	draw.SimpleText( health, "hvh_hudnumbers", 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "F", "hvh_hudicon", 20, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( real_health, "hvh_hudnumbers", 130, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( "F", "hvh_hudicon", 20, scrh - 48, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 end
 
@@ -97,13 +148,87 @@ local function HUD_DrawArmor()
 
 end
 
+local timer_flash = true
+local timer_toggle_time = 0
+local timer_next_toggle = 0
+
 local function HUD_DrawRoundTimer()
 
 	local scrw, scrh = ScrW(), ScrH()
 
+	local timer = GetRoundTimer()
+	local clr
+
+	if ( timer > 30 ) then
+	
+		timer_flash = true
+		timer_next_toggle = 0
+		clr = clr_numbers
+	
+	elseif ( timer == 0 ) then
+	
+		timer_flash = false
+		timer_next_toggle = 0
+		clr = clr_flash
+	
+	else
+
+		if ( CurTime() > timer_next_toggle ) then
+		
+			if ( timer <= 2 ) then
+			
+				timer_flash = !timer_flash
+				timer_toggle_time = CurTime()
+				timer_next_toggle = CurTime() + 0.05
+
+			elseif ( timer <= 5 ) then
+			
+				timer_flash = !timer_flash
+				timer_toggle_time = CurTime()
+				timer_next_toggle = CurTime() + 0.1
+
+			elseif ( timer <= 10 ) then
+			
+				timer_flash = !timer_flash
+				timer_toggle_time = CurTime()
+				timer_next_toggle = CurTime() + 0.2
+
+			elseif ( timer <= 20 ) then
+			
+				timer_flash = !timer_flash
+				timer_toggle_time = CurTime()
+				timer_next_toggle = CurTime() + 0.4
+
+			else
+			
+				timer_flash = !timer_flash
+				timer_toggle_time = CurTime()
+				timer_next_toggle = CurTime() + 0.8
+
+			end
+		
+		end
+
+		local frac = ( CurTime() - timer_toggle_time ) / ( timer_next_toggle - timer_toggle_time )
+		
+		clr = timer_flash && clr_flash:Lerp( clr_numbers, frac ) || clr_numbers:Lerp( clr_flash, frac )
+		
+	end
+	
 	draw.RoundedBox( 5, ( scrw / 2 ) - 70, scrh - 55, 140, 40, clr_bg )
-	draw.SimpleText( string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "hvh_hudnumbers", ( scrw / 2 ) + 65, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "G", "hvh_hudicon", ( scrw / 2 ) - 65, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_hudnumbers", ( scrw / 2 ) + 65, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+	draw.SimpleText( "G", "hvh_hudicon", ( scrw / 2 ) - 65, scrh - 48, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+
+end
+
+local function HUD_DrawTeamScore()
+
+	local scrw, scrh = ScrW(), ScrH()
+
+	draw.RoundedBoxEx( 5, ( scrw / 2 ) - 72, 15, 70, 40, clr_bg, true, false, true, false )
+	draw.RoundedBoxEx( 5, ( scrw / 2 ) + 2, 15, 70, 40, clr_bg, false, true, false, true )
+	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_hudnumbers", ( scrw / 2 ) - 37, 35, team.GetColor( TEAM_CT ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_hudnumbers", ( scrw / 2 ) + 37, 35, team.GetColor( TEAM_TERRORIST ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
 end
 
@@ -149,6 +274,8 @@ end
 local function HUD_DrawSpec()
 
 	local scrw, scrh = ScrW(), ScrH()
+	
+	local timer = GetRoundTimer()
 
 	surface.SetDrawColor( clr_bar )
 	surface.DrawRect( 0, 0, scrw, 60 )
@@ -163,7 +290,7 @@ local function HUD_DrawSpec()
 	draw.SimpleText( "Map : " .. game.GetMap(), "hvh_menu", 20, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 	draw.SimpleText( "G", "hvh_hudiconsmall", 16, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	draw.SimpleText( " : " .. string.FormattedTime( GetRoundTimer(), "%i:%.2i" ), "hvh_menu", 35, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( " : " .. Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_menu", 35, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()
@@ -207,6 +334,7 @@ function GM:HUDDrawGeneral()
 		HUD_DrawHealth()
 		HUD_DrawArmor()
 		HUD_DrawRoundTimer()
+		HUD_DrawTeamScore()
 		HUD_DrawAmmo()
 	
 	end

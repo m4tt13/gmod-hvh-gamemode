@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/m3"
 SWEP.IconLetter				= "k"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_m3", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_SHOTGUN
 SWEP.Weight					= 20
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -96,7 +97,7 @@ function SWEP:Think()
 
 			self:SetReloadState( 1 )
 
-			self.Owner:RemoveAmmo( 1, self:GetPrimaryAmmoType() )
+			self:GetOwner():RemoveAmmo( 1, self:GetPrimaryAmmoType() )
 			self:SetClip1( self:Clip1() + 1 )
 			
 		end

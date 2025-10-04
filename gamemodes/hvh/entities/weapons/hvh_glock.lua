@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/glock18"
 SWEP.IconLetter				= "c"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_glock", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
+SWEP.Type					= WPNTYPE_PITSOL
 SWEP.Weight					= 5
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -85,12 +86,13 @@ function SWEP:PrimaryAttack()
 	self:ShootBullet( damage, self.Primary.Recoil, self.Primary.NumShots, cone )
 
 	self:SendWeaponAnim( self:GetBurstMode() && ACT_VM_SECONDARYATTACK || ACT_VM_PRIMARYATTACK )
-	self.Owner:MuzzleFlash()
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	self:GetOwner():MuzzleFlash()
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
 	self:TakePrimaryAmmo( 1 )
 	
 	self:SetNextPrimaryFire( CurTime() + delay )
+	self:SetNextSecondaryFire( CurTime() + delay )
 
 end
 
@@ -100,13 +102,13 @@ function SWEP:SecondaryAttack()
 	
 		self:SetBurstMode( false )
 		self.Primary.Automatic = false
-		self.Owner:PrintMessage( HUD_PRINTCENTER, "Switched to semi-automatic" )
+		self:GetOwner():PrintMessage( HUD_PRINTCENTER, "Switched to semi-automatic" )
 	
 	else
 	
 		self:SetBurstMode( true )
 		self.Primary.Automatic = true
-		self.Owner:PrintMessage( HUD_PRINTCENTER, "Switched to Burst-Fire mode" )
+		self:GetOwner():PrintMessage( HUD_PRINTCENTER, "Switched to Burst-Fire mode" )
 	
 	end
 
@@ -130,7 +132,7 @@ function SWEP:Think()
 
 		self:ShootBullet( self.Primary.Damage, self.Primary.Recoil, self.Primary.NumShots, 0.05 )
 
-		self.Owner:SetAnimation( PLAYER_ATTACK1 )
+		self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
 		self:TakePrimaryAmmo( 1 )
 		
@@ -166,18 +168,9 @@ function SWEP:Deploy()
 	
 end
 
-function SWEP:OnTraceAttack( dmginfo, dir, trace )
+function SWEP:GetRangeModifier()
 
-	local rangeModifier = self.RangeModifier
-	
-	if ( self:GetBurstMode() ) then	
-		rangeModifier = 0.9
-	end
-
-	local travelledDistance = trace.Fraction * self.Range
-	local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
-
-	dmginfo:ScaleDamage( damageScale )
+	return ( self:GetBurstMode() && 0.9 || self.RangeModifier )
 
 end
 

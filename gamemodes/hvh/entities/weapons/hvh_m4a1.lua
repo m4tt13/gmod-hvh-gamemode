@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/m4a1"
 SWEP.IconLetter				= "w"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_m4a1", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_RIFLE
 SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -79,6 +80,7 @@ function SWEP:PrimaryAttack()
 	self:TakePrimaryAmmo( 1 )
 	
 	self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+	self:SetNextSecondaryFire( CurTime() + self.Primary.Delay )
 
 end
 
@@ -132,18 +134,9 @@ function SWEP:Deploy()
 	
 end
 
-function SWEP:OnTraceAttack( dmginfo, dir, trace )
+function SWEP:GetRangeModifier()
 
-	local rangeModifier = self.RangeModifier
-	
-	if ( self:GetSilencerOn() ) then	
-		rangeModifier = 0.95
-	end
-
-	local travelledDistance = trace.Fraction * self.Range
-	local damageScale = math.pow( rangeModifier, ( travelledDistance / 500 ) )
-
-	dmginfo:ScaleDamage( damageScale )
+	return ( self:GetSilencerOn() && 0.95 || self.RangeModifier )
 
 end
 
@@ -156,15 +149,15 @@ function SWEP:ShootEffects()
 	else
 	
 		self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-		self.Owner:MuzzleFlash()
+		self:GetOwner():MuzzleFlash()
 		
 	end
 
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
 
 end
 
-if CLIENT then
+if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 

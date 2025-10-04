@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/mac10"
 SWEP.IconLetter				= "l"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_mac10", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_SMG
 SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true

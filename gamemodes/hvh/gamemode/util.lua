@@ -21,7 +21,7 @@ function util.ColorizeText( ... )
    
 end
 
-if SERVER then
+if ( SERVER ) then
 
 	function util.PlaySound( snd )
 

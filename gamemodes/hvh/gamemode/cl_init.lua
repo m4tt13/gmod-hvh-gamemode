@@ -26,7 +26,7 @@ include( "cl_scoreboard.lua" )
 include( "cl_targetid.lua" )
 include( "cl_weapons.lua" )
 
-CreateClientConVar( "cl_default_spec_mode", tostring( OBS_MODE_ROAMING ), true, true, "Default Spectator Mode" )
+CreateClientConVar( "cl_default_spec_mode", OBS_MODE_ROAMING, true, true, "Default Spectator Mode" )
 CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary Weapon" )
 CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary Weapon" )
 

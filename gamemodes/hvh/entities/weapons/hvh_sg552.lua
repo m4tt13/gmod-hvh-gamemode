@@ -7,12 +7,14 @@ SWEP.Alias 					= "sg552"
 SWEP.Image        		 	= "vgui/gfx/vgui/sg552"
 SWEP.IconLetter				= "A"
 SWEP.CanBuy        		 	= true
+SWEP.HideViewModelWhenZoomed = false
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_sg552", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
+SWEP.Type					= WPNTYPE_RIFLE
 SWEP.Weight					= 25
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
@@ -73,6 +75,7 @@ function SWEP:PrimaryAttack()
 	self:TakePrimaryAmmo( 1 )
 	
 	self:SetNextPrimaryFire( CurTime() + delay )
+	self:SetNextSecondaryFire( CurTime() + delay )
 
 end
 
@@ -81,12 +84,12 @@ function SWEP:SecondaryAttack()
 	if ( self:GetZoomLevel() == 0 ) then
 	
 		self:SetZoomLevel( 1 )
-		self.Owner:SetFOV( 55, 0.2 )
+		self:GetOwner():SetFOV( 55, 0.2 )
 		
 	else
 	
 		self:SetZoomLevel( 0 )
-		self.Owner:SetFOV( 0, 0.15 )
+		self:GetOwner():SetFOV( 0, 0.15 )
 		
 	end
 
@@ -101,7 +104,7 @@ function SWEP:Reload()
 	if ( self:GetZoomLevel() != 0 ) then
 	
 		self:SetZoomLevel( 0 )
-		self.Owner:SetFOV( 0, 0.15 )
+		self:GetOwner():SetFOV( 0, 0.15 )
 		
 	end
 	
@@ -117,16 +120,8 @@ function SWEP:Deploy()
 	
 end
 
-if CLIENT then
+function SWEP:IsZoomed()
 
-	function SWEP:AdjustMouseSensitivity()
-
-		if ( self:GetZoomLevel() == 1 ) then
-			return 0.7
-		end
-
-		return nil
-
-	end
-
+	return ( self:GetZoomLevel() != 0 )
+	
 end

@@ -893,8 +893,13 @@ function GM:PlayerTraceAttack( ply, dmginfo, dir, trace )
 	
 		local weapon = attacker:GetActiveWeapon()
 		
-		if ( IsValid( weapon ) && weapon.OnTraceAttack ) then
-			weapon:OnTraceAttack( dmginfo, dir, trace )
+		if ( IsValid( weapon ) && weapon.ScaleDamageByDistance ) then
+		
+			local travelledDistance = trace.Fraction * weapon.Range
+			local damageScale = math.pow( weapon:GetRangeModifier(), ( travelledDistance / 500 ) )
+
+			dmginfo:ScaleDamage( damageScale )
+			
 		end
 	
 	end

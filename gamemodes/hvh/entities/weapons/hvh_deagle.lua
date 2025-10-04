@@ -8,11 +8,12 @@ SWEP.Image        		 	= "vgui/gfx/vgui/deserteagle"
 SWEP.IconLetter				= "f"
 SWEP.CanBuy        		 	= true
 
-if CLIENT then
+if ( CLIENT ) then
 	killicon.AddFont( "hvh_deagle", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
+SWEP.Type					= WPNTYPE_PITSOL
 SWEP.Weight					= 7
 SWEP.ViewModelFlip			= true
 SWEP.CSMuzzleFlashes 		= true
