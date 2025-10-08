@@ -50,7 +50,9 @@ if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 	
-		return true
+		if ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) then 
+			return true 
+		end
 		
 	end
 	

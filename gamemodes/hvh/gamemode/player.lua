@@ -136,7 +136,7 @@ local function ValidateCurObsTarget( ply )
 			if ( IsValid( obsTarget ) ) then
 			
 				ply:SpectateEntity( obsTarget )
-				
+
 			else
 			
 				local oldObsTarget = ply:GetInternalVariable( "m_hObserverTarget" )
@@ -144,7 +144,7 @@ local function ValidateCurObsTarget( ply )
 				ply:Spectate( OBS_MODE_ROAMING )
 				ply:SetSaveValue( "m_hObserverTarget", oldObsTarget )
 				ply.ObserverPotentialMode = mode
-
+				
 			end
 		
 		end
@@ -462,15 +462,15 @@ function GM:PlayerSay( ply, text, teamonly )
 		PrintMessage( HUD_PRINTTALK, "The current map is " .. game.GetMap() )
 	
 	elseif ( ltext == "timeleft" ) then
-	
-		local TimeLeft = GAMEMODE:GetMapRemainingTime()
+
+		local TimeRemaining = GAMEMODE:GetMapRemainingTime()
 		
-		if ( TimeLeft < 0 ) then
-			PrintMessage( HUD_PRINTTALK, "No timelimit for map" )
-		elseif ( TimeLeft == 0 ) then
-			PrintMessage( HUD_PRINTTALK, "This is the last round!" )
+		if ( TimeRemaining < 0 ) then
+			PrintMessage( HUD_PRINTTALK, "* No Time Limit *" )
+		elseif ( TimeRemaining == 0 ) then
+			PrintMessage( HUD_PRINTTALK, "* Last Round *" )
 		else
-			PrintMessage( HUD_PRINTTALK, Format( "Time remaining for map: %d:%02d", math.floor( TimeLeft / 60 ), math.floor( TimeLeft % 60 ) ) )
+			PrintMessage( HUD_PRINTTALK, Format( "Time Remaining:  %d:%2.2d", math.floor( TimeRemaining / 60 ), math.floor( TimeRemaining % 60 ) ) )
 		end
 	
 	elseif ( ltext == "rank" ) then
@@ -627,6 +627,18 @@ function GM:PlayerInitialSpawn( pl, transiton )
 
 	pl:SetTeam( TEAM_UNASSIGNED )
 	pl:ConCommand( "gm_showteam" )
+
+end
+
+function GM:PlayerSelectSpawn( pl, transiton )
+
+	local ent = self.BaseClass.PlayerSelectSpawn( self, pl, transiton )
+	
+	if ( IsValid( ent ) && pl:Team() == TEAM_UNASSIGNED ) then
+		pl:SpectateEntity( ent )
+	end
+	
+	return ent
 
 end
 

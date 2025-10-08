@@ -159,7 +159,7 @@ if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 
-		if ( self:GetSilencerOn() ) then 
+		if ( ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) && self:GetSilencerOn() ) then 
 			return true
 		end
 

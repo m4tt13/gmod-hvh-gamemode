@@ -64,6 +64,22 @@ local function GetRoundTimer()
 
 end
 
+local function FlashColor( flash, frac )
+
+	local from, to
+
+	if ( flash ) then from, to = clr_flash, clr_numbers
+	else from, to = clr_numbers, clr_flash end
+
+	if ( frac >= 1 ) then return to end
+	if ( frac <= 0 ) then return from end
+	
+	frac = 3 * frac ^ 2 - 2 * frac ^ 3
+	
+	return from:Lerp( to, frac )
+
+end
+
 local health = 100
 local health_flash = true
 local health_toggle_time = 0
@@ -119,7 +135,7 @@ local function HUD_DrawHealth()
 	end
 	
 	local frac = ( CurTime() - health_toggle_time ) / ( health_next_toggle - health_toggle_time )
-	local clr = health_flash && clr_flash:Lerp( clr_numbers, frac ) || clr_numbers:Lerp( clr_flash, frac )
+	local clr = FlashColor( health_flash, frac )
 
 	draw.RoundedBox( 5, 15, scrh - 55, 120, 40, clr_bg )
 	draw.SimpleText( real_health, "hvh_hudnumbers", 130, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
@@ -211,7 +227,7 @@ local function HUD_DrawRoundTimer()
 	end
 	
 	local frac = ( CurTime() - timer_toggle_time ) / ( timer_next_toggle - timer_toggle_time )
-	local clr = timer_flash && clr_flash:Lerp( clr_numbers, frac ) || clr_numbers:Lerp( clr_flash, frac )
+	local clr = FlashColor( timer_flash, frac )
 	
 	draw.RoundedBox( 5, ( scrw / 2 ) - 70, scrh - 55, 140, 40, clr_bg )
 	draw.SimpleText( Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_hudnumbers", ( scrw / 2 ) + 65, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
