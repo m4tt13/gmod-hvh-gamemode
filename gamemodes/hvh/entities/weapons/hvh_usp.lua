@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_usp.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.79
 SWEP.ArmorRatio				= 1
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_USP.Single" )
 SWEP.Primary.Recoil			= 2
@@ -159,7 +160,7 @@ if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 
-		if ( ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) && self:GetSilencerOn() ) then 
+		if ( ( event == 5001 || event == 5011 || event == 5021 || event == 5031 || event == 5003 || event == 5013 || event == 5023 || event == 5033 ) && self:GetSilencerOn() ) then 
 			return true
 		end
 

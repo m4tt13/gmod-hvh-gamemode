@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_rif_ak47.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.98
 SWEP.ArmorRatio				= 1.55
+SWEP.MaxSpeed				= 221
 
 SWEP.Primary.Sound			= Sound( "Weapon_AK47.Single" )
 SWEP.Primary.Recoil			= 1

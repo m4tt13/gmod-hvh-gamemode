@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_mach_m249para.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.97
 SWEP.ArmorRatio				= 1.5
+SWEP.MaxSpeed				= 220
 
 SWEP.Primary.Sound			= Sound( "Weapon_M249.Single" )
 SWEP.Primary.Recoil			= 0.8

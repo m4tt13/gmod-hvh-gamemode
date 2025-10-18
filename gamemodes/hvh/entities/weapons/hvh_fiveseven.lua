@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_fiveseven.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.885
 SWEP.ArmorRatio				= 1.5
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_FiveSeven.Single" )
 SWEP.Primary.Recoil			= 2

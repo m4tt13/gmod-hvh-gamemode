@@ -27,6 +27,7 @@ SWEP.WorldModel				= "models/weapons/w_rif_sg552.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.955
 SWEP.ArmorRatio				= 1.4
+SWEP.MaxSpeed				= 235
 
 SWEP.Primary.Sound			= Sound( "Weapon_SG552.Single" )
 SWEP.Primary.Recoil			= 0.625
@@ -118,6 +119,12 @@ function SWEP:Deploy()
 	
 	return true
 	
+end
+
+function SWEP:GetMaxSpeed()
+
+	return ( ( self:GetZoomLevel() != 0 ) && 200 || self.MaxSpeed )
+
 end
 
 function SWEP:IsZoomed()

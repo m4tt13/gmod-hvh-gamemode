@@ -25,6 +25,7 @@ SWEP.ViewModel				= "models/weapons/v_knife_t.mdl"
 SWEP.WorldModel				= "models/weapons/w_knife_t.mdl"	
 
 SWEP.ArmorRatio				= 1.7
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1

@@ -27,6 +27,7 @@ SWEP.WorldModel				= "models/weapons/w_rif_aug.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1.4
+SWEP.MaxSpeed				= 221
 
 SWEP.Primary.Sound			= Sound( "Weapon_AUG.Single" )
 SWEP.Primary.Recoil			= 0.625

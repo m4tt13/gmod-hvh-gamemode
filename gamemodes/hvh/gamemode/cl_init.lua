@@ -30,6 +30,9 @@ CreateClientConVar( "cl_default_spec_mode", OBS_MODE_ROAMING, true, true, "Defau
 CreateClientConVar( "cl_loadout_primary", "hvh_ak47", true, true, "Primary Weapon" )
 CreateClientConVar( "cl_loadout_secondary", "hvh_deagle", true, true, "Secondary Weapon" )
 
+CreateConVar( "cl_playercolor", "0.24 0.34 0.41", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "The value is a Vector - so between 0-1 - not between 0-255" )
+CreateConVar( "cl_weaponcolor", "0.30 1.80 2.10", { FCVAR_ARCHIVE, FCVAR_USERINFO, FCVAR_DONTRECORD }, "The value is a Vector - so between 0-1 - not between 0-255" )
+
 local hud = {
 
 	["CHudHealth"] 			= true,

@@ -669,7 +669,7 @@ local function SetUpPlayerVars( ply )
 	ply:SetSlowWalkSpeed( 100 )
 	ply:SetWalkSpeed( 250 )
 	ply:SetRunSpeed( 250 )
-	ply:SetCrouchedWalkSpeed( 0.3 )
+	ply:SetCrouchedWalkSpeed( 0.34 )
 	ply:SetDuckSpeed( 0.3 )
 	ply:SetUnDuckSpeed( 0.2 )
 	ply:SetJumpPower( sv_jump_impulse:GetFloat() )
@@ -693,6 +693,15 @@ local function SetUpPlayerVars( ply )
 	if ( sv_disable_blood:GetBool() ) then
 		ply:SetBloodColor( DONT_BLEED )
 	end
+	
+	local plyclr = ply:GetInfo( "cl_playercolor" )
+	ply:SetPlayerColor( Vector( plyclr ) )
+
+	local wepclr = Vector( ply:GetInfo( "cl_weaponcolor" ) )
+	if ( wepclr:Length() < 0.001 ) then
+		wepclr = Vector( 0.001, 0.001, 0.001 )
+	end
+	ply:SetWeaponColor( wepclr )
 
 end
 
@@ -952,7 +961,7 @@ function GM:PlayerShouldTakeDamage( ply, attacker )
 
 	if ( !mp_friendlyfire:GetBool() ) then
 	
-		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker:Team() == ply:Team() ) then
+		if ( IsValid( attacker ) && attacker:IsPlayer() && attacker != ply && attacker:Team() == ply:Team() ) then
 			return false
 		end
 		

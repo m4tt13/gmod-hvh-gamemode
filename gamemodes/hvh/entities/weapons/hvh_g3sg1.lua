@@ -27,6 +27,7 @@ SWEP.WorldModel				= "models/weapons/w_snip_g3sg1.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.98
 SWEP.ArmorRatio				= 1.65
+SWEP.MaxSpeed				= 210
 
 SWEP.Primary.Sound			= Sound( "Weapon_G3SG1.Single" )
 SWEP.Primary.Recoil			= 1.25

@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_rif_m4a1.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.97
 SWEP.ArmorRatio				= 1.4
+SWEP.MaxSpeed				= 230
 
 SWEP.Primary.Sound			= Sound( "Weapon_M4A1.Single" )
 SWEP.Primary.Recoil			= 0.65
@@ -161,7 +162,7 @@ if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 	
-		if ( ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) && self:GetSilencerOn() ) then 
+		if ( ( event == 5001 || event == 5011 || event == 5021 || event == 5031 || event == 5003 || event == 5013 || event == 5023 || event == 5033 ) && self:GetSilencerOn() ) then 
 			return true
 		end
 

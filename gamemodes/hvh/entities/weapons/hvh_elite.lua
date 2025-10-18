@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_elite.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_Elite.Single" )
 SWEP.Primary.Recoil			= 2

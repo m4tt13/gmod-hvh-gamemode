@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_smg_tmp.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.84
 SWEP.ArmorRatio				= 1
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_TMP.Single" )
 SWEP.Primary.Recoil			= 0.725
@@ -50,7 +51,7 @@ if ( CLIENT ) then
 
 	function SWEP:FireAnimationEvent( pos, ang, event, options )
 	
-		if ( event == 5001 || event == 5011 || event == 5021 || event == 5031 ) then 
+		if ( event == 5001 || event == 5011 || event == 5021 || event == 5031 || event == 5003 || event == 5013 || event == 5023 || event == 5033 ) then 
 			return true 
 		end
 		

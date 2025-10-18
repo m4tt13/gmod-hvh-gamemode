@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_smg_p90.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.84
 SWEP.ArmorRatio				= 1.5
+SWEP.MaxSpeed				= 245
 
 SWEP.Primary.Sound			= Sound( "Weapon_P90.Single" )
 SWEP.Primary.Recoil			= 0.3

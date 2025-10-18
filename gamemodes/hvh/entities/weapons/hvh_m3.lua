@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_shot_m3super90.mdl"
 SWEP.Range					= 3000
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1
+SWEP.MaxSpeed				= 220
 
 SWEP.Primary.Sound			= Sound( "Weapon_M3.Single" )
 SWEP.Primary.Recoil			= 5

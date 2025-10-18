@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_p228.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.8
 SWEP.ArmorRatio				= 1.25
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_P228.Single" )
 SWEP.Primary.Recoil			= 2

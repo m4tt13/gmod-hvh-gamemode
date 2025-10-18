@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_smg_mp5.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.84
 SWEP.ArmorRatio				= 1
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_MP5Navy.Single" )
 SWEP.Primary.Recoil			= 0.25

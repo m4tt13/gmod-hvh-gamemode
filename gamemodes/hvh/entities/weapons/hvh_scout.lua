@@ -27,6 +27,7 @@ SWEP.WorldModel				= "models/weapons/w_snip_scout.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.98
 SWEP.ArmorRatio				= 1.7
+SWEP.MaxSpeed				= 260
 
 SWEP.Primary.Sound			= Sound( "Weapon_Scout.Single" )
 SWEP.Primary.Recoil			= 2
@@ -165,6 +166,12 @@ function SWEP:Deploy()
 	
 	return true
 	
+end
+
+function SWEP:GetMaxSpeed()
+
+	return ( ( self:GetZoomLevel() != 0 ) && 220 || self.MaxSpeed )
+
 end
 
 function SWEP:IsZoomed()

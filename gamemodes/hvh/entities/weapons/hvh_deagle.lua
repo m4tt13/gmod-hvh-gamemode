@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_deagle.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.81
 SWEP.ArmorRatio				= 1.5
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_DEagle.Single" )
 SWEP.Primary.Recoil			= 2

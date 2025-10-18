@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_smg_mac10.mdl"
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.82
 SWEP.ArmorRatio				= 0.95
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_MAC10.Single" )
 SWEP.Primary.Recoil			= 0.775

@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_pist_glock18.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_Glock.Single" )
 SWEP.Primary.Recoil			= 0

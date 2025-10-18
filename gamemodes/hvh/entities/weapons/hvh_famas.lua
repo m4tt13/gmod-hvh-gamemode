@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_rif_famas.mdl"
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1.4
+SWEP.MaxSpeed				= 210
 
 SWEP.Primary.Sound			= Sound( "Weapon_FAMAS.Single" )
 SWEP.Primary.Recoil			= 0.625

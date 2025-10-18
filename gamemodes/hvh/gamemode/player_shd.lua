@@ -15,6 +15,36 @@ function GM:StartCommand( ply, ucmd )
 
 end
 
+local sv_maxspeed = GetConVar( "sv_maxspeed" )
+
+function GM:Move( ply, mv )
+
+	if ( !ply:IsWalking() ) then
+
+		local weapon = ply:GetActiveWeapon()
+		
+		if ( IsValid( weapon ) && weapon.GetMaxSpeed ) then
+		
+			local maxspeed = weapon:GetMaxSpeed()
+			
+			mv:SetMaxClientSpeed( maxspeed )
+			
+			if ( !( maxspeed > 0 && maxspeed < sv_maxspeed:GetFloat() ) ) then
+				maxspeed = sv_maxspeed:GetFloat()
+			end
+			
+			if ( ply:IsFlagSet( FL_DUCKING ) && ply:GetGroundEntity() != NULL ) then
+				maxspeed = maxspeed * ply:GetCrouchedWalkSpeed()
+			end
+			
+			mv:SetMaxSpeed( maxspeed )
+
+		end
+		
+	end
+
+end
+
 local JUMPING = nil
 
 function GM:SetupMove( ply, mv, cmd )

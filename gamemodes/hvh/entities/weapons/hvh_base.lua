@@ -38,6 +38,7 @@ SWEP.ScaleDamageByDistance	= true
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05
+SWEP.MaxSpeed				= 250
 
 SWEP.Primary.Sound			= Sound( "Weapon_AR2.Single" )
 SWEP.Primary.Recoil			= 2
@@ -141,6 +142,12 @@ end
 function SWEP:GetRangeModifier()
 
 	return self.RangeModifier
+
+end
+
+function SWEP:GetMaxSpeed()
+
+	return self.MaxSpeed
 
 end
 

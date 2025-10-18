@@ -26,6 +26,7 @@ SWEP.WorldModel				= "models/weapons/w_shot_xm1014.mdl"
 SWEP.Range					= 3048
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1
+SWEP.MaxSpeed				= 240
 
 SWEP.Primary.Sound			= Sound( "Weapon_XM1014.Single" )
 SWEP.Primary.Recoil			= 4

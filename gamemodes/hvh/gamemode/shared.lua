@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.11"
+GM.Version = "1.2.12"
 
 GM.TeamBased = true
 
@@ -80,7 +80,7 @@ function GM:GetMapRemainingTime()
 	
 end
 
-local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", FCVAR_NOTIFY + FCVAR_REPLICATED, "How many minutes each round takes.", 1, 60 )
+local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", { FCVAR_NOTIFY, FCVAR_REPLICATED }, "How many minutes each round takes.", 1, 60 )
 
 function GM:GetRoundRemainingTime()
 
