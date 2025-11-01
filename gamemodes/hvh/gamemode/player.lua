@@ -459,7 +459,11 @@ function GM:PlayerSay( ply, text, teamonly )
 	
 	elseif ( ltext == "currentmap" ) then
 	
-		PrintMessage( HUD_PRINTTALK, "The current map is " .. game.GetMap() )
+		PrintMessage( HUD_PRINTTALK, "Current Map: " .. game.GetMap() )
+		
+	elseif ( ltext == "thetime" ) then
+	
+		PrintMessage( HUD_PRINTTALK, "Server Time: " .. os.date( "%H:%M:%S - %d/%m/%Y" ) )
 	
 	elseif ( ltext == "timeleft" ) then
 

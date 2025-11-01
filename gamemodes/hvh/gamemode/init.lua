@@ -104,10 +104,6 @@ function GM:Initialize()
 	SetGlobalFloat( "RoundStartTime", 0 )
 	SetGlobalFloat( "GameStartTime", 0 )
 	
-	Stats_Load()
-	
-	VoteMap_Init()
-	
 end
 
 function GM:InitPostEntity()

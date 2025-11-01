@@ -37,7 +37,7 @@ end
 
 function GM:AddDeathNotice( attacker, team1, inflictor, victim, team2, flags )
 
-	if ( !victim ) then return end
+	if ( !isstring( victim ) ) then return end
 	if ( inflictor == "suicide" ) then attacker = nil end
 
 	local Death = {}
@@ -81,7 +81,7 @@ local function DrawDeath( x, y, death, time )
 	
 	killicon.Render( x, y, death.icon, alpha, true )
 
-	if ( death.left ) then
+	if ( isstring( death.left ) ) then
 		draw.SimpleText( death.left, "ChatFont", x, y, death.color1, TEXT_ALIGN_RIGHT )
 	end
 

@@ -84,30 +84,29 @@ if ( CLIENT ) then
 
 	function SWEP:GetTracerOrigin()
 	
-		local ent = self
 		local owner = self:GetOwner()
 		local ply = LocalPlayer()
 
 		if ( ( ( owner == ply ) && !owner:ShouldDrawLocalPlayer() ) || ( ( owner != ply ) && owner:IsPlayer() && ply:GetObserverMode() == OBS_MODE_IN_EYE && ply:GetObserverTarget() == owner ) ) then
 		
-			local viewmodel = owner:GetViewModel()
+			local vm = owner:GetViewModel()
 			
-			if ( viewmodel ) then
-				ent = viewmodel
+			if ( IsValid( vm ) ) then
+			
+				local att = vm:GetAttachment( vm:LookupAttachment( self:GetFireRight() && "2" || "1" ) )
+				
+				if ( att ) then
+					return att.Pos
+				end
+				
 			end
 
 		end
 		
-		if ( self:GetFireRight() ) then
+		local att = self:GetAttachment( self:LookupAttachment( self:GetFireRight() && "muzzle" || "muzzle2" ) )
 		
-			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle" ) ) || ent:GetAttachment( ent:LookupAttachment( "2" ) )
+		if ( att ) then
 			return att.Pos
-			
-		else
-		
-			local att = ent:GetAttachment( ent:LookupAttachment( "muzzle2" ) ) || ent:GetAttachment( ent:LookupAttachment( "1" ) )
-			return att.Pos
-			
 		end
 		
 	end
