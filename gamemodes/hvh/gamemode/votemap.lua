@@ -8,7 +8,7 @@ local votemap_allowed = true
 
 local clr_prefix = Color( 250, 130, 30 )
 
-function VoteMap_Init()
+local function LoadVoteMapList()
 
 	local f = file.Open( "cfg/votemaplist.txt", "r", "GAME" )
 	
@@ -50,6 +50,8 @@ function VoteMap_Init()
 	timer.Simple( votemap_initialdelay:GetFloat(), function() votemap_allowed = true end )
 	
 end
+
+LoadVoteMapList()
 
 local function ChangeMap( name )
 
@@ -216,13 +218,13 @@ ShowMenu = function( ply, section )
 	
 	Menu_Start()
 	
-		Menu_AddLine( "[VoteMap] Map List:" )
-	
 		local mapcount = #maplist
 		local start_index = ( section * 7 ) - 6
 		local end_index = math.min( start_index + 6, mapcount )
 		local votes_needed = math.ceil( #player.GetHumans() * votemap_needed:GetFloat() )
 		local item = 1
+		
+		Menu_AddLine( Format( "[VoteMap] Showing from %i to %i of %i:", start_index, end_index, mapcount ) )
 
 		for i = start_index, end_index do
 

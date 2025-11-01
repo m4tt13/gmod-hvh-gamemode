@@ -1,29 +1,22 @@
 local hvhrank_points_start 		= CreateConVar( "hvhrank_points_start", "1000" )
+local hvhrank_points_negate		= CreateConVar( "hvhrank_points_negate", "1" )
 local hvhrank_points_kill 		= CreateConVar( "hvhrank_points_kill", "2" )
 local hvhrank_points_diff 		= CreateConVar( "hvhrank_points_diff", "100" )
 local hvhrank_points_headshot 	= CreateConVar( "hvhrank_points_headshot", "1" )
 local hvhrank_points_knife_mult	= CreateConVar( "hvhrank_points_knife_mult", "2" )
 local hvhrank_show_rank_all		= CreateConVar( "hvhrank_show_rank_all", "1" )
 
-local table_exist = false
-
 local clr_prefix = Color( 127, 127, 255 )
 
-function Stats_Load()
-	
-	local result = sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (id INTEGER PRIMARY KEY, steamid TEXT, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC, knifekills NUMERIC)" )
-	
-	if ( result == false ) then
-		MsgC( Color( 255, 0, 0 ), Format( "[HvH Rank] Could not create SQL table: %s\n", sql.LastError() ) )
-	else
-		table_exist = true
-	end
-	
+if ( !sql.TableExists( "hvhrank" ) ) then
+
+	sql.Query( "CREATE TABLE IF NOT EXISTS hvhrank (steamid TEXT NOT NULL PRIMARY KEY, name TEXT, score NUMERIC, kills NUMERIC, deaths NUMERIC, headshots NUMERIC, knifekills NUMERIC, lastplayed NUMERIC);" )
+
 end
 
 function Stats_LoadPlayer( ply, steamid )
 
-	if ( !table_exist || ply:IsBot() ) then
+	if ( ply:IsBot() ) then
 		return
 	end
 
@@ -55,7 +48,7 @@ function Stats_LoadPlayer( ply, steamid )
 			
 		}
 		
-		sql.Query( Format( "INSERT INTO hvhrank VALUES (NULL, %s, %s, %i, 0, 0, 0, 0)", sql.SQLStr( steamid ), sql.SQLStr( ply:Name() ), points_start ) )
+		sql.Query( Format( "INSERT INTO hvhrank VALUES (%s, %s, %i, 0, 0, 0, 0, %i)", sql.SQLStr( steamid ), sql.SQLStr( ply:Name() ), points_start, os.time() ) )
 		
 	end
 
@@ -67,7 +60,7 @@ function Stats_SavePlayer( ply )
 		return
 	end
 
-	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i, knifekills = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, ply.Stats.KnifeKills, sql.SQLStr( ply:SteamID() ) ) )
+	sql.Query( Format( "UPDATE hvhrank SET name = %s, score = %i, kills = %i, deaths = %i, headshots = %i, knifekills = %i, lastplayed = %i WHERE steamid = %s", sql.SQLStr( ply:Name() ), ply.Stats.Score, ply.Stats.Kills, ply.Stats.Deaths, ply.Stats.Headshots, ply.Stats.KnifeKills, os.time(), sql.SQLStr( ply:SteamID() ) ) )
 
 end
 
@@ -103,6 +96,10 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 			points_kill = math.ceil( points_kill * points_knife_mult )
 		end
 		
+	end
+	
+	if ( !hvhrank_points_negate:GetBool() ) then
+		points_kill = math.min( points_kill, math.max( 0, victim.Stats.Score ) )
 	end
 	
 	victim.Stats.Score 		= victim.Stats.Score	- points_kill
@@ -190,6 +187,8 @@ local function HandleMenuItem( ply, item )
 	
 		local info = ply.DisplayedPlayersInfo[ item ]
 		
+		local last_played = os.date( "%H:%M:%S - %d/%m/%Y", tonumber( info.lastplayed ) )
+		
 		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "[HvH Rank] Player Info:" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
@@ -202,6 +201,7 @@ local function HandleMenuItem( ply, item )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Deaths: " .. info.deaths .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Headshots: " .. info.headshots .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "Knife Kills: " .. info.knifekills .. "\n" )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Last Played: " .. last_played .. "\n" )
 		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
 	
 		Menu_Start()
@@ -217,6 +217,7 @@ local function HandleMenuItem( ply, item )
 			Menu_AddLine( "Deaths: " .. info.deaths )
 			Menu_AddLine( "Headshots: " .. info.headshots )
 			Menu_AddLine( "Knife Kills: " .. info.knifekills )
+			Menu_AddLine( "Last Played: " .. last_played )
 
 			Menu_AddLine()
 			
@@ -274,7 +275,7 @@ ShowMenu = function( ply, section )
 				local deaths = tonumber( info.deaths )
 				info.kdr = kills / ( ( deaths != 0 ) && deaths || 1 )
 				info.rank = i
-				
+
 				Menu_AddLine( Format( "%s (%s) - KDR: %.2f", info.name, info.score, info.kdr ), true, item )
 				
 				table.insert( ply.DisplayedPlayersInfo, item, info )
@@ -314,10 +315,6 @@ ShowMenu = function( ply, section )
 end
 
 function Stats_ShowTopPlayers( ply )
-
-	if ( !table_exist ) then
-		return
-	end
 
 	ShowMenu( ply, 1 )
 
