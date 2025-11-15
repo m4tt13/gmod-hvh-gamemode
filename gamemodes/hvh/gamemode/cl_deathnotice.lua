@@ -99,10 +99,9 @@ function GM:DrawDeathNotice()
 	local x = ScrW() - 15
 	local y = 15
 	
-	local ply 	= LocalPlayer()
-	local mode 	= ply:GetObserverMode()
+	local ply = LocalPlayer()
 	
-	if ( mode != OBS_MODE_NONE ) then
+	if ( IsValid( ply ) && ply:GetObserverMode() != OBS_MODE_NONE ) then
 		y = y + 60
 	end
 

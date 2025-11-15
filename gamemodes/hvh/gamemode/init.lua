@@ -4,6 +4,7 @@ AddCSLuaFile( "cl_deathnotice.lua" )
 AddCSLuaFile( "cl_hud.lua" )
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "cl_menu.lua" )
+AddCSLuaFile( "cl_motd.lua" )
 AddCSLuaFile( "cl_pickteam.lua" )
 AddCSLuaFile( "cl_scoreboard.lua" )
 AddCSLuaFile( "cl_targetid.lua" )
@@ -40,6 +41,7 @@ local mp_map_end_at_timelimit = CreateConVar( "mp_map_end_at_timelimit", "0", FC
 
 util.AddNetworkString( "hvh_playsound" )
 util.AddNetworkString( "hvh_showmenu" )
+util.AddNetworkString( "hvh_showmotd" )
 
 local round_end_info = {
 
@@ -99,10 +101,10 @@ function GM:Initialize()
 	GAMEMODE.NumCTWins 				= 0
 	GAMEMODE.TotalRoundsPlayed		= -1
 	
-	SetGlobalBool( "FreezePeriod", true )
-	SetGlobalInt( "RoundTime", 0 )
-	SetGlobalFloat( "RoundStartTime", 0 )
-	SetGlobalFloat( "GameStartTime", 0 )
+	SetGlobal2Bool( "FreezePeriod", true )
+	SetGlobal2Int( "RoundTime", 0 )
+	SetGlobal2Float( "RoundStartTime", 0 )
+	SetGlobal2Float( "GameStartTime", 0 )
 	
 end
 
@@ -145,7 +147,7 @@ local function GoToIntermission()
 	
 	GAMEMODE.IntermissionEndTime = CurTime() + mp_chattime:GetInt()
 	
-	SetGlobalBool( "FreezePeriod", true )
+	SetGlobal2Bool( "FreezePeriod", true )
 
 	for id, pl in ipairs( player.GetAll() ) do
 
@@ -228,7 +230,7 @@ function GM:CheckWinConditions()
 		GAMEMODE.FirstConnected = true
 		GAMEMODE.CompleteReset = true
 	
-		SetGlobalBool( "FreezePeriod", false )
+		SetGlobal2Bool( "FreezePeriod", false )
 	
 		TerminateRound( 3, REASON_GAME_COMMENCING )
 	
@@ -360,7 +362,7 @@ local function CheckFreezePeriodExpired()
 		return
 	end
 
-	SetGlobalBool( "FreezePeriod", false )
+	SetGlobal2Bool( "FreezePeriod", false )
 	
 	util.PlaySound( round_start_sounds[ math.random( #round_start_sounds ) ] )
 
@@ -388,7 +390,7 @@ local function RestartRound()
 	
 	if ( GAMEMODE.CompleteReset ) then
 	
-		SetGlobalFloat( "GameStartTime", CurTime() )
+		SetGlobal2Float( "GameStartTime", CurTime() )
 
 		GAMEMODE.TotalRoundsPlayed	= 0
 	
@@ -403,8 +405,8 @@ local function RestartRound()
 		
 	end
 	
-	SetGlobalBool( "FreezePeriod", true )
-	SetGlobalFloat( "RoundStartTime", CurTime() + mp_freezetime:GetInt() )
+	SetGlobal2Bool( "FreezePeriod", true )
+	SetGlobal2Float( "RoundStartTime", CurTime() + mp_freezetime:GetInt() )
 	
 	for id, pl in ipairs( player.GetAll() ) do
 	
@@ -501,14 +503,36 @@ function GM:Think()
 	
 end
 
+local motdfile = GetConVar( "motdfile" )
+
 function GM:ShowHelp( ply )
 
-	ply:ConCommand( "buymenu" )
+	local has_text = !ply.HasMOTD && file.Exists( motdfile:GetString(), "GAME" )
+
+	net.Start( "hvh_showmotd" )
+		
+		net.WriteBool( has_text )
+		
+		if ( has_text ) then
+		
+			ply.HasMOTD = true
+		
+			net.WriteString( file.Read( motdfile:GetString(), "GAME" ) )
+			
+		end
+
+	net.Send( ply )
 
 end
 
 function GM:ShowTeam( ply )
 
 	ply:ConCommand( "teammenu" )
+
+end
+
+function GM:ShowSpare2( ply )
+
+	ply:ConCommand( "buymenu" )
 
 end

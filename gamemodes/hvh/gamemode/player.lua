@@ -2,7 +2,7 @@ local mp_flood_time = CreateConVar( "mp_flood_time", "0.75", FCVAR_NONE, "Amount
 local mp_deathcam_time = CreateConVar( "mp_deathcam_time", "3" )
 local mp_respawn_on_death = CreateConVar( "mp_respawn_on_death", "0", FCVAR_NONE, "When set to 1, players will respawn after dying." )
 local mp_join_grace_time = CreateConVar( "mp_join_grace_time", "15.0", FCVAR_NONE, "Number of seconds after round start to allow a player to join a game.", 0, 30 )
-local mp_teamswitch_cooldown = CreateConVar( "mp_teamswitch_cooldown", "10.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
+local mp_teamswitch_cooldown = CreateConVar( "mp_teamswitch_cooldown", "20.0", FCVAR_NONE, "Number of seconds between being able to switch team." )
 local sv_noplayercollision = CreateConVar( "sv_noplayercollision", "1", FCVAR_NONE, "Disable player collision." )
 local sv_nodamageforces = CreateConVar( "sv_nodamageforces", "1", FCVAR_NONE, "Disable forces from physics damage." )
 local sv_disable_blood = CreateConVar( "sv_disable_blood", "1", FCVAR_NONE, "Disable player blood." )
@@ -491,7 +491,11 @@ function GM:PlayerSay( ply, text, teamonly )
 		
 	elseif ( prefix ) then
 	
-		if ( ltext == "guns" ) then
+		if ( ltext == "motd" || ltext == "help" ) then
+	
+			ply:ConCommand( "gm_showhelp" )
+	
+		elseif ( ltext == "guns" ) then
 	
 			ply:ConCommand( "buymenu" )
 			
@@ -630,7 +634,7 @@ end
 function GM:PlayerInitialSpawn( pl, transiton )
 
 	pl:SetTeam( TEAM_UNASSIGNED )
-	pl:ConCommand( "gm_showteam" )
+	pl:ConCommand( "gm_showhelp" )
 
 end
 
@@ -706,6 +710,10 @@ local function SetUpPlayerVars( ply )
 		wepclr = Vector( 0.001, 0.001, 0.001 )
 	end
 	ply:SetWeaponColor( wepclr )
+	
+	ply:SetNW2Int( "NextJumpTick", 0 )
+	ply:SetNW2Int( "NextJumpTickAcc", 0 )
+	ply:SetNW2Int( "NextJumpTickRem", 0 )
 
 end
 
@@ -734,7 +742,7 @@ end
 function GM:PlayerSetModel( pl )
 
 	local modelName = "models/player/kleiner.mdl"
-	local teamModels = PlayerModels[ pl:Team() ]
+	local teamModels = g_PlayerModels[ pl:Team() ]
 	
 	if ( teamModels ) then
 	

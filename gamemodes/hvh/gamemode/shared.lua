@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.13"
+GM.Version = "1.2.14"
 
 GM.TeamBased = true
 
@@ -56,7 +56,7 @@ end
 
 function GM:IsFreezePeriod()
 
-	return GetGlobalBool( "FreezePeriod", false )
+	return GetGlobal2Bool( "FreezePeriod", false )
 	
 end
 
@@ -70,7 +70,7 @@ function GM:GetMapRemainingTime()
 		return -1
 	end
 
-	local TimeLeft = ( GetGlobalFloat( "GameStartTime", 0 ) + timelimit * 60 ) - CurTime()
+	local TimeLeft = ( GetGlobal2Float( "GameStartTime", 0 ) + timelimit * 60 ) - CurTime()
 
 	if ( TimeLeft < 0 ) then
 		TimeLeft = 0
@@ -84,17 +84,17 @@ local mp_roundtime = CreateConVar( "mp_roundtime", "2.5", { FCVAR_NOTIFY, FCVAR_
 
 function GM:GetRoundRemainingTime()
 
-	return ( GetGlobalFloat( "RoundStartTime", 0 ) + math.floor( mp_roundtime:GetFloat() * 60 ) ) - CurTime()
+	return ( GetGlobal2Float( "RoundStartTime", 0 ) + math.floor( mp_roundtime:GetFloat() * 60 ) ) - CurTime()
 	
 end
 
 function GM:GetRoundStartTime()
 
-	return GetGlobalFloat( "RoundStartTime", 0 )
+	return GetGlobal2Float( "RoundStartTime", 0 )
 	
 end
 
-PlayerModels = {
+g_PlayerModels = {
 
 	[TEAM_TERRORIST] = {
 

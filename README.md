@@ -6,8 +6,9 @@ Counter-Strike: Source style with a round-based gamemode for Garry's Mod which f
 * CS:S player models
 * HUD style like in CS:S
 * Scoreboard style like in CS:S
-* Weapon selection menu (F1)
-* Team selection menu (F2)
+* MOTD (F1, !motd, !help)
+* Team selection menu (F2, !team)
+* Weapon selection menu (F4, !guns)
 * Spectator system (!spec, !spectate)
 * Freeze time (mp_freezetime)
 * Completing a match with different conditions (mp_timelimit, mp_fraglimit, mp_winlimit, mp_maxrounds)
@@ -27,4 +28,5 @@ Counter-Strike: Source style with a round-based gamemode for Garry's Mod which f
 * Voting for map (!votemap)
 * Fall damage scalling (sv_falldamage_scale)
 * Jump boost (sv_jump_boost)
+* Head unhide system
 * Colored chat

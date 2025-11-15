@@ -1,5 +1,5 @@
 local hvhrank_points_start 		= CreateConVar( "hvhrank_points_start", "1000" )
-local hvhrank_points_negate		= CreateConVar( "hvhrank_points_negate", "1" )
+local hvhrank_points_negate		= CreateConVar( "hvhrank_points_negate", "0" )
 local hvhrank_points_kill 		= CreateConVar( "hvhrank_points_kill", "2" )
 local hvhrank_points_diff 		= CreateConVar( "hvhrank_points_diff", "100" )
 local hvhrank_points_headshot 	= CreateConVar( "hvhrank_points_headshot", "1" )

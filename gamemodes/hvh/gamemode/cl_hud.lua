@@ -336,21 +336,24 @@ function GM:HUDDrawGeneral()
 	
 	if ( !cl_drawhud:GetBool() ) then return end
 	
-	local ply 	= LocalPlayer()
-	local mode 	= ply:GetObserverMode()
+	local ply = LocalPlayer()
 	
-	if ( mode != OBS_MODE_NONE ) then
+	if ( IsValid( ply ) ) then
+	
+		if ( ply:GetObserverMode() != OBS_MODE_NONE ) then
+			
+			HUD_DrawSpec()
+			
+		else
 		
-		HUD_DrawSpec()
+			HUD_DrawHealth()
+			HUD_DrawArmor()
+			HUD_DrawRoundTimer()
+			HUD_DrawTeamScore()
+			HUD_DrawAmmo()
 		
-	else
-	
-		HUD_DrawHealth()
-		HUD_DrawArmor()
-		HUD_DrawRoundTimer()
-		HUD_DrawTeamScore()
-		HUD_DrawAmmo()
-	
+		end
+
 	end
 
 end

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<title>Hack vs Hack MOTD</title>
+<style type="text/css">
+pre, h3 {
+		font-family:Verdana,Tahoma;
+		color:#FFB000;
+    	}
+body	{
+		background:#000000;
+		margin-left:8px;
+		margin-top:0px;
+		}
+</style>
+</head>
+<body>
+<h3>Gamemode help</h3>
+<pre>
+Welcome to the Hacker vs Hacker server!
+
+This gamemode is a round-based gameplay in the style of 
+Counter-Strike: Source where cheaters play against each other.
+
+Press F1 to open the MOTD menu.
+Press F2 to open the team selection menu.
+Press F4 to open the weapon selection menu.
+</pre>
+<h3>Chat commands</h3>
+<pre>
+!nextmap
+ - Show the next map.
+
+!currentmap
+ - Show the current map.
+
+!thetime
+ - Show current server time.
+
+!timeleft
+ - Show remaining time on map.
+
+!rank
+ - Show your current statistics.
+
+!top, !top10
+ - Open the menu with top players.
+
+!votemap
+ - Vote for a map change.
+
+!motd, !help
+ - Open the MOTD menu.
+
+!guns
+ - Open the weapon selection menu.
+
+!team
+ - Open the team selection menu.
+
+!t, !ter
+ - Join the Terrorist team.
+
+!ct
+ - Join the Counter-Terrorist team.
+
+!spec, !spectate
+ - Join the spectators.
+
+!rs, !resetscore
+ - Reset your current frags and deaths.
+
+!ak47, !deagle, etc.
+ - Get a weapon by its name.
+</pre>
+</body>
+</html>

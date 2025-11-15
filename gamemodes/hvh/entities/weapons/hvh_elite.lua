@@ -42,7 +42,7 @@ SWEP.Primary.Ammo			= "BULLET_PLAYER_9MM"
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Bool", 0, "FireRight" )
+	self:NetworkVar( "Bool", "FireRight" )
 	
 end
 

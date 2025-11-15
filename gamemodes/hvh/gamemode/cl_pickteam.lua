@@ -12,24 +12,10 @@ local class_random_image = {
 
 function GM:ShowTeam()
 
-	local ply		= LocalPlayer()
-	local teamid 	= ply:Team()
+	if ( IsValid( self.TeamSelectPnl ) ) then return end
 
-	if ( IsValid( self.TeamSelectPnl ) ) then
-	
-		if ( teamid != TEAM_UNASSIGNED ) then
-			GAMEMODE:HideTeam()
-		end
-		
-		return
-		
-	end
-	
-	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
-		return
-	end
-	
 	GAMEMODE:HideHelp()
+	GAMEMODE:HideSpare2()
 
 	self.TeamSelectPnl = vgui.Create( "EditablePanel" )
 	self.TeamSelectPnl:MakePopup()
@@ -93,7 +79,7 @@ function GM:ShowTeam()
 	local activeTeamPnl = nil
 	local bestAutoJoinTeam = team.BestAutoJoinTeam()
 	
-	for k, teamModels in ipairs( PlayerModels ) do
+	for k, teamModels in ipairs( g_PlayerModels ) do
 	
 		local teamPnl = self.TeamSelectPnl:Add( "Panel" )
 		teamPnl:SetVisible( false )
@@ -282,7 +268,9 @@ function GM:ShowTeam()
 		
 	end
 	
-	if ( teamid != TEAM_UNASSIGNED ) then
+	local ply = LocalPlayer()
+	
+	if ( IsValid( ply ) && ply:Team() != TEAM_UNASSIGNED ) then
 	
 		local cancelButton = mainMenu:Add( "DLabel" )
 		cancelButton:SetHeight( 20 )
@@ -319,6 +307,10 @@ function GM:ShowTeam()
 			
 		end
 		
+	end
+	
+	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
+		self.TeamSelectPnl:Hide()
 	end
 	
 end

@@ -1,3 +1,6 @@
+local sv_unhide_head_detect = CreateConVar( "sv_unhide_head_detect", "2.5", FCVAR_REPLICATED )
+local sv_unhide_head_reset = CreateConVar( "sv_unhide_head_reset", "0.5", FCVAR_REPLICATED )
+local sv_unhide_head_punish = CreateConVar( "sv_unhide_head_punish", "5", FCVAR_REPLICATED )
 local sv_jump_boost = CreateConVar( "sv_jump_boost", "0", FCVAR_REPLICATED )
 
 function GM:StartCommand( ply, ucmd )
@@ -33,7 +36,7 @@ function GM:Move( ply, mv )
 				maxspeed = sv_maxspeed:GetFloat()
 			end
 			
-			if ( ply:IsFlagSet( FL_DUCKING ) && ply:GetGroundEntity() != NULL ) then
+			if ( ply:Crouching() && ply:GetGroundEntity() != NULL ) then
 				maxspeed = maxspeed * ply:GetCrouchedWalkSpeed()
 			end
 			
@@ -41,6 +44,56 @@ function GM:Move( ply, mv )
 
 		end
 		
+	end
+	
+	if ( sv_unhide_head_detect:GetFloat() > 0 ) then
+ 
+		ply.NextJumpTick = ply:GetNW2Int( "NextJumpTick" )
+		ply.NextJumpTickAcc = ply:GetNW2Int( "NextJumpTickAcc" )
+		ply.NextJumpTickRem = ply:GetNW2Int( "NextJumpTickRem" )
+	 
+		if ( ply.NextJumpTickRem >= 0 ) then
+	 
+			if ( ply:Crouching() && !ply:OnGround() ) then
+	 
+				local distance = select( 2, ply:GetHull() ).z + select( 2, ply:GetHullDuck() ).z
+				local groundTrace = util.TraceHull( { start = mv:GetOrigin(), endpos = Vector( mv:GetOrigin().x, mv:GetOrigin().y, mv:GetOrigin().z - distance ), mins = Vector( -16, -16 ), maxs = Vector( 16, 16 ), mask = MASK_SHOT, collisiongroup = COLLISION_GROUP_WORLD } )
+	 
+				if ( groundTrace.HitWorld ) then
+	 
+					local ceilTrace = util.TraceHull( { start = groundTrace.HitPos, endpos = Vector( groundTrace.HitPos.x, groundTrace.HitPos.y, groundTrace.HitPos.z + distance ), mins = Vector( -16, -16 ), maxs = Vector( 16, 16 ), mask = MASK_SHOT, collisiongroup = COLLISION_GROUP_WORLD } )
+	 
+					if ( ceilTrace.HitWorld ) then
+						ply.NextJumpTick = ply.NextJumpTickAcc + math.floor( 0.5 + sv_unhide_head_reset:GetFloat() / engine.TickInterval() )
+					end
+	 
+				end
+	 
+			end
+	 
+			if ( ply.NextJumpTick > ply.NextJumpTickAcc ) then
+				ply.NextJumpTickRem = ply.NextJumpTickRem + 1
+			else
+				ply.NextJumpTickRem = 0
+			end
+	 
+			if ( ply.NextJumpTickRem >= math.floor( 0.5 + sv_unhide_head_detect:GetFloat() / engine.TickInterval() ) ) then
+				ply.NextJumpTickRem = -math.floor( 0.5 + sv_unhide_head_punish:GetFloat() / engine.TickInterval() )
+			end
+	 
+		end
+	 
+		if ( ply.NextJumpTickRem < 0 ) then
+	 
+			mv:SetButtons( 0 )
+			ply.NextJumpTickRem = ply.NextJumpTickRem + 1
+	 
+		end
+	 
+		ply:SetNW2Int( "NextJumpTick", ply.NextJumpTick )
+		ply:SetNW2Int( "NextJumpTickAcc", ply.NextJumpTickAcc + 1 )
+		ply:SetNW2Int( "NextJumpTickRem", ply.NextJumpTickRem )
+	 
 	end
 
 end

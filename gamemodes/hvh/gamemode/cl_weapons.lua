@@ -49,31 +49,17 @@ local allowed_weapons = {
 	
 }
 
-function GM:ShowHelp()
+function GM:ShowSpare2()
 
-	if ( IsValid( self.WeaponSelectPnl ) ) then
-	
-		GAMEMODE:HideHelp()
-		return
-		
-	end
-	
-	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
-		return
-	end
-	
+	if ( IsValid( self.WeaponSelectPnl ) ) then return end
+
 	local ply = LocalPlayer()
 
-	if ( !ply:Alive() ) then
+	if ( !IsValid( ply ) || !ply:Alive() ) then
 		return
 	end
 	
-	local teamid = ply:Team()
-
-	if ( teamid != TEAM_TERRORIST && teamid != TEAM_CT ) then
-		return
-	end
-
+	GAMEMODE:HideHelp()
 	GAMEMODE:HideTeam()
 
 	self.WeaponSelectPnl = vgui.Create( "EditablePanel" )
@@ -233,7 +219,7 @@ function GM:ShowHelp()
 			weaponButton.DoClick = function( self )
 
 				RunConsoleCommand( "giveweapon", weapon )
-				GAMEMODE:HideHelp() 
+				GAMEMODE:HideSpare2() 
 				
 			end
 			
@@ -274,7 +260,7 @@ function GM:ShowHelp()
 
 	cancelButton.DoClick = function( self )
 	
-		GAMEMODE:HideHelp() 
+		GAMEMODE:HideSpare2() 
 
 	end
 	
@@ -284,9 +270,13 @@ function GM:ShowHelp()
 		
 	end
 	
+	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
+		self.WeaponSelectPnl:Hide()
+	end
+	
 end
 
-function GM:HideHelp()
+function GM:HideSpare2()
 
 	if ( IsValid( self.WeaponSelectPnl ) ) then
 	
@@ -297,4 +287,4 @@ function GM:HideHelp()
 
 end
 
-concommand.Add( "buymenu", function() GAMEMODE:ShowHelp() end )
+concommand.Add( "buymenu", function() GAMEMODE:ShowSpare2() end )
