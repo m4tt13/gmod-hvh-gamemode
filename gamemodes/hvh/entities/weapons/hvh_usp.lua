@@ -44,8 +44,8 @@ SWEP.Secondary.Delay		= 3
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Bool", 0, "SilencerOn" )
-	self:NetworkVar( "Float", 0, "DoneSwitchingSilencer" )
+	self:NetworkVar( "Bool", "SilencerOn" )
+	self:NetworkVar( "Float", "DoneSwitchingSilencer" )
 	
 end
 

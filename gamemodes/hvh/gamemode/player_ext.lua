@@ -37,7 +37,7 @@ function meta:OutputDamageStatsAndReset()
 		
 	end
 	
-	self.DamageGivenList = nil
-	self.DamageTakenList = nil
+	self.DamageGivenList = {}
+	self.DamageTakenList = {}
 
 end

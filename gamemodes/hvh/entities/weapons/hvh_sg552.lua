@@ -45,7 +45,7 @@ SWEP.Secondary.Delay		= 0.3
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 0, "ZoomLevel" )
+	self:NetworkVar( "Int", "ZoomLevel" )
 	
 end
 

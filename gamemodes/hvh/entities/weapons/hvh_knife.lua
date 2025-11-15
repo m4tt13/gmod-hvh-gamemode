@@ -65,13 +65,11 @@ function SWEP:SwingOrStab( bStab )
 		
 			vecEnd = vecSrc + ( ( tr.HitPos - vecSrc ) * 2 )
 		
-			tmpTrace = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = ply, mask = MASK_SOLID } )
+			local tmpTrace = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = ply, mask = MASK_SOLID } )
 			
 			if ( tmpTrace.Fraction < 1.0 ) then
 				tr = tmpTrace	
 			end
-		
-			vecEnd = tr.HitPos
 		
 		end
 		
@@ -92,7 +90,7 @@ function SWEP:SwingOrStab( bStab )
 
 			if ( SERVER ) then
 
-				local damage = 42
+				local damage
 				
 				if ( bStab ) then
 				

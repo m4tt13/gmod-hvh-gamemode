@@ -42,8 +42,8 @@ SWEP.Primary.Ammo			= "BULLET_PLAYER_BUCKSHOT"
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Int", 0, "ReloadState" )
-	self:NetworkVar( "Float", 0, "ReloadTimer" )
+	self:NetworkVar( "Int", "ReloadState" )
+	self:NetworkVar( "Float", "ReloadTimer" )
 	
 end
 

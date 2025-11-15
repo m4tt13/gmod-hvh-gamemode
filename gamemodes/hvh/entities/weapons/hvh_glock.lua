@@ -44,9 +44,9 @@ SWEP.Secondary.Delay		= 0.3
 
 function SWEP:SetupDataTables()
 
-	self:NetworkVar( "Bool", 0, "BurstMode" )
-	self:NetworkVar( "Int", 0, "BurstShotsRemaining" )
-	self:NetworkVar( "Float", 0, "NextBurstShot" )
+	self:NetworkVar( "Bool", "BurstMode" )
+	self:NetworkVar( "Int", "BurstShotsRemaining" )
+	self:NetworkVar( "Float", "NextBurstShot" )
 	
 end
 

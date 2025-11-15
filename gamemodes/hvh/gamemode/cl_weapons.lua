@@ -51,31 +51,17 @@ local allowed_weapons = {
 
 function GM:ShowHelp()
 
-	if ( IsValid( self.WeaponSelectPnl ) ) then
-	
-		GAMEMODE:HideHelp()
-		return
-		
-	end
-	
-	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
-		return
-	end
-	
+	if ( IsValid( self.WeaponSelectPnl ) ) then return end
+
 	local ply = LocalPlayer()
 
-	if ( !ply:Alive() ) then
+	if ( !IsValid( ply ) || !ply:Alive() ) then
 		return
 	end
 	
-	local teamid = ply:Team()
-
-	if ( teamid != TEAM_TERRORIST && teamid != TEAM_CT ) then
-		return
-	end
-
 	GAMEMODE:HideTeam()
-
+	GAMEMODE:HideSpare2()
+	
 	self.WeaponSelectPnl = vgui.Create( "EditablePanel" )
 	self.WeaponSelectPnl:MakePopup()
 	self.WeaponSelectPnl:SetKeyboardInputEnabled( false )
@@ -282,6 +268,10 @@ function GM:ShowHelp()
 	
 		weaponImage:SetVisible( false )
 		
+	end
+	
+	if ( IsValid( self.ScoreboardPnl ) && self.ScoreboardPnl:IsVisible() ) then
+		self.WeaponSelectPnl:Hide()
 	end
 	
 end

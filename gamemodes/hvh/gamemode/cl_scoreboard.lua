@@ -669,6 +669,10 @@ function GM:ScoreboardShow()
 	if ( IsValid( self.WeaponSelectPnl ) ) then
 		self.WeaponSelectPnl:Hide()
 	end
+	
+	if ( IsValid( self.MOTDPnl ) ) then
+		self.MOTDPnl:Hide()
+	end
 
 	if ( !IsValid( self.ScoreboardPnl ) ) then
 		self.ScoreboardPnl = CreateScoreboard()
@@ -704,6 +708,13 @@ function GM:ScoreboardHide()
 		self.WeaponSelectPnl:Show()
 		self.WeaponSelectPnl:MakePopup()
 		self.WeaponSelectPnl:SetKeyboardInputEnabled( false )
+		
+	end
+	
+	if ( IsValid( self.MOTDPnl ) ) then
+	
+		self.MOTDPnl:Show()
+		self.MOTDPnl:MakePopup()
 		
 	end
 

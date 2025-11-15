@@ -1,7 +1,12 @@
 function GM:HUDDrawTargetID()
 
-	local ply 	= LocalPlayer()
-	local mode 	= ply:GetObserverMode()
+	local ply = LocalPlayer()
+	
+	if ( !IsValid( ply ) ) then
+		return
+	end
+	
+	local mode = ply:GetObserverMode()
 	
 	if ( mode == OBS_MODE_DEATHCAM || mode == OBS_MODE_CHASE ) then
 		return
