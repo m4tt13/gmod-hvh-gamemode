@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "USP"
 SWEP.Alias 					= "usp"
 SWEP.Image        		 	= "vgui/gfx/vgui/usp45"
-SWEP.IconLetter				= "y"
+SWEP.IconLetter				= "A"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

@@ -4,7 +4,7 @@ SWEP.Base 					= "hvh_base"
 
 SWEP.PrintName 				= "Knife"
 SWEP.Alias 					= "knife"
-SWEP.IconLetter				= "j"
+SWEP.IconLetter				= "J"
 SWEP.CanBuy        		 	= true
 SWEP.ScaleDamageByDistance	= false
 

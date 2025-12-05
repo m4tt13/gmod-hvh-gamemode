@@ -10,6 +10,8 @@ local class_random_image = {
 	
 }
 
+local matCSLogo = Material( "vgui/gfx/vgui/cs_logo" )
+
 function GM:ShowTeam()
 
 	if ( IsValid( self.TeamSelectPnl ) ) then return end
@@ -26,7 +28,7 @@ function GM:ShowTeam()
 	local header = self.TeamSelectPnl:Add( "DLabel" )
 	header:SetHeight( 50 )
 	header:SetFont( "hvh_menutitle" )
-	header:SetTextInset( 15, 0 )
+	header:SetTextInset( 60, 0 )
 	header:SetTextColor( clr_text )
 	header:SetText( "Team Menu" )
 	header:SetContentAlignment( 4 )
@@ -35,6 +37,10 @@ function GM:ShowTeam()
 	header.Paint = function( self, w, h )
 
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, true, true, false, false )
+		
+		surface.SetDrawColor( clr_text )
+		surface.SetMaterial( matCSLogo )
+		surface.DrawTexturedRect( 10, 5, 40, 40 ) 
 		
 	end
 	

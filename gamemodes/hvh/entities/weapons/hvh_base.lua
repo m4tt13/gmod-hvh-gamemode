@@ -4,8 +4,8 @@ if ( CLIENT ) then
 
 	surface.CreateFont( "hvh_selectionicon", {
 
-		font = "csd",
-		size = ScreenScale( 60 ),
+		font = "Counter-Strike",
+		size = math.min( ScreenScale( 70 ), 127 ),
 		weight = 0,
 		antialias = true,
 		additive = true
@@ -30,7 +30,7 @@ SWEP.CSMuzzleX 				= false
 SWEP.CSMuzzleScale			= 1.0
 SWEP.DeploySpeed 			= 1.0
 SWEP.HoldType				= "pistol"
-SWEP.IconLetter        	 	= "c"
+SWEP.IconLetter        	 	= "C"
 SWEP.CanBuy        		 	= false
 SWEP.HideViewModelWhenZoomed = true
 SWEP.ScaleDamageByDistance	= true
@@ -295,12 +295,7 @@ if ( CLIENT ) then
 
 	function SWEP:DrawWeaponSelection( x, y, wide, tall, alpha )
 	
-		local pos_x = x + wide / 2
-		local pos_y = y + tall * 0.2
-	
-		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x, pos_y, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER )
-		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x + math.Rand( -4, 4 ), pos_y + math.Rand( -14, 14 ), Color( 255, 210, 0, math.Rand( 10, 120 ) ), TEXT_ALIGN_CENTER )
-		draw.SimpleText( self.IconLetter, "hvh_selectionicon", pos_x + math.Rand( -4, 4 ), pos_y + math.Rand( -9, 9 ), Color( 255, 210, 0, math.Rand( 10, 120 ) ), TEXT_ALIGN_CENTER )
+		draw.SimpleText( self.IconLetter, "hvh_selectionicon", x + wide / 2, y + tall / 2, Color( 255, 210, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 	
 	end
 

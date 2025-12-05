@@ -5,6 +5,8 @@ local clr_border	= Color( 188, 112, 0, 128 )
 
 local motd_text = nil
 
+local matCSLogo = Material( "vgui/gfx/vgui/cs_logo" )
+
 function GM:ShowHelp()
 
 	if ( IsValid( self.MOTDPnl ) ) then return end
@@ -16,11 +18,11 @@ function GM:ShowHelp()
 	self.MOTDPnl:MakePopup()
 	self.MOTDPnl:SetSize( 600, 400 )
 	self.MOTDPnl:Center()
-
+	
 	local header = self.MOTDPnl:Add( "DLabel" )
 	header:SetHeight( 50 )
 	header:SetFont( "hvh_menutitle" )
-	header:SetTextInset( 15, 0 )
+	header:SetTextInset( 60, 0 )
 	header:SetTextColor( clr_text )
 	header:SetText( GetHostName() )
 	header:SetContentAlignment( 4 )
@@ -29,6 +31,10 @@ function GM:ShowHelp()
 	header.Paint = function( self, w, h )
 
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, true, true, false, false )
+		
+		surface.SetDrawColor( clr_text )
+		surface.SetMaterial( matCSLogo )
+		surface.DrawTexturedRect( 10, 5, 40, 40 ) 
 		
 	end
 	
@@ -44,6 +50,7 @@ function GM:ShowHelp()
 	local html = mainMenu:Add( "DHTML" )
 	html:Dock( FILL )
 	html:DockMargin( 0, 0, 0, 10 )
+	html:SetAllowLua( true )
 	
 	if ( motd_text ) then
 	

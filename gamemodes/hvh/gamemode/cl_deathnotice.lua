@@ -91,7 +91,7 @@ end
 
 function GM:DrawDeathNotice()
 
-	if ( cl_drawhud:GetInt() == 0 ) then return end
+	if ( !cl_drawhud:GetBool() ) then return end
 
 	local time = hud_deathnotice_time:GetFloat()
 	local reset = Deaths[1] != nil

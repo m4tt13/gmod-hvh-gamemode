@@ -689,7 +689,7 @@ local function SetUpPlayerVars( ply )
 	ply:ShouldDropWeapon( false )
 	ply:SetNoCollideWithTeammates( false )
 	ply:SetAvoidPlayers( false )
-	
+
 	if ( sv_noplayercollision:GetBool() ) then
 		ply:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 	end

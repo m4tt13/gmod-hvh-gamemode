@@ -5,7 +5,7 @@ include( "player_shd.lua" )
 
 GM.Name = "Hack vs Hack"
 GM.Author = "MattDoggie"
-GM.Version = "1.2.14"
+GM.Version = "1.2.15"
 
 GM.TeamBased = true
 

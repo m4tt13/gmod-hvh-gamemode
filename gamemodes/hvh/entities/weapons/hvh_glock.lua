@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "Glock"
 SWEP.Alias 					= "glock"
 SWEP.Image        		 	= "vgui/gfx/vgui/glock18"
-SWEP.IconLetter				= "c"
+SWEP.IconLetter				= "C"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

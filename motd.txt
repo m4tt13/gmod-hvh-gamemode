@@ -19,7 +19,7 @@ body	{
 <pre>
 Welcome to the Hacker vs Hacker server!
 
-This gamemode is a round-based gameplay in the style of 
+This gamemode is a round-based teamplay in the style of 
 Counter-Strike: Source where cheaters play against each other.
 
 Press F1 to open the MOTD menu.

@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "M4A1"	
 SWEP.Alias 					= "m4a1"
 SWEP.Image        		 	= "vgui/gfx/vgui/m4a1"
-SWEP.IconLetter				= "w"
+SWEP.IconLetter				= "W"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

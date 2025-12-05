@@ -24,6 +24,8 @@ function meta:OutputDamageStatsAndReset()
 			self:PrintMessage( HUD_PRINTCONSOLE, Format( "Damage Given to %q - %i in %i hit%s\n", name, record.Damage, record.NumHits, ( ( record.NumHits == 1 ) && "" || "s" ) ) )
 		end
 		
+		self.DamageGivenList = nil
+		
 	end
 	
 	if ( self.DamageTakenList ) then
@@ -35,9 +37,8 @@ function meta:OutputDamageStatsAndReset()
 			self:PrintMessage( HUD_PRINTCONSOLE, Format( "Damage Taken from %q - %i in %i hit%s\n", name, record.Damage, record.NumHits, ( ( record.NumHits == 1 ) && "" || "s" ) ) )
 		end
 		
+		self.DamageTakenList = nil
+		
 	end
-	
-	self.DamageGivenList = nil
-	self.DamageTakenList = nil
 
 end

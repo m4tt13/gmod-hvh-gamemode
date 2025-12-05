@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "MAC10"
 SWEP.Alias 					= "mac10"
 SWEP.Image        		 	= "vgui/gfx/vgui/mac10"
-SWEP.IconLetter				= "l"
+SWEP.IconLetter				= "L"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

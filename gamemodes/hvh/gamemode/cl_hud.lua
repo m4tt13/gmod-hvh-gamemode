@@ -1,16 +1,6 @@
 surface.CreateFont( "hvh_hudnumbers", {
 
-	font = "Tahoma",
-	size = 45,
-	weight = 600,
-	antialias = true,
-	additive = true
-
-} )
-
-surface.CreateFont( "hvh_hudicon", {
-
-	font = "csd",
+	font = "Counter-Strike",
 	size = 50,
 	weight = 0,
 	antialias = true,
@@ -18,7 +8,17 @@ surface.CreateFont( "hvh_hudicon", {
 
 } )
 
-surface.CreateFont( "hvh_hudiconsmall", {
+surface.CreateFont( "hvh_hudammo", {
+
+	font = "csd",
+	size = 75,
+	weight = 0,
+	antialias = true,
+	additive = true
+
+} )
+
+surface.CreateFont( "hvh_hudtimer", {
 
 	font = "csd",
 	size = 28,
@@ -137,9 +137,9 @@ local function HUD_DrawHealth()
 	local frac = ( CurTime() - health_toggle_time ) / ( health_next_toggle - health_toggle_time )
 	local clr = FlashColor( health_flash, frac )
 
-	draw.RoundedBox( 5, 15, scrh - 55, 120, 40, clr_bg )
-	draw.SimpleText( real_health, "hvh_hudnumbers", 130, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "F", "hvh_hudicon", 20, scrh - 48, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.RoundedBox( 8, 10, scrh - 55, 128, 45, clr_bg )
+	draw.SimpleText( "b", "hvh_hudnumbers", 20, scrh - 62, clr )
+	draw.SimpleText( real_health, "hvh_hudnumbers", 128, scrh - 62, clr, TEXT_ALIGN_RIGHT )
 
 end
 
@@ -154,9 +154,9 @@ local function HUD_DrawArmor()
 		armor = 0
 	end
 
-	draw.RoundedBox( 5, 170, scrh - 55, 120, 40, clr_bg )
-	draw.SimpleText( armor, "hvh_hudnumbers", 285, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( ( armor > 0 ) && "E" || "p", "hvh_hudicon", 175, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.RoundedBox( 8, 163, scrh - 55, 129, 45, clr_bg )
+	draw.SimpleText( ( armor > 0 ) && "l" || "a", "hvh_hudnumbers", 173, scrh - 62, clr_numbers )
+	draw.SimpleText( armor, "hvh_hudnumbers", 282, scrh - 62, clr_numbers, TEXT_ALIGN_RIGHT )
 
 end
 
@@ -229,22 +229,24 @@ local function HUD_DrawRoundTimer()
 	local frac = ( CurTime() - timer_toggle_time ) / ( timer_next_toggle - timer_toggle_time )
 	local clr = FlashColor( timer_flash, frac )
 	
-	draw.RoundedBox( 5, ( scrw / 2 ) - 70, scrh - 55, 140, 40, clr_bg )
-	draw.SimpleText( Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_hudnumbers", ( scrw / 2 ) + 65, scrh - 35, clr, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
-	draw.SimpleText( "G", "hvh_hudicon", ( scrw / 2 ) - 65, scrh - 48, clr, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-
+	draw.RoundedBox( 8, ( scrw / 2 ) - 83, scrh - 55, 166, 45, clr_bg )
+	draw.SimpleText( "e", "hvh_hudnumbers", ( scrw / 2 ) - 73, scrh - 62, clr )
+	draw.SimpleText( Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_hudnumbers", ( scrw / 2 ) + 73, scrh - 62, clr, TEXT_ALIGN_RIGHT )
+	
 end
 
 local function HUD_DrawTeamScore()
 
 	local scrw, scrh = ScrW(), ScrH()
 
-	draw.RoundedBoxEx( 5, ( scrw / 2 ) - 72, 15, 70, 40, clr_bg, true, false, true, false )
-	draw.RoundedBoxEx( 5, ( scrw / 2 ) + 2, 15, 70, 40, clr_bg, false, true, false, true )
-	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_hudnumbers", ( scrw / 2 ) - 37, 35, team.GetColor( TEAM_CT ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
-	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_hudnumbers", ( scrw / 2 ) + 37, 35, team.GetColor( TEAM_TERRORIST ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+	draw.RoundedBoxEx( 8, ( scrw / 2 ) - 76, 10, 74, 45, clr_bg, true, false, true, false )
+	draw.RoundedBoxEx( 8, ( scrw / 2 ) + 2, 10, 74, 45, clr_bg, false, true, false, true )
+	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_hudnumbers", ( scrw / 2 ) - 39, 3, team.GetColor( TEAM_CT ), TEXT_ALIGN_CENTER )
+	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_hudnumbers", ( scrw / 2 ) + 39, 3, team.GetColor( TEAM_TERRORIST ), TEXT_ALIGN_CENTER )
 
 end
+
+local txWhiteAdditive = surface.GetTextureID( "vgui/white_additive" )
 
 local function HUD_DrawAmmo()
 
@@ -263,24 +265,24 @@ local function HUD_DrawAmmo()
 		return
 	end
 	
-	draw.RoundedBox( 5, scrw - 200, scrh - 55, 185, 40, clr_bg )
+	draw.RoundedBox( 8, scrw - 246, scrh - 55, 236, 45, clr_bg )
 	
 	if ( wpn:GetMaxClip1() != -1 ) then
 	
-		draw.SimpleText( wpn:Clip1(), "hvh_hudnumbers", scrw - 130, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
+		draw.SimpleText( wpn:Clip1(), "hvh_hudnumbers", scrw - 167, scrh - 62, clr_numbers, TEXT_ALIGN_RIGHT )
 
-		draw.NoTexture()
 		surface.SetDrawColor( clr_numbers )
-		surface.DrawTexturedRect( scrw - 125, scrh - 52, 3, 34 )
+		surface.SetTexture( txWhiteAdditive )
+		surface.DrawTexturedRect( scrw - 157, scrh - 50, 3, 36 )
 		
 	end
-
-	draw.SimpleText( ply:GetAmmoCount( ammoType ), "hvh_hudnumbers", scrw - 55, scrh - 35, clr_numbers, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER )
 	
+	draw.SimpleText( ply:GetAmmoCount( ammoType ), "hvh_hudnumbers", scrw - 75, scrh - 62, clr_numbers, TEXT_ALIGN_RIGHT )
+
 	local ammoLetter = ammo_letters[ game.GetAmmoName( ammoType ) ]
 	
 	if ( ammoLetter ) then
-		draw.SimpleText( ammoLetter, "hvh_hudicon", scrw - 50, scrh - 48, clr_numbers, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		draw.SimpleText( ammoLetter, "hvh_hudammo", scrw - 65, scrh - 52, clr_numbers )
 	end
 
 end
@@ -295,16 +297,16 @@ local function HUD_DrawSpec()
 	surface.DrawRect( 0, 0, scrw, 60 )
 	surface.DrawRect( 0, scrh - 60, scrw, 60 )
 	
-	draw.SimpleText( team.GetName( TEAM_CT ) .. " :", "hvh_menu", scrw - 45, 10, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
-	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_menu", scrw - 40, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetName( TEAM_CT ) .. " :", "hvh_menu", scrw - 45, 10, clr_text, TEXT_ALIGN_RIGHT )
+	draw.SimpleText( team.GetScore( TEAM_CT ), "hvh_menu", scrw - 40, 10, clr_text )
 	
-	draw.SimpleText( team.GetName( TEAM_TERRORIST ) .. " :", "hvh_menu", scrw - 45, 30, clr_text, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
-	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_menu", scrw - 40, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( team.GetName( TEAM_TERRORIST ) .. " :", "hvh_menu", scrw - 45, 30, clr_text, TEXT_ALIGN_RIGHT )
+	draw.SimpleText( team.GetScore( TEAM_TERRORIST ), "hvh_menu", scrw - 40, 30, clr_text )
 	
-	draw.SimpleText( "Map : " .. game.GetMap(), "hvh_menu", 20, 10, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "Map : " .. game.GetMap(), "hvh_menu", 20, 10, clr_text )
 	
-	draw.SimpleText( "G", "hvh_hudiconsmall", 16, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	draw.SimpleText( " : " .. Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_menu", 35, 30, clr_text, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "G", "hvh_hudtimer", 16, 30, clr_text )
+	draw.SimpleText( " : " .. Format( "%i:%.2i", math.floor( timer / 60 ), math.floor( timer % 60 ) ), "hvh_menu", 35, 30, clr_text )
 	
 	local ply 	= LocalPlayer()
 	local mode 	= ply:GetObserverMode()

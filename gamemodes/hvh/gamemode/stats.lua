@@ -1,5 +1,5 @@
 local hvhrank_points_start 		= CreateConVar( "hvhrank_points_start", "1000" )
-local hvhrank_points_negate		= CreateConVar( "hvhrank_points_negate", "0" )
+local hvhrank_points_min		= CreateConVar( "hvhrank_points_min", "0" )
 local hvhrank_points_kill 		= CreateConVar( "hvhrank_points_kill", "2" )
 local hvhrank_points_diff 		= CreateConVar( "hvhrank_points_diff", "100" )
 local hvhrank_points_headshot 	= CreateConVar( "hvhrank_points_headshot", "1" )
@@ -98,10 +98,8 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 		
 	end
 	
-	if ( !hvhrank_points_negate:GetBool() ) then
-		points_kill = math.min( points_kill, math.max( 0, victim.Stats.Score ) )
-	end
-	
+	points_kill = math.min( points_kill, math.max( 0, victim.Stats.Score - hvhrank_points_min:GetInt() ) )
+
 	victim.Stats.Score 		= victim.Stats.Score	- points_kill
 	attacker.Stats.Score 	= attacker.Stats.Score 	+ points_kill
 

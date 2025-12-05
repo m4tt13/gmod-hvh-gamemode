@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "Five Seven"
 SWEP.Alias 					= "fiveseven"
 SWEP.Image        		 	= "vgui/gfx/vgui/fiveseven"
-SWEP.IconLetter				= "u"
+SWEP.IconLetter				= "U"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

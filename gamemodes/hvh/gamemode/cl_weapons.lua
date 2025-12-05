@@ -49,6 +49,8 @@ local allowed_weapons = {
 	
 }
 
+local matCSLogo = Material( "vgui/gfx/vgui/cs_logo" )
+
 function GM:ShowSpare2()
 
 	if ( IsValid( self.WeaponSelectPnl ) ) then return end
@@ -56,6 +58,12 @@ function GM:ShowSpare2()
 	local ply = LocalPlayer()
 
 	if ( !IsValid( ply ) || !ply:Alive() ) then
+		return
+	end
+	
+	local teamid = ply:Team()
+
+	if ( teamid != TEAM_TERRORIST && teamid != TEAM_CT ) then
 		return
 	end
 	
@@ -71,7 +79,7 @@ function GM:ShowSpare2()
 	local header = self.WeaponSelectPnl:Add( "DLabel" )
 	header:SetHeight( 50 )
 	header:SetFont( "hvh_menutitle" )
-	header:SetTextInset( 15, 0 )
+	header:SetTextInset( 60, 0 )
 	header:SetTextColor( clr_text )
 	header:SetText( "Weapon Menu" )
 	header:SetContentAlignment( 4 )
@@ -80,6 +88,10 @@ function GM:ShowSpare2()
 	header.Paint = function( self, w, h )
 
 		draw.RoundedBoxEx( 16, 0, 0, w, h, clr_bg, true, true, false, false )
+		
+		surface.SetDrawColor( clr_text )
+		surface.SetMaterial( matCSLogo )
+		surface.DrawTexturedRect( 10, 5, 40, 40 ) 
 		
 	end
 		

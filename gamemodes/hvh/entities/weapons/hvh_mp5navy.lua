@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "MP5 Navy"
 SWEP.Alias 					= "mp5"
 SWEP.Image        		 	= "vgui/gfx/vgui/mp5"
-SWEP.IconLetter				= "x"
+SWEP.IconLetter				= "X"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

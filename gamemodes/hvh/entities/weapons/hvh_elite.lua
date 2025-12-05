@@ -5,7 +5,7 @@ SWEP.Base 					= "hvh_base"
 SWEP.PrintName 				= "Dual Elites"
 SWEP.Alias 					= "elite"
 SWEP.Image        		 	= "vgui/gfx/vgui/elites"
-SWEP.IconLetter				= "s"
+SWEP.IconLetter				= "S"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then

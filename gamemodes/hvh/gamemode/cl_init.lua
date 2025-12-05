@@ -20,6 +20,7 @@ surface.CreateFont( "hvh_menutitle", {
 
 include( "cl_deathnotice.lua" )
 include( "cl_hud.lua" )
+include( "cl_hudpickup.lua" )
 include( "cl_menu.lua" )
 include( "cl_motd.lua" )
 include( "cl_pickteam.lua" )
