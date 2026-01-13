@@ -27,6 +27,6 @@ Counter-Strike: Source style with a round-based gamemode for Garry's Mod which f
 * Statistics (!rank, !top, !top10)
 * Voting for map (!votemap)
 * Fall damage scalling (sv_falldamage_scale)
-* Jump boost (sv_jump_boost)
+* Jump boost system
 * Head unhide system
 * Colored chat

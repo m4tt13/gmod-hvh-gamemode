@@ -714,6 +714,7 @@ local function SetUpPlayerVars( ply )
 	ply:SetNW2Int( "NextJumpTick", 0 )
 	ply:SetNW2Int( "NextJumpTickAcc", 0 )
 	ply:SetNW2Int( "NextJumpTickRem", 0 )
+	ply:SetNW2Int( "JumpBoostCooldown", 0 )
 
 end
 

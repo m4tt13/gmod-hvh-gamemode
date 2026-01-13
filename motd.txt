@@ -22,7 +22,7 @@ Welcome to the Hacker vs Hacker server!
 This gamemode is a round-based teamplay in the style of 
 Counter-Strike: Source where cheaters play against each other.
 
-Press F1 to open the MOTD menu.
+Press F1 to open the MOTD panel.
 Press F2 to open the team selection menu.
 Press F4 to open the weapon selection menu.
 </pre>
@@ -50,7 +50,7 @@ Press F4 to open the weapon selection menu.
  - Vote for a map change.
 
 !motd, !help
- - Open the MOTD menu.
+ - Open the MOTD panel.
 
 !guns
  - Open the weapon selection menu.

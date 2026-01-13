@@ -1,7 +1,11 @@
 local sv_unhide_head_detect = CreateConVar( "sv_unhide_head_detect", "2.5", FCVAR_REPLICATED )
 local sv_unhide_head_reset = CreateConVar( "sv_unhide_head_reset", "0.5", FCVAR_REPLICATED )
 local sv_unhide_head_punish = CreateConVar( "sv_unhide_head_punish", "5", FCVAR_REPLICATED )
-local sv_jump_boost = CreateConVar( "sv_jump_boost", "0", FCVAR_REPLICATED )
+local sv_jump_boost_gain = CreateConVar( "sv_jump_boost_gain", "0", FCVAR_REPLICATED )
+local sv_jump_boost_dynamic = CreateConVar( "sv_jump_boost_dynamic", "0", FCVAR_REPLICATED )
+local sv_jump_boost_min_speed = CreateConVar( "sv_jump_boost_min_speed", "0", FCVAR_REPLICATED )
+local sv_jump_boost_max_speed = CreateConVar( "sv_jump_boost_max_speed", "5000", FCVAR_REPLICATED )
+local sv_jump_boost_cooldown = CreateConVar( "sv_jump_boost_cooldown", "0.5", FCVAR_REPLICATED )
 
 function GM:StartCommand( ply, ucmd )
 
@@ -110,15 +114,42 @@ end
 
 function GM:FinishMove( ply, mv )
 
-	local jump_boost = sv_jump_boost:GetFloat()
+	if ( sv_jump_boost_gain:GetFloat() > 0 ) then
+		
+		ply.JumpBoostCooldown = ply:GetNW2Int( "JumpBoostCooldown" )
+		
+		if ( ply.JumpBoostCooldown < 0 ) then
+		
+			ply.JumpBoostCooldown = ply.JumpBoostCooldown + 1
+			
+		else
 
-	if ( JUMPING && jump_boost > 0 ) then
+			if ( JUMPING ) then
 
-		local addVel = mv:GetVelocity() 
-		addVel.z = 0
-		addVel:Normalize()
-		addVel = addVel * jump_boost
-		mv:SetVelocity( mv:GetVelocity() + addVel )
+				local vel = mv:GetVelocity()
+				local spd = vel:Length2D()
+
+				if ( spd >= sv_jump_boost_min_speed:GetFloat() && spd < sv_jump_boost_max_speed:GetFloat() ) then
+				
+					local gain = sv_jump_boost_gain:GetFloat()
+					
+					if ( sv_jump_boost_dynamic:GetBool() ) then
+						gain = gain * ( sv_jump_boost_max_speed:GetFloat() - spd ) / ( sv_jump_boost_max_speed:GetFloat() - sv_jump_boost_min_speed:GetFloat() )
+					end
+					
+					vel.z = 0
+					vel:Normalize()
+					vel = vel * math.min( gain, sv_jump_boost_max_speed:GetFloat() - spd )
+					mv:SetVelocity( mv:GetVelocity() + vel )
+					ply.JumpBoostCooldown = -math.floor( 0.5 + sv_jump_boost_cooldown:GetFloat() / engine.TickInterval() )
+					
+				end
+				
+			end
+			
+		end
+		
+		ply:SetNW2Int( "JumpBoostCooldown", ply.JumpBoostCooldown )
 		
 	end
 
