@@ -9,7 +9,7 @@ SWEP.IconLetter				= "D"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_tmp", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_tmp", "hvh_killicon", "d", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "smg"
 SWEP.ViewModel				= "models/weapons/v_smg_tmp.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_tmp.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.84
 SWEP.ArmorRatio				= 1

@@ -9,7 +9,7 @@ SWEP.IconLetter				= "Z"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_m249", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_m249", "hvh_killicon", "z", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_mach_m249para.mdl"	
 SWEP.WorldModel				= "models/weapons/w_mach_m249para.mdl"	
 
+SWEP.Penetration			= 2
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.97
 SWEP.ArmorRatio				= 1.5

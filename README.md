@@ -2,7 +2,7 @@
 ![img](https://github.com/user-attachments/assets/fbeeb988-1228-4659-867b-903a8cf6b7de)
 Counter-Strike: Source style with a round-based gamemode for Garry's Mod which focuses on the HvH gameplay.
 ## Features
-* CS:S weapons (without penetration system)
+* CS:S weapons
 * CS:S player models
 * HUD style like in CS:S
 * Scoreboard style like in CS:S

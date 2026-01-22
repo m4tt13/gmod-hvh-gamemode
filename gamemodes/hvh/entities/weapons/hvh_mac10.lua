@@ -9,7 +9,7 @@ SWEP.IconLetter				= "L"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_mac10", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_mac10", "hvh_killicon", "l", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_smg_mac10.mdl"	
 SWEP.WorldModel				= "models/weapons/w_smg_mac10.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.82
 SWEP.ArmorRatio				= 0.95

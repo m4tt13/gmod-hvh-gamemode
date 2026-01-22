@@ -9,7 +9,7 @@ SWEP.IconLetter				= "O"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_sg550", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_sg550", "hvh_killicon", "o", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -24,6 +24,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_snip_sg550.mdl"	
 SWEP.WorldModel				= "models/weapons/w_snip_sg550.mdl"	
 
+SWEP.Penetration			= 2
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.98
 SWEP.ArmorRatio				= 1.45

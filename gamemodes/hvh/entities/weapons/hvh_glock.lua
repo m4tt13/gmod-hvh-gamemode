@@ -9,7 +9,7 @@ SWEP.IconLetter				= "C"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_glock", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_glock", "hvh_killicon", "c", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_glock18.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_glock18.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05

@@ -919,29 +919,6 @@ function GM:PlayerShouldTaunt( ply, actid )
 
 end
 
-function GM:PlayerTraceAttack( ply, dmginfo, dir, trace )
-
-	local attacker = dmginfo:GetAttacker()
-	
-	if ( IsValid( attacker ) && attacker:IsPlayer() ) then
-	
-		local weapon = attacker:GetActiveWeapon()
-		
-		if ( IsValid( weapon ) && weapon.ScaleDamageByDistance ) then
-		
-			local travelledDistance = trace.Fraction * weapon.Range
-			local damageScale = math.pow( weapon:GetRangeModifier(), ( travelledDistance / 500 ) )
-
-			dmginfo:ScaleDamage( damageScale )
-			
-		end
-	
-	end
-	
-	return false
-
-end
-
 local hitgroup_dmgscale = {
 
 	[HITGROUP_HEAD]		= mp_damage_scale_head,

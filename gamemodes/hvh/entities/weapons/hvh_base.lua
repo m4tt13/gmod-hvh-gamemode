@@ -33,8 +33,8 @@ SWEP.HoldType				= "pistol"
 SWEP.IconLetter        	 	= "C"
 SWEP.CanBuy        		 	= false
 SWEP.HideViewModelWhenZoomed = true
-SWEP.ScaleDamageByDistance	= true
 
+SWEP.Penetration			= 2
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05
@@ -52,6 +52,7 @@ SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= true
 SWEP.Secondary.Ammo			= "none"
 
+local sv_penetration = CreateConVar( "sv_penetration", "1", FCVAR_REPLICATED )
 local sv_infinite_ammo = CreateConVar( "sv_infinite_ammo", "0", FCVAR_REPLICATED, "Player's active weapon will never run out of ammo." )
 
 function SWEP:Initialize()
@@ -85,9 +86,70 @@ function SWEP:Deploy()
 	
 end
 
+local bullet_type_parameters = {
+
+	["BULLET_PLAYER_50AE"] 		= { PenetrationPower = 30, PenetrationDistance = 1000 },
+	["BULLET_PLAYER_762MM"]		= { PenetrationPower = 39, PenetrationDistance = 5000 },
+	["BULLET_PLAYER_556MM"]		= { PenetrationPower = 35, PenetrationDistance = 4000 },
+	["BULLET_PLAYER_556MM_BOX"]	= { PenetrationPower = 35, PenetrationDistance = 4000 },
+	["BULLET_PLAYER_338MAG"]	= { PenetrationPower = 45, PenetrationDistance = 8000 },
+	["BULLET_PLAYER_9MM"]		= { PenetrationPower = 21, PenetrationDistance = 800 },
+	["BULLET_PLAYER_BUCKSHOT"]	= { PenetrationPower = 0, PenetrationDistance = 0 },
+	["BULLET_PLAYER_45ACP"]		= { PenetrationPower = 15, PenetrationDistance = 500 },
+	["BULLET_PLAYER_357SIG"]	= { PenetrationPower = 25, PenetrationDistance = 800 },
+	["BULLET_PLAYER_57MM"]		= { PenetrationPower = 30, PenetrationDistance = 2000 }
+
+}
+
+local material_parameters = {
+
+	[MAT_METAL]		= { PenetrationModifier = 0.5, DamageModifier = 0.3 },
+	[MAT_DIRT]		= { PenetrationModifier = 0.5, DamageModifier = 0.3 },
+	[MAT_CONCRETE]	= { PenetrationModifier = 0.4, DamageModifier = 0.25 },
+	[MAT_GRATE]		= { PenetrationModifier = 1, DamageModifier = 0.99 },
+	[MAT_VENT]		= { PenetrationModifier = 0.5, DamageModifier = 0.45 },
+	[MAT_TILE]		= { PenetrationModifier = 0.65, DamageModifier = 0.3 },
+	[MAT_COMPUTER]	= { PenetrationModifier = 0.4, DamageModifier = 0.45 },
+	[MAT_WOOD]		= { PenetrationModifier = 1, DamageModifier = 0.6 }
+
+}
+
+local function TraceToExit( start, dir, step_size, max_distance )
+
+	local distance = 0
+
+	while ( distance <= max_distance ) do
+	
+		distance = distance + step_size
+
+		local pos = start + ( distance * dir )
+
+		if ( bit.band( util.PointContents( pos ), MASK_SOLID ) == 0 ) then
+			return pos
+		end
+		
+	end
+
+	return nil
+
+end
+
 function SWEP:ShootBullet( damage, recoil, num_bullets, aimcone )
 
 	local owner = self:GetOwner()
+
+	local penetration_power = 0
+	local penetration_distance = 0
+
+	local bullet_params = bullet_type_parameters[self.Primary.Ammo]
+	if ( bullet_params ) then
+	
+		penetration_power = bullet_params.PenetrationPower
+		penetration_distance = bullet_params.PenetrationDistance
+
+	end
+	
+	local bullet_ctxs = {}
 
 	local bullet = {}
 	bullet.Num			= num_bullets
@@ -102,8 +164,154 @@ function SWEP:ShootBullet( damage, recoil, num_bullets, aimcone )
 	bullet.AmmoType 	= self.Primary.Ammo
 	bullet.Attacker 	= owner
 	bullet.Inflictor 	= self
+	bullet.Callback 	= function( attacker, tr, dmgInfo )
+	
+		local ctx = {}
+		
+		ctx.Trace = tr
+		ctx.Penetration = self.Penetration
+		ctx.Distance = self.Range
+		ctx.TravelledDistance = tr.Fraction * ctx.Distance
+		ctx.PenetrationPower = penetration_power
+		
+		dmgInfo:ScaleDamage( math.pow( self:GetRangeModifier(), ctx.TravelledDistance / 500 ) )
+		ctx.Damage = dmgInfo:GetDamage()
+		
+		table.insert( bullet_ctxs, ctx )
+
+	end
 
 	owner:FireBullets( bullet )
+	
+	if ( sv_penetration:GetBool() ) then
+	
+		bullet.Num = 1
+		bullet.Spread = Vector( 0, 0, 0 )
+		
+		for _, ctx in ipairs( bullet_ctxs ) do
+		
+			if ( ctx.Trace.Fraction == 0 ) then
+				continue
+			end
+		
+			local dir = ctx.Trace.Normal
+			bullet.Dir = dir
+		
+			while ( true ) do
+			
+				if ( ctx.Trace.Fraction == 1 ) then
+					break
+				end
+				
+				if ( ctx.TravelledDistance > penetration_distance ) then
+					break
+				end
+		
+				if ( ctx.Penetration == 0 ) then
+					break
+				end
+				
+				local penetration_end = TraceToExit( ctx.Trace.HitPos, dir, 24, 128 )
+				if ( !penetration_end ) then
+					break
+				end
+				
+				local exitTr = util.TraceLine( {
+					start = penetration_end,
+					endpos = ctx.Trace.HitPos,
+					mask = MASK_SHOT
+				} )
+				
+				if ( exitTr.Entity != ctx.Trace.Entity && exitTr.Entity != NULL ) then
+				
+					exitTr = util.TraceLine( {
+						start = penetration_end,
+						endpos = ctx.Trace.HitPos,
+						mask = MASK_SHOT,
+						filter = exitTr.Entity
+					} )
+				
+				end
+				
+				local penetration_modifier = 1
+				local damage_modifier = 0.5
+				
+				local mat_params = material_parameters[ctx.Trace.MatType]
+				if ( mat_params ) then
+				
+					penetration_modifier = mat_params.PenetrationModifier
+					damage_modifier = mat_params.DamageModifier
+
+				end
+				
+				if ( ctx.Trace.MatType == exitTr.MatType ) then
+				
+					if ( exitTr.MatType == MAT_WOOD || exitTr.MatType == MAT_METAL ) then
+						penetration_modifier = penetration_modifier * 2
+					end
+					
+				end
+				
+				local trace_distance = ( exitTr.HitPos - ctx.Trace.HitPos ):Length()
+				if ( trace_distance > ( ctx.PenetrationPower * penetration_modifier ) ) then
+					break
+				end
+				
+				if ( exitTr.Fraction != 1 && exitTr.Entity != NULL && !exitTr.HitSky ) then
+				
+					if ( !( CLIENT && !IsFirstTimePredicted() ) ) then
+				
+						local edata = EffectData()
+						edata:SetOrigin( exitTr.HitPos )
+						edata:SetStart( exitTr.StartPos )
+						edata:SetSurfaceProp( exitTr.SurfaceProps )
+						edata:SetDamageType( DMG_BULLET )
+						edata:SetHitBox( exitTr.HitBox )
+						
+						if ( CLIENT ) then
+							edata:SetEntity( exitTr.Entity )
+						else
+							edata:SetEntIndex( exitTr.Entity:EntIndex() )
+						end
+						
+						util.Effect( "Impact", edata )
+						
+					end
+					
+				end
+				
+				ctx.PenetrationPower = ctx.PenetrationPower - ( trace_distance / penetration_modifier )
+				ctx.TravelledDistance = ctx.TravelledDistance + trace_distance
+				ctx.Distance = ( ctx.Distance - ctx.TravelledDistance ) * 0.5
+				ctx.Damage = ctx.Damage * damage_modifier
+
+				if ( ctx.Damage == 0 ) then
+					break
+				end
+
+				ctx.Penetration = ctx.Penetration - 1
+		
+				bullet.Src			= exitTr.HitPos
+				bullet.Damage		= ctx.Damage
+				bullet.Distance		= ctx.Distance
+				bullet.IgnoreEntity	= ( IsValid( ctx.Trace.Entity ) && ctx.Trace.Entity:IsPlayer() ) && ctx.Trace.Entity || NULL
+				bullet.Callback 	= function( attacker, tr, dmgInfo )
+
+					ctx.Trace = tr
+					ctx.TravelledDistance = ctx.TravelledDistance + ( tr.Fraction * ctx.Distance )
+					
+					dmgInfo:ScaleDamage( math.pow( self:GetRangeModifier(), ctx.TravelledDistance / 500 ) )
+					ctx.Damage = dmgInfo:GetDamage()
+				
+				end
+
+				owner:FireBullets( bullet )
+			
+			end
+		
+		end
+		
+	end
 
 	self:ShootEffects()
 	

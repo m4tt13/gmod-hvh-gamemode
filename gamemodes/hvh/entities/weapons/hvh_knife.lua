@@ -6,10 +6,9 @@ SWEP.PrintName 				= "Knife"
 SWEP.Alias 					= "knife"
 SWEP.IconLetter				= "J"
 SWEP.CanBuy        		 	= true
-SWEP.ScaleDamageByDistance	= false
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_knife", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_knife", "hvh_killicon", "j", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_MELEE
@@ -43,39 +42,99 @@ local head_hull_maxs = Vector( 16, 16, 18 )
 
 local phys_pushscale = GetConVar( "phys_pushscale" )
 
+local function IsBSPModel( ent )
+
+	if ( ent:GetSolid() == SOLID_BSP ) then
+		return true
+	end
+
+	if ( ent:GetSolid() == SOLID_VPHYSICS && ent:GetBrushSurfaces() ) then
+		return true
+	end
+
+	return false
+
+end
+
+local function FindHullIntersection( vecSrc, tr, mins, maxs, entity )
+
+	local vecHullEnd = vecSrc + ( ( tr.HitPos - vecSrc ) * 2 )
+	local tmpTrace = util.TraceLine( { start = vecSrc, endpos = vecHullEnd, filter = entity, mask = MASK_SOLID } )
+	
+	if ( tmpTrace.Fraction < 1.0 ) then
+		return tmpTrace
+	end
+	
+	local vecEnd = Vector()
+	local minmaxs = { mins, maxs }
+	local distance = 1e6
+
+	for i = 1, 2 do
+	
+		for j = 1, 2 do
+		
+			for k = 1, 2 do
+			
+				vecEnd.x = vecHullEnd.x + minmaxs[i].x
+				vecEnd.y = vecHullEnd.y + minmaxs[j].y
+				vecEnd.z = vecHullEnd.z + minmaxs[k].z
+				
+				tmpTrace = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = entity, mask = MASK_SOLID } )
+
+				if ( tmpTrace.Fraction < 1.0 ) then
+				
+					local thisDistance = ( tmpTrace.HitPos - vecSrc ):Length()
+					
+					if ( thisDistance < distance ) then
+					
+						tr = tmpTrace
+						distance = thisDistance
+					
+					end
+				
+				end
+				
+			end
+			
+		end
+		
+	end
+	
+	return tr
+	
+end
+
 function SWEP:SwingOrStab( bStab )
 
-	local ply = self:GetOwner()
+	local owner = self:GetOwner()
 
-	if ( !IsValid( ply ) ) then return end
+	owner:LagCompensation( true )
 
-	ply:LagCompensation( true )
-
-	local vecSrc = ply:GetShootPos()
-	local vecDir = ply:GetAimVector()
+	local vecSrc = owner:GetShootPos()
+	local vecDir = owner:GetAimVector()
 	local vecEnd = vecSrc + ( vecDir * ( bStab && 32 || 48 ) )
 
-	local tr = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = ply, mask = MASK_SOLID } )
+	local tr = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = owner, mask = MASK_SOLID } )
 
-	if ( tr.Fraction == 1.0 ) then
+	if ( tr.Fraction >= 1.0 ) then
 	
-		tr = util.TraceHull( { start = vecSrc, endpos = vecEnd, filter = ply, mask = MASK_SOLID, mins = head_hull_mins, maxs = head_hull_maxs } )
+		tr = util.TraceHull( { start = vecSrc, endpos = vecEnd, filter = owner, mask = MASK_SOLID, mins = head_hull_mins, maxs = head_hull_maxs } )
 		
 		if ( tr.Fraction < 1.0 ) then
 		
-			vecEnd = vecSrc + ( ( tr.HitPos - vecSrc ) * 2 )
-		
-			local tmpTrace = util.TraceLine( { start = vecSrc, endpos = vecEnd, filter = ply, mask = MASK_SOLID } )
+			if ( tr.Entity == NULL || IsBSPModel( tr.Entity ) ) then
 			
-			if ( tmpTrace.Fraction < 1.0 ) then
-				tr = tmpTrace	
+				local mins, maxs = owner:GetHullDuck()
+				
+				tr = FindHullIntersection( vecSrc, tr, mins, maxs, owner )
+				
 			end
 		
 		end
 		
 	end
 	
-	ply:SetAnimation( PLAYER_ATTACK1 )
+	owner:SetAnimation( PLAYER_ATTACK1 )
 	
 	if ( tr.Fraction < 1.0 ) then
 	
@@ -98,15 +157,15 @@ function SWEP:SwingOrStab( bStab )
 				
 					if ( hitEnt:IsPlayer() ) then
 					
-						local vecTragetForward = hitEnt:GetAngles():Forward()
-						local vecLOS = hitEnt:GetPos() - ply:GetPos()
+						local vecTargetForward = hitEnt:GetAngles():Forward()
+						local vecLOS = hitEnt:GetPos() - owner:GetPos()
 						
-						vecTragetForward.z = 0
+						vecTargetForward.z = 0
 						vecLOS.z = 0
 						
 						vecLOS:Normalize()
 
-						local dot = vecLOS:Dot( vecTragetForward )
+						local dot = vecLOS:Dot( vecTargetForward )
 
 						if ( dot > 0.8 ) then
 							damage = damage * 3
@@ -124,8 +183,8 @@ function SWEP:SwingOrStab( bStab )
 
 				local dmgInfo = DamageInfo()
 				dmgInfo:SetDamage( damage )
-				dmgInfo:SetAttacker( ply )
-				dmgInfo:SetInflictor( ply )
+				dmgInfo:SetAttacker( owner )
+				dmgInfo:SetInflictor( owner )
 				dmgInfo:SetDamageForce( vecDir * 300 * phys_pushscale:GetFloat() )
 				dmgInfo:SetDamagePosition( tr.HitPos )
 				dmgInfo:SetDamageType( DMG_SLASH )
@@ -151,7 +210,7 @@ function SWEP:SwingOrStab( bStab )
 					edata:SetEntIndex( hitEnt:EntIndex() )
 				end
 				
-				edata:SetAngles( ply:GetAngles() )
+				edata:SetAngles( owner:GetAngles() )
 				edata:SetFlags( 1 )
 
 				util.Effect( "Impact", edata )
@@ -174,7 +233,7 @@ function SWEP:SwingOrStab( bStab )
 	
 	end
 	
-	ply:LagCompensation( false )
+	owner:LagCompensation( false )
 	
 end
 

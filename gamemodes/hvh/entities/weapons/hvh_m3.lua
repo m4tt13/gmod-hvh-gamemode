@@ -9,7 +9,7 @@ SWEP.IconLetter				= "K"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_m3", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_m3", "hvh_killicon", "k", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "shotgun"
 SWEP.ViewModel				= "models/weapons/v_shot_m3super90.mdl"	
 SWEP.WorldModel				= "models/weapons/w_shot_m3super90.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 3000
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1

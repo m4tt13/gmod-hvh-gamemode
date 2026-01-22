@@ -9,7 +9,7 @@ SWEP.IconLetter				= "S"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_elite", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_elite", "hvh_killicon", "s", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "duel"
 SWEP.ViewModel				= "models/weapons/v_pist_elite.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_elite.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.75
 SWEP.ArmorRatio				= 1.05

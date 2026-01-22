@@ -9,7 +9,7 @@ SWEP.IconLetter				= "U"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_fiveseven", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_fiveseven", "hvh_killicon", "u", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "pistol"
 SWEP.ViewModel				= "models/weapons/v_pist_fiveseven.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_fiveseven.mdl"	
 
+SWEP.Penetration			= 1
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.885
 SWEP.ArmorRatio				= 1.5

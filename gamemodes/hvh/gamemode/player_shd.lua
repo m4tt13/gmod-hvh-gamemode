@@ -118,35 +118,31 @@ function GM:FinishMove( ply, mv )
 		
 		ply.JumpBoostCooldown = ply:GetNW2Int( "JumpBoostCooldown" )
 		
-		if ( ply.JumpBoostCooldown < 0 ) then
-		
-			ply.JumpBoostCooldown = ply.JumpBoostCooldown + 1
+		if ( ply.JumpBoostCooldown >= 0 && JUMPING ) then
+
+			local vel = mv:GetVelocity()
+			local spd = vel:Length2D()
+
+			if ( spd >= sv_jump_boost_min_speed:GetFloat() && spd < sv_jump_boost_max_speed:GetFloat() ) then
 			
-		else
-
-			if ( JUMPING ) then
-
-				local vel = mv:GetVelocity()
-				local spd = vel:Length2D()
-
-				if ( spd >= sv_jump_boost_min_speed:GetFloat() && spd < sv_jump_boost_max_speed:GetFloat() ) then
+				local gain = sv_jump_boost_gain:GetFloat()
 				
-					local gain = sv_jump_boost_gain:GetFloat()
-					
-					if ( sv_jump_boost_dynamic:GetBool() ) then
-						gain = gain * ( sv_jump_boost_max_speed:GetFloat() - spd ) / ( sv_jump_boost_max_speed:GetFloat() - sv_jump_boost_min_speed:GetFloat() )
-					end
-					
-					vel.z = 0
-					vel:Normalize()
-					vel = vel * math.min( gain, sv_jump_boost_max_speed:GetFloat() - spd )
-					mv:SetVelocity( mv:GetVelocity() + vel )
-					ply.JumpBoostCooldown = -math.floor( 0.5 + sv_jump_boost_cooldown:GetFloat() / engine.TickInterval() )
-					
+				if ( sv_jump_boost_dynamic:GetBool() ) then
+					gain = gain * ( sv_jump_boost_max_speed:GetFloat() - spd ) / ( sv_jump_boost_max_speed:GetFloat() - sv_jump_boost_min_speed:GetFloat() )
 				end
+				
+				vel.z = 0
+				vel:Normalize()
+				vel = vel * math.min( gain, sv_jump_boost_max_speed:GetFloat() - spd )
+				mv:SetVelocity( mv:GetVelocity() + vel )
+				ply.JumpBoostCooldown = -math.floor( 0.5 + sv_jump_boost_cooldown:GetFloat() / engine.TickInterval() )
 				
 			end
 			
+		end
+
+		if ( ply.JumpBoostCooldown < 0 ) then
+			ply.JumpBoostCooldown = ply.JumpBoostCooldown + 1
 		end
 		
 		ply:SetNW2Int( "JumpBoostCooldown", ply.JumpBoostCooldown )

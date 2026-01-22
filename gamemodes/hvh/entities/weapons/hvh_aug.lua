@@ -10,7 +10,7 @@ SWEP.CanBuy        		 	= true
 SWEP.HideViewModelWhenZoomed = false
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_aug", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_aug", "hvh_killicon", "e", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_PRIMARY
@@ -24,6 +24,7 @@ SWEP.HoldType				= "ar2"
 SWEP.ViewModel				= "models/weapons/v_rif_aug.mdl"	
 SWEP.WorldModel				= "models/weapons/w_rif_aug.mdl"	
 
+SWEP.Penetration			= 2
 SWEP.Range					= 8192
 SWEP.RangeModifier			= 0.96
 SWEP.ArmorRatio				= 1.4

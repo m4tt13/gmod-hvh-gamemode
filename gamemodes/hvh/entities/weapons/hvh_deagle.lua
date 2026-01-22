@@ -9,7 +9,7 @@ SWEP.IconLetter				= "F"
 SWEP.CanBuy        		 	= true
 
 if ( CLIENT ) then
-	killicon.AddFont( "hvh_deagle", "hvh_killicon", SWEP.IconLetter, Color( 255, 80, 0, 255 ) )
+	killicon.AddFont( "hvh_deagle", "hvh_killicon", "f", Color( 255, 80, 0, 255 ) )
 end
 
 SWEP.Slot					= WPNSLOT_SECONDARY
@@ -23,6 +23,7 @@ SWEP.HoldType				= "revolver"
 SWEP.ViewModel				= "models/weapons/v_pist_deagle.mdl"	
 SWEP.WorldModel				= "models/weapons/w_pist_deagle.mdl"	
 
+SWEP.Penetration			= 2
 SWEP.Range					= 4096
 SWEP.RangeModifier			= 0.81
 SWEP.ArmorRatio				= 1.5
