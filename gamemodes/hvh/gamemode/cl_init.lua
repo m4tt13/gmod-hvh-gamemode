@@ -110,11 +110,11 @@ function GM:ChatText( playerindex, playername, text, filter )
 	
 		local args = {}
 		local cur_pos = 1
-		local total_len = string.len( text )
+		local total_len = text:len()
 
 		while ( cur_pos <= total_len ) do
 
-			local code_start = string.find( text, "\x01", cur_pos, true )
+			local code_start = text:find( "\x01", cur_pos, true )
 
 			if ( code_start ) then
 
@@ -122,7 +122,7 @@ function GM:ChatText( playerindex, playername, text, filter )
 				local range_len = code_start - cur_pos
 				
 				if ( range_len > 0 ) then
-					table.insert( args, string.sub( text, cur_pos, code_start - 1 ) )
+					table.insert( args, text:sub( cur_pos, code_start - 1 ) )
 				end
 				
 				if ( code_end <= total_len ) then
@@ -139,7 +139,7 @@ function GM:ChatText( playerindex, playername, text, filter )
 
 			else
 
-				table.insert( args, string.sub( text, cur_pos ) )
+				table.insert( args, text:sub( cur_pos ) )
 				break
 
 			end

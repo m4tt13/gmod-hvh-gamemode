@@ -40,8 +40,8 @@ Press F4 to open the weapon selection menu.
 !timeleft
  - Show remaining time on map.
 
-!rank
- - Show your current statistics.
+!rank [name | steamid], !stats [name | steamid]
+ - Show player statistics.
 
 !top, !top10
  - Open the menu with top players.
@@ -68,7 +68,7 @@ Press F4 to open the weapon selection menu.
  - Join the spectators.
 
 !rs, !resetscore
- - Reset your current frags and deaths.
+ - Reset your frags and deaths.
 
 !ak47, !deagle, etc.
  - Get a weapon by its name.

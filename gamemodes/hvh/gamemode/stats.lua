@@ -4,7 +4,7 @@ local hvhrank_points_kill 		= CreateConVar( "hvhrank_points_kill", "2" )
 local hvhrank_points_diff 		= CreateConVar( "hvhrank_points_diff", "100" )
 local hvhrank_points_headshot 	= CreateConVar( "hvhrank_points_headshot", "1" )
 local hvhrank_points_knife_mult	= CreateConVar( "hvhrank_points_knife_mult", "2" )
-local hvhrank_show_rank_all		= CreateConVar( "hvhrank_show_rank_all", "1" )
+local hvhrank_changes_chat		= CreateConVar( "hvhrank_changes_chat", "1" )
 
 local clr_prefix = Color( 127, 127, 255 )
 
@@ -103,8 +103,12 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 	victim.Stats.Score 		= victim.Stats.Score	- points_kill
 	attacker.Stats.Score 	= attacker.Stats.Score 	+ points_kill
 
-	victim:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] -", tostring( points_kill ), " points (", tostring( victim.Stats.Score ), ") for being killed by ", COLOR_NICKNAME, attacker:Name(), color_white, " (", tostring( attacker.Stats.Score ), ")" ) )
-	attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_kill ), " points (", tostring( attacker.Stats.Score ), ") for killing ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
+	if ( hvhrank_changes_chat:GetBool() ) then
+	
+		victim:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] -", tostring( points_kill ), " points (", tostring( victim.Stats.Score ), ") for being killed by ", COLOR_NICKNAME, attacker:Name(), color_white, " (", tostring( attacker.Stats.Score ), ")" ) )
+		attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_kill ), " points (", tostring( attacker.Stats.Score ), ") for killing ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
+		
+	end
 	
 	if ( headshot ) then
 
@@ -116,7 +120,9 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 		
 			attacker.Stats.Score = attacker.Stats.Score + points_headshot
 
-			attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_headshot ), " points (", tostring( attacker.Stats.Score ), ") for headshotting ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
+			if ( hvhrank_changes_chat:GetBool() ) then
+				attacker:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] +", tostring( points_headshot ), " points (", tostring( attacker.Stats.Score ), ") for headshotting ", COLOR_NICKNAME, victim:Name(), color_white, " (", tostring( victim.Stats.Score ), ")" ) )
+			end
 		
 		end
 		
@@ -127,55 +133,64 @@ function Stats_OnPlayerDeath( victim, attacker, headshot, knifekill )
 
 end
 
-function Stats_ShowRank( ply )
-
-	if ( !ply.Stats ) then
-		return
-	end
-
-	local result = sql.Query( "SELECT * FROM hvhrank ORDER BY score DESC" )
-	
-	if ( result ) then
-	
-		for rank, row in ipairs( result ) do
-		
-			if ( row.steamid == ply:SteamID() ) then
-			
-				local text = util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] ", COLOR_NICKNAME, ply:Name(), color_white, " is ranked at ", tostring( rank ), "/", tostring( #result ), " with ", tostring( ply.Stats.Score ), " points, ", tostring( ply.Stats.Kills ), " kills, ", tostring( ply.Stats.Deaths ), " deaths, ", tostring( ply.Stats.Headshots ), " headshots and ", tostring( ply.Stats.KnifeKills ), " knife kills" )
-				
-				if ( hvhrank_show_rank_all:GetBool() ) then
-					PrintMessage( HUD_PRINTTALK, text )
-				else
-					ply:ChatPrint( text )
-				end
-				
-				break
-			
-			end
-		
-		end
-
-	end
-
-end
-
 local ShowMenu = nil
 
-local function HandlePlayerInfoItem( ply, item )
+local function ShowPlayerInfo( ply, info, back )
 
-	if ( item == 1 ) then
+	local last_played = os.date( "%H:%M:%S - %d/%m/%Y", tonumber( info.lastplayed ) )
+	
+	ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "[HvH Rank] Player Info:" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Name: " .. info.name .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "SteamID: " .. info.steamid .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Rank: " .. info.rank .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Points: " .. info.score .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, Format( "KDR: %.2f\n", info.kdr ) )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Kills: " .. info.kills .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Deaths: " .. info.deaths .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Headshots: " .. info.headshots .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Knife Kills: " .. info.knifekills .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "Last Played: " .. last_played .. "\n" )
+	ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
 
-		ply:PlaySound( "buttons/button14.wav" )
+	Menu_Start()
+	
+		Menu_AddLine( "[HvH Rank] Player Info:" )
+		Menu_AddLine( "------------------------------" )
+		Menu_AddLine( "Name: " .. info.name )
+		Menu_AddLine( "SteamID: " .. info.steamid )
+		Menu_AddLine( "Rank: " .. info.rank )
+		Menu_AddLine( "Points: " .. info.score )
+		Menu_AddLine( Format( "KDR: %.2f", info.kdr ) )
+		Menu_AddLine( "Kills: " .. info.kills )
+		Menu_AddLine( "Deaths: " .. info.deaths )
+		Menu_AddLine( "Headshots: " .. info.headshots )
+		Menu_AddLine( "Knife Kills: " .. info.knifekills )
+		Menu_AddLine( "Last Played: " .. last_played )
 
-		ShowMenu( ply, ply.MenuSection )
+		Menu_AddLine()
+		
+		if ( back ) then Menu_AddLine( "Back", true, 1 ) end
+		Menu_AddLine( "Exit", false, 10 )
+		
+	Menu_End( ply, function( ply, item )
 	
-	elseif ( item == 10 ) then
+		if ( back && item == 1 ) then
+
+			ply:PlaySound( "buttons/button14.wav" )
+
+			ShowMenu( ply, ply.MenuSection )
+		
+		elseif ( item == 10 ) then
+		
+			ply:PlaySound( "buttons/combine_button7.wav" )
+		
+			Menu_Close( ply )
+		
+		end
 	
-		ply:PlaySound( "buttons/combine_button7.wav" )
-	
-		Menu_Close( ply )
-	
-	end
+	end )
 
 end
 
@@ -183,46 +198,7 @@ local function HandleMenuItem( ply, item )
 
 	if ( item >= 1 && item <= 7 ) then
 	
-		local info = ply.DisplayedPlayersInfo[ item ]
-		
-		local last_played = os.date( "%H:%M:%S - %d/%m/%Y", tonumber( info.lastplayed ) )
-		
-		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "[HvH Rank] Player Info:" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Name: " .. info.name .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "SteamID: " .. info.steamid .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Rank: " .. info.rank .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Points: " .. info.score .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, Format( "KDR: %.2f\n", info.kdr ) )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Kills: " .. info.kills .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Deaths: " .. info.deaths .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Headshots: " .. info.headshots .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Knife Kills: " .. info.knifekills .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Last Played: " .. last_played .. "\n" )
-		ply:PrintMessage( HUD_PRINTCONSOLE, "-------------------------\n" )
-	
-		Menu_Start()
-		
-			Menu_AddLine( "[HvH Rank] Player Info:" )
-			Menu_AddLine( "------------------------------" )
-			Menu_AddLine( "Name: " .. info.name )
-			Menu_AddLine( "SteamID: " .. info.steamid )
-			Menu_AddLine( "Rank: " .. info.rank )
-			Menu_AddLine( "Points: " .. info.score )
-			Menu_AddLine( Format( "KDR: %.2f", info.kdr ) )
-			Menu_AddLine( "Kills: " .. info.kills )
-			Menu_AddLine( "Deaths: " .. info.deaths )
-			Menu_AddLine( "Headshots: " .. info.headshots )
-			Menu_AddLine( "Knife Kills: " .. info.knifekills )
-			Menu_AddLine( "Last Played: " .. last_played )
-
-			Menu_AddLine()
-			
-			Menu_AddLine( "Back", true, 1 )
-			Menu_AddLine( "Exit", false, 10 )
-			
-		Menu_End( ply, HandlePlayerInfoItem )
+		ShowPlayerInfo( ply, ply.DisplayedPlayersInfo[ item ], true )
 		
 		ply:PlaySound( "buttons/button14.wav" )
 
@@ -248,6 +224,15 @@ local function HandleMenuItem( ply, item )
 
 end
 
+local function FillAdditionalInfo( info, rank )
+
+	local kills = tonumber( info.kills )
+	local deaths = tonumber( info.deaths )
+	info.kdr = kills / ( ( deaths != 0 ) && deaths || 1 )
+	info.rank = rank
+
+end
+
 ShowMenu = function( ply, section )
 
 	local result = sql.Query( "SELECT * FROM hvhrank ORDER BY score DESC" )
@@ -269,11 +254,8 @@ ShowMenu = function( ply, section )
 			for i = start_index, end_index do
 			
 				local info = result[ i ]
-				local kills = tonumber( info.kills )
-				local deaths = tonumber( info.deaths )
-				info.kdr = kills / ( ( deaths != 0 ) && deaths || 1 )
-				info.rank = i
-
+			
+				FillAdditionalInfo( info, i )
 				Menu_AddLine( Format( "%s (%s) - KDR: %.2f", info.name, info.score, info.kdr ), true, item )
 				
 				table.insert( ply.DisplayedPlayersInfo, item, info )
@@ -310,6 +292,81 @@ ShowMenu = function( ply, section )
 	
 	end
 	
+end
+
+function Stats_ShowRank( ply, ident )
+
+	local result = sql.Query( "SELECT * FROM hvhrank ORDER BY score DESC" )
+	
+	if ( result ) then
+
+		if ( ident ) then
+		
+			local found = false
+		
+			if ( ident:StartsWith( "STEAM_" ) ) then
+			
+				for rank, row in ipairs( result ) do
+				
+					if ( row.steamid == ident ) then
+					
+						FillAdditionalInfo( row, rank )
+						ShowPlayerInfo( ply, row )
+						
+						found = true
+						break
+					
+					end
+				
+				end
+				
+				if ( !found ) then
+					ply:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] No players with this SteamID found." ) )
+				end
+
+			else
+			
+				ident = ident:lower()
+			
+				for rank, row in ipairs( result ) do
+				
+					if ( row.name:lower():StartsWith( ident ) ) then
+					
+						FillAdditionalInfo( row, rank )
+						ShowPlayerInfo( ply, row )
+						
+						found = true
+						break
+					
+					end
+				
+				end
+				
+				if ( !found ) then
+					ply:ChatPrint( util.ColorizeText( color_white, "[", clr_prefix, "HvH Rank", color_white, "] No player name matches found." ) )
+				end
+
+			end
+		
+		else
+		
+			for rank, row in ipairs( result ) do
+			
+				if ( row.steamid == ply:SteamID() ) then
+				
+					FillAdditionalInfo( row, rank )
+					ShowPlayerInfo( ply, row )
+					
+					break
+				
+				end
+			
+			end
+			
+		end
+		
+	end
+
 end
 
 function Stats_ShowTopPlayers( ply )

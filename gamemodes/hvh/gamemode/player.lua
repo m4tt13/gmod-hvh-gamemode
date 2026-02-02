@@ -434,20 +434,20 @@ function GM:PlayerSay( ply, text, teamonly )
 
 	local hidechat = false
 	local prefix = false
-	local ltext = string.lower( text )
-	
-	if ( ltext[1] == "/" || ltext[1] == "!" ) then
+	local cmd = text:lower()
 
-		if ( ltext[1] == "/" ) then
+	if ( text[1] == "/" || text[1] == "!" ) then
+
+		if ( text[1] == "/" ) then
 			hidechat = true
 		end
 
 		prefix = true
-		ltext = string.sub( ltext, 2 )
-		
+		cmd = cmd:sub( 2 )
+
 	end
 
-	if ( ltext == "nextmap" ) then
+	if ( cmd == "nextmap" ) then
 	
 		local nextmap = nextlevel:GetString()
 		
@@ -457,15 +457,15 @@ function GM:PlayerSay( ply, text, teamonly )
 		
 		PrintMessage( HUD_PRINTTALK, "Next Map: " .. nextmap )
 	
-	elseif ( ltext == "currentmap" ) then
+	elseif ( cmd == "currentmap" ) then
 	
 		PrintMessage( HUD_PRINTTALK, "Current Map: " .. game.GetMap() )
 		
-	elseif ( ltext == "thetime" ) then
+	elseif ( cmd == "thetime" ) then
 	
 		PrintMessage( HUD_PRINTTALK, "Server Time: " .. os.date( "%H:%M:%S - %d/%m/%Y" ) )
 	
-	elseif ( ltext == "timeleft" ) then
+	elseif ( cmd == "timeleft" ) then
 
 		local TimeRemaining = GAMEMODE:GetMapRemainingTime()
 		
@@ -477,52 +477,76 @@ function GM:PlayerSay( ply, text, teamonly )
 			PrintMessage( HUD_PRINTTALK, Format( "Time Remaining:  %d:%2.2d", math.floor( TimeRemaining / 60 ), math.floor( TimeRemaining % 60 ) ) )
 		end
 	
-	elseif ( ltext == "rank" ) then
+	elseif ( cmd:StartsWith( "rank" ) ) then
 		
-		Stats_ShowRank( ply )
+		if ( cmd:len() > 5 ) then
 		
-	elseif ( ltext == "top" || ltext == "top10" ) then
+			if ( cmd[5] == " " ) then
+				Stats_ShowRank( ply, text:sub( prefix && 7 || 6 ) )
+			end
+			
+		elseif ( cmd:len() == 4 ) then
+		
+			Stats_ShowRank( ply )
+			
+		end
+		
+	elseif ( cmd:StartsWith( "stats" ) ) then
+		
+		if ( cmd:len() > 6 ) then
+		
+			if ( cmd[6] == " " ) then
+				Stats_ShowRank( ply, text:sub( prefix && 8 || 7 ) )
+			end
+			
+		elseif ( cmd:len() == 5 ) then
+		
+			Stats_ShowRank( ply )
+			
+		end
+		
+	elseif ( cmd == "top" || cmd == "top10" ) then
 		
 		Stats_ShowTopPlayers( ply )
 		
-	elseif ( ltext == "votemap" ) then
+	elseif ( cmd == "votemap" ) then
 		
 		VoteMap_ShowMenu( ply )
 		
 	elseif ( prefix ) then
 	
-		if ( ltext == "motd" || ltext == "help" ) then
+		if ( cmd == "motd" || cmd == "help" ) then
 	
 			ply:ConCommand( "gm_showhelp" )
 	
-		elseif ( ltext == "guns" ) then
+		elseif ( cmd == "guns" ) then
 	
 			ply:ConCommand( "buymenu" )
 			
-		elseif ( ltext == "team" ) then
+		elseif ( cmd == "team" ) then
 
 			ply:ConCommand( "teammenu" )
 			
-		elseif ( ltext == "t" || ltext == "ter" ) then
+		elseif ( cmd == "t" || cmd == "ter" ) then
 
 			ply:ConCommand( "changeteam " .. TEAM_TERRORIST )
 			
-		elseif ( ltext == "ct" ) then
+		elseif ( cmd == "ct" ) then
 
 			ply:ConCommand( "changeteam " .. TEAM_CT )
 	
-		elseif ( ltext == "spec" || ltext == "spectate" ) then
+		elseif ( cmd == "spec" || cmd == "spectate" ) then
 		
 			ply:ConCommand( "changeteam " .. TEAM_SPECTATOR )
 	
-		elseif ( ltext == "rs" || ltext == "resetscore" ) then
+		elseif ( cmd == "rs" || cmd == "resetscore" ) then
 		
 			ply:SetFrags( 0 )
 			ply:SetDeaths( 0 )
 			
 			PrintMessage( HUD_PRINTTALK, util.ColorizeText( color_white, "[", Color( 90, 200, 180 ), "ResetScore", color_white, "] ", COLOR_NICKNAME, ply:Nick(), color_white, " has reset his score." ) )
 
-		elseif ( !GiveWeapon( ply, ltext, true ) ) then
+		elseif ( !GiveWeapon( ply, cmd, true ) ) then
 		
 			hidechat = false
 		

@@ -128,7 +128,13 @@ function GM:FinishMove( ply, mv )
 				local gain = sv_jump_boost_gain:GetFloat()
 				
 				if ( sv_jump_boost_dynamic:GetBool() ) then
-					gain = gain * ( sv_jump_boost_max_speed:GetFloat() - spd ) / ( sv_jump_boost_max_speed:GetFloat() - sv_jump_boost_min_speed:GetFloat() )
+				
+					if ( sv_jump_boost_dynamic:GetInt() == 1 ) then
+						gain = gain * ( sv_jump_boost_max_speed:GetFloat() - spd ) / ( sv_jump_boost_max_speed:GetFloat() - sv_jump_boost_min_speed:GetFloat() )
+					else
+						gain = gain * spd
+					end
+					
 				end
 				
 				vel.z = 0

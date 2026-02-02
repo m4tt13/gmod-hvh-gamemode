@@ -16,9 +16,9 @@ local function LoadVoteMapList()
 	
 		while ( !f:EndOfFile() ) do
 			
-			local line = string.Trim( f:ReadLine() )
+			local line = f:ReadLine():Trim()
 			
-			if ( line != "" && string.sub( line, 1, 2 ) != "//" && line != game.GetMap() ) then
+			if ( line != "" && line:sub( 1, 2 ) != "//" && line != game.GetMap() ) then
 			
 				if ( file.Exists( "maps/" .. line .. ".bsp", "GAME" ) ) then
 			
